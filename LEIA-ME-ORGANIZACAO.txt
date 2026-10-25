@@ -1,0 +1,23 @@
+ROMMO — projeto organizado
+
+ESTRUTURA
+- rommo-site/: site público, checkout e painel administrativo
+- rommo-site/gestao-6f2a/: arquivos do painel
+- worker/: API/backend
+- migrations/: migrações do D1
+- seed_products.sql: dados iniciais de produtos
+- package.json e wrangler.toml: comandos e configuração
+
+INICIAR LOCALMENTE
+1. Abra o PowerShell nesta pasta (a pasta que contém package.json).
+2. Execute: npm install
+3. Crie .dev.vars na raiz com ADMIN_EMAIL e ADMIN_PASSWORD. Não compartilhe esse arquivo.
+4. Execute migrações e seed LOCALMENTE seguindo o README do projeto.
+5. Execute: npm run dev
+
+SEGURANÇA E VALIDAÇÃO
+- .dev.vars, .wrangler e node_modules foram excluídos intencionalmente.
+- node_modules será recriado por npm install.
+- Este pacote combina o projeto completo com os arquivos do painel recebidos em rommo-painel-correto.zip.
+- Nenhum deploy nem migração remota foi executado.
+- Antes de produção, teste login, pedidos, atualização de status, checkout e /api/health.

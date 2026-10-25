@@ -1,0 +1,42 @@
+/* ROMMO – animações do site (movimento, hover, entrada ao rolar) */
+/* banner principal: texto entra em sequência e a foto dá um zoom lento */
+body:not(.ldg) .sl.on h1{animation:up .9s .15s both cubic-bezier(.2,.8,.2,1)}
+body:not(.ldg) .sl.on p{animation:up .9s .35s both cubic-bezier(.2,.8,.2,1)}
+body:not(.ldg) .sl.on .btn{animation:up .9s .55s both cubic-bezier(.2,.8,.2,1)}
+.sl.on .bg{animation:kb 9s ease-out both}
+@keyframes up{from{opacity:0;transform:translateY(34px)}to{opacity:1;transform:none}}
+@keyframes kb{from{transform:scale(1.14)}to{transform:scale(1)}}
+/* entrada ao rolar a página (classe .rv é colocada pelo JS) */
+.rv{opacity:0;transform:translateY(34px);transition:opacity .75s cubic-bezier(.2,.8,.2,1),transform .75s cubic-bezier(.2,.8,.2,1)}
+.rv.vis{opacity:1;transform:none}
+/* cabeçalho encolhe ao rolar */
+.hd{transition:height .3s}.lgw img{transition:height .3s}
+header.sc .hd{height:62px}header.sc .lgw img{height:36px}
+/* botões */
+.btn{transition:background .2s,transform .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-3px);box-shadow:0 10px 22px #0000003d}.btn:active{transform:scale(.96)}
+.sb button,.arr,.fab,.tabs button,.act>*{transition:transform .2s,background .2s,border-color .2s,color .2s}
+.arr:hover{transform:translateY(-50%) scale(1.12)}.fab:hover{transform:scale(1.1) rotate(-8deg)}
+/* categorias */
+.cat{transition:transform .3s,border-color .3s,color .3s,box-shadow .3s}
+.cat:hover{transform:translateY(-6px);box-shadow:0 12px 22px #00000024}
+.cat .c{transition:background .3s,color .3s,transform .3s}.cat:hover .c{transform:scale(1.08)}
+.cat:hover .c .ic{animation:wig .6s}
+@keyframes wig{20%{transform:rotate(-14deg)}50%{transform:rotate(12deg)}80%{transform:rotate(-6deg)}}
+/* produtos */
+.card{transition:transform .3s,box-shadow .3s,border-color .3s}
+.card:hover{transform:translateY(-7px);box-shadow:0 16px 30px #00000029}
+.pi img{transition:transform .6s cubic-bezier(.2,.8,.2,1)}.card:hover .pi img{transform:scale(1.08)}
+.bd{animation:bd 2.6s ease-in-out infinite}@keyframes bd{50%{transform:scale(1.1)}}
+.pb2{transition:transform .35s,box-shadow .35s}.pb2:hover{transform:translateY(-5px);box-shadow:0 16px 28px #0000003a}
+.pb2 h3{transition:transform .35s}.pb2:hover h3{transform:translateX(8px)}
+nav.m a{transition:color .2s,border-color .2s,background .2s}nav.m a:hover{background:#f2f2ef}
+footer a{transition:color .2s,transform .2s}footer a:hover{transform:translateX(5px)}
+.bn>div,.lj{transition:transform .3s,box-shadow .3s}.bn>div:hover{transform:translateY(-4px);box-shadow:0 10px 20px #0000001f}
+/* botão do WhatsApp aparece com um pulo depois do carregamento */
+body:not(.ldg) .fab{animation:pop .8s .5s both cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+/* carrinho */
+.it{animation:slin .4s both cubic-bezier(.2,.8,.2,1)}@keyframes slin{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+.md.on .ok{animation:pop .55s .1s both cubic-bezier(.3,1.6,.5,1)}
+.md.on h3,.md.on p{animation:up .5s .25s both}

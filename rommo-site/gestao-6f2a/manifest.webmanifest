@@ -1,0 +1,25 @@
+{
+  "name": "ROMMO · Operações",
+  "short_name": "ROMMO",
+  "description": "Painel de operações da loja ROMMO",
+  "start_url": "/gestao-6f2a/",
+  "scope": "/gestao-6f2a/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5f7f4",
+  "theme_color": "#176b35",
+  "icons": [
+    {
+      "src": "/assets/rommo-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/rommo-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

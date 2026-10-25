@@ -1,0 +1,17 @@
+name = "rommo-store"
+main = "worker/index.js"
+compatibility_date = "2026-10-25"
+
+[assets]
+directory = "./rommo-site"
+binding = "ASSETS"
+run_worker_first = ["/api/*"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "rommo-db"
+database_id = "ed21d947-64de-4a0b-aeb8-b73979fca919"
+migrations_dir = "migrations"
+
+[vars]
+STORE_NAME = "ROMMO"

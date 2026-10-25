@@ -1,0 +1,17 @@
+{
+  "name": "rommo-cloudflare",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:migrate": "wrangler d1 migrations apply rommo-db --remote",
+    "db:seed": "wrangler d1 execute rommo-db --remote --file=seed_products.sql"
+  },
+  "devDependencies": {
+    "wrangler": "^4.152.0"
+  },
+  "overrides": {
+    "undici": "7.30.1"
+  }
+}

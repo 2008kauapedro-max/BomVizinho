@@ -1,0 +1,28 @@
+/* ROMMO – telas internas (Sobre, Privacidade, Termos, Como comprar) */
+.btn.sm{padding:9px 16px;font-size:14px}
+body.pgl{overflow:hidden}
+.pgv,.ck{position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto;opacity:0;visibility:hidden;transform:translateY(30px);transition:opacity .35s,transform .35s cubic-bezier(.2,.8,.2,1),visibility 0s .35s}
+.ck{z-index:210}
+.pgv.on,.ck.on{opacity:1;visibility:visible;transform:none;transition:opacity .35s,transform .35s cubic-bezier(.2,.8,.2,1)}
+.pgt{position:sticky;top:0;z-index:5;background:var(--k);box-shadow:0 2px 0 var(--gl)}
+.pgb{display:flex;align-items:center;justify-content:space-between;height:68px}
+.pgb .btn.o{background:transparent;color:#fff;border-color:#555}.pgb .btn.o:hover{background:#ffffff1a}
+.pgh{background:var(--k);color:#fff;padding:44px 0 40px}
+.pgh h1{font-size:clamp(30px,5vw,46px);font-weight:800;line-height:1.05;padding-left:16px;border-left:6px solid var(--gl)}
+.pgh p{color:#b4b4b0;margin:10px 0 0 22px;max-width:620px}
+.pga{max-width:860px;padding:34px 24px 20px}
+.pga h2{font-size:21px;font-weight:800;margin:30px 0 8px}.pga h2:first-child{margin-top:0}
+.pga p,.pga li{color:#3b3b38;margin-bottom:10px;line-height:1.7}.pga ul{padding-left:22px;margin-bottom:10px}
+.pga a{color:var(--g);font-weight:700;text-decoration:underline}
+.pga .meta{color:var(--mu);font-size:13px;margin-bottom:22px}
+.pga .box{background:#fff;border:1px solid var(--ln);border-left:5px solid var(--gl);border-radius:8px;padding:16px 18px;margin:18px 0}
+.pgf{max-width:860px;padding:10px 24px 60px;display:flex;gap:12px;flex-wrap:wrap}
+.pgf .btn.o{border-color:#bdbdb6}
+/* tutorial */
+.stp{display:grid;gap:14px;counter-reset:s;margin:6px 0 24px}
+.stp li{list-style:none;display:grid;grid-template-columns:52px 1fr;gap:16px;background:#fff;border:1px solid var(--ln);border-radius:12px;padding:18px;margin:0;align-items:start}
+.stp li::before{counter-increment:s;content:counter(s);width:52px;height:52px;border-radius:50%;background:var(--k);color:var(--y);font:800 24px Archivo;display:grid;place-items:center}
+.stp b{display:block;font:800 18px Archivo;margin-bottom:3px;color:var(--tx)}.stp span{color:#4a4a46}
+.stp.c{padding:0}
+.sbt{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:8px 0 22px}.sbt div{background:#fff;border:1px solid var(--ln);border-radius:10px;padding:18px}.sbt b{display:block;font:800 17px Archivo}.sbt span{color:var(--mu);font-size:14px}
+@media(max-width:760px){.pgb{height:60px}.pgb .btn span{display:none}.pgh{padding:30px 0 28px}.pga{padding:24px 16px 10px}.pgf{padding:6px 16px 50px}.stp li{grid-template-columns:42px 1fr;gap:12px;padding:14px}.stp li::before{width:42px;height:42px;font-size:20px}.sbt{grid-template-columns:1fr}}

@@ -1,0 +1,32 @@
+ESTRUTURA DO SITE ROMMO
+  index.html          estrutura da página (textos, seções, ícones)
+  css/style.css       cores, layout, cards, responsivo (celular)
+  css/animacoes.css   animações do site (hover, entrada ao rolar, banner)
+  css/loader.css      tela de carregamento (logo animada)
+  css/paginas.css     telas internas (Sobre, Privacidade, Termos, Como comprar)
+  css/checkout.css    tela de finalização (dados, entrega e pagamento)
+  js/data.js          DADOS: WhatsApp, empresa (CNPJ/e-mail), pagamentos, categorias, banners e produtos  <- edite aqui
+  js/app.js           lógica: produtos, carrinho, banner, pedido no WhatsApp
+  js/loader.js        tempo da tela de carregamento (DUR, em milissegundos)
+  js/paginas.js       textos das telas internas + mensagens do WhatsApp (Central e Trocas)
+  js/checkout.js      formulário de finalização e montagem da mensagem do pedido
+  assets/             imagens (lista abaixo)
+Mantenha as pastas css/, js/ e assets/ ao lado do index.html.
+
+LOGO (já incluída, recortada da logo enviada) - pasta assets/logo/
+  quad-1.png ... quad-4.png   os 4 quadradinhos (usados na animação, cabeçalho e rodapé)
+  nome.png                    "ROMMO" (fundo transparente)
+  tagline.png                 linha colorida + "FERRAMENTAS • IRRIGAÇÃO • AGROPECUÁRIA"
+  ../logo.png                 logo redonda completa (ícone da aba do navegador)
+Para trocar por versões melhores (de preferência as originais), substitua os arquivos mantendo os mesmos nomes.
+
+OUTRAS IMAGENS (pasta assets/) - se faltar, o site mostra um visual de reserva e nada quebra
+  fachada.png     Foto da fachada, ~1200x800 px
+  banner-1.jpg, banner-2.jpg, banner-3.jpg   Banners do topo, 1920x600 px
+                  (se a arte já tiver texto, coloque soImagem:true no slide em js/data.js)
+  promo-1.jpg, promo-2.jpg                   Banners médios, 900x420 px
+  categorias/     eletricas.png manuais.png kits.png irrigacao.png agro.png jardim.png construcao.png limpeza.png (300x300, opcional)
+  produtos/       1.png, 2.png, 3.png ... (número = id do produto em js/data.js), 800x800 px
+
+BANNERS: o nome precisa ser exatamente banner-1, banner-2, banner-3 (aceita .jpg .jpeg .png .webp), dentro de assets/, ao lado do index.html.
+O mesmo vale para promo-1, promo-2 e fachada.
