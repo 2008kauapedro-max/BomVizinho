@@ -1,4 +1,4 @@
-/* ROMMO – animações do site (movimento, hover, entrada ao rolar) */
+/* BomVizinho – animações do site (movimento, hover, entrada ao rolar) */
 /* banner principal: texto entra em sequência e a foto dá um zoom lento */
 body:not(.ldg) .sl.on h1{animation:up .9s .15s both cubic-bezier(.2,.8,.2,1)}
 body:not(.ldg) .sl.on p{animation:up .9s .35s both cubic-bezier(.2,.8,.2,1)}

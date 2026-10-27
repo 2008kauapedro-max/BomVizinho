@@ -1,4 +1,4 @@
-/* ROMMO – telas internas (Sobre, Privacidade, Termos, Como comprar) */
+/* BomVizinho – telas internas (Sobre, Privacidade, Termos, Como comprar) */
 .btn.sm{padding:9px 16px;font-size:14px}
 body.pgl{overflow:hidden}
 .pgv,.ck{position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto;opacity:0;visibility:hidden;transform:translateY(30px);transition:opacity .35s,transform .35s cubic-bezier(.2,.8,.2,1),visibility 0s .35s}

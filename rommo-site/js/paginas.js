@@ -1,4 +1,4 @@
-/* ROMMO – telas internas (Sobre, Privacidade, Termos, Como comprar) e links do rodapé que abrem o WhatsApp */
+/* BomVizinho — telas internas (Sobre, Privacidade, Termos, Como comprar) e links do rodapé que abrem o WhatsApp */
 const DATA_ATUAL="outubro de 2026";
 const TITULO=document.title;
 const cnpjTxt=()=>EMPRESA.cnpj?` (CNPJ ${EMPRESA.cnpj})`:"";
@@ -9,7 +9,7 @@ function centralWA(){wa(`Olá! Gostaria de falar com a central de atendimento da
 function trocasWA(){wa(`*TROCA / DEVOLUÇÃO – ${LOJA}*\n━━━━━━━━━━━━━━━\n\nOlá! Preciso de ajuda com uma troca ou devolução.\n\n• Nome: \n• Número do pedido / data da compra: \n• Produto: \n• Motivo: \n\nAguardo o retorno. Obrigado!`)}
 
 const PG={
-sobre:{t:"Sobre a ROMMO",s:"Ferramentas, irrigação e agropecuária com qualidade, atendimento e agilidade.",h:()=>`
+sobre:{t:"Sobre a BomVizinho",s:"Produtos, ferramentas e equipamentos com qualidade, atendimento e agilidade.",h:()=>`
 <h2>Quem somos</h2>
 <p>A ${EMPRESA.nome} é uma loja de ferramentas, irrigação e agropecuária em ${EMPRESA.cidade}. Atendemos profissionais, produtores rurais e quem precisa da ferramenta certa para o dia a dia, com produtos de marcas selecionadas e atendimento direto com a nossa equipe.</p>
 <h2>O que você encontra aqui</h2>

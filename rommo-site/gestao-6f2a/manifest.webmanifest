@@ -1,22 +1,22 @@
 {
-  "name": "ROMMO · Operações",
-  "short_name": "ROMMO",
-  "description": "Painel de operações da loja ROMMO",
+  "name": "BomVizinho · Operações",
+  "short_name": "BomVizinho",
+  "description": "Painel de operações da loja BomVizinho",
   "start_url": "/gestao-6f2a/",
   "scope": "/gestao-6f2a/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#f5f7f4",
-  "theme_color": "#176b35",
+  "theme_color": "#0a76b9",
   "icons": [
     {
-      "src": "/assets/rommo-icon-192.png",
+      "src": "/assets/bomvizinho-icon.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/rommo-icon-512.png",
+      "src": "/assets/bomvizinho-icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"

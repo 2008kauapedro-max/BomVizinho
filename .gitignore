@@ -1,5 +1,39 @@
+﻿# Dependencias e arquivos locais
 node_modules/
 .wrangler/
+.cache/
+dist/
+coverage/
+
+# Segredos e variaveis de ambiente
 .env
+.env.*
+!.env.example
 .dev.vars
+.dev.vars.*
+*.pem
+*.key
+secrets.*
+credentials.*
+
+# Backups e dumps de dados
+backup*.sql
+backup*.json
+*.dump
+*.sqlite
+*.sqlite3
+*.db
+
+# Logs e arquivos do sistema
+*.log
 .DS_Store
+Thumbs.db
+
+# Documentos internos/comerciais - revisar antes de publicar
+/DADOS-COMERCIAIS-BOMVIZINHO.txt
+/README-BOMVIZINHO.md
+
+
+# Estado local do Wrangler
+.wrangler/
+**/.wrangler/

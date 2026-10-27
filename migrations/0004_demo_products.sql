@@ -1,0 +1,1 @@
+﻿-- Produtos de demonstracao nao devem ser inseridos automaticamente no catalogo real.

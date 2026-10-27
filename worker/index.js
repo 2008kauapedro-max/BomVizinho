@@ -12,6 +12,7 @@ async function requireAdmin(req,env){const raw=cookieVal(req,'rommo_session');if
 async function route(req,env){const url=new URL(req.url),path=url.pathname,method=req.method;
  if(method==='OPTIONS')return new Response(null,{status:204,headers:{...corsHeaders,'Access-Control-Allow-Methods':'GET,POST,PATCH,OPTIONS','Access-Control-Allow-Headers':'Content-Type'}});
  if(path==='/api/health'&&method==='GET')return json({ok:true,service:'rommo-api'});
+ if(path==='/api/products'&&method==='GET'){const result=await env.DB.prepare('SELECT id,name,category,description,price_cents,image_url,stock,sku FROM products WHERE active=1 ORDER BY category,name').all();return json({products:result.results||[]})}
  if(path==='/api/orders'&&method==='POST'){
   const p=await body(req);if(!p||typeof p!=='object')return fail('dados_invalidos');
   const name=String(p.customer?.name||'').trim(),phone=String(p.customer?.phone||'').replace(/\D/g,''),email=String(p.customer?.email||'').trim().slice(0,160),customerNote=String(p.customerNote||'').trim().slice(0,1000);
@@ -47,6 +48,24 @@ async function route(req,env){const url=new URL(req.url),path=url.pathname,metho
   }
   const admin=await requireAdmin(req,env);if(!admin)return fail('nao_autorizado',401);
   if(path==='/api/admin/me'&&method==='GET')return json({email:admin.email});
+  if(path==='/api/admin/products'&&method==='GET'){
+   const q=(url.searchParams.get('q')||'').trim().slice(0,100),active=url.searchParams.get('active');let sql='SELECT id,name,category,description,price_cents,image_url,stock,sku,active,updated_at FROM products WHERE 1=1',args=[];
+   if(q){sql+=' AND (name LIKE ? OR category LIKE ? OR sku LIKE ?)';args.push(`%${q}%`,`%${q}%`,`%${q}%`)}if(active==='1'||active==='0'){sql+=' AND active=?';args.push(Number(active))}sql+=' ORDER BY updated_at DESC,id DESC';const r=await env.DB.prepare(sql).bind(...args).all();return json({products:r.results||[]});
+  }
+  if(path==='/api/admin/products'&&method==='POST'){
+   const p=await body(req);if(!p||typeof p!=='object')return fail('dados_invalidos');const name=String(p.name||'').trim().slice(0,160),category=String(p.category||'').trim().slice(0,80),description=String(p.description||'').trim().slice(0,2000),sku=String(p.sku||'').trim().slice(0,60),image=String(p.image_url||'').trim().slice(0,1000),price=Number(p.price_cents),stock=Number(p.stock);
+   if(name.length<2||!category||!Number.isSafeInteger(price)||price<0||!Number.isInteger(stock)||stock<0||stock>1000000|| (image&&!/^https:\/\//i.test(image)&&!/^\/assets\//i.test(image)))return fail('dados_invalidos');
+   try{const r=await env.DB.prepare('INSERT INTO products(name,category,description,price_cents,image_url,stock,sku,active,updated_at) VALUES(?,?,?,?,?,?,?, ?,?)').bind(name,category,description,price,image,stock,sku,p.active===false?0:1,now()).run();return json({ok:true,id:r.meta?.last_row_id},201)}catch(e){if(String(e).includes('UNIQUE'))return fail('sku_duplicado',409);throw e}
+  }
+  const productRoute=path.match(/^\/api\/admin\/products\/(\d+)$/);
+  if(productRoute&&method==='PATCH'){
+   const id=Number(productRoute[1]),p=await body(req);if(!p||typeof p!=='object')return fail('dados_invalidos');const name=String(p.name||'').trim().slice(0,160),category=String(p.category||'').trim().slice(0,80),description=String(p.description||'').trim().slice(0,2000),sku=String(p.sku||'').trim().slice(0,60),image=String(p.image_url||'').trim().slice(0,1000),price=Number(p.price_cents),stock=Number(p.stock),active=p.active===false?0:1;
+   if(name.length<2||!category||!Number.isSafeInteger(price)||price<0||!Number.isInteger(stock)||stock<0||stock>1000000||(image&&!/^https:\/\//i.test(image)&&!/^\/assets\//i.test(image)))return fail('dados_invalidos');
+   try{const r=await env.DB.prepare('UPDATE products SET name=?,category=?,description=?,price_cents=?,image_url=?,stock=?,sku=?,active=?,updated_at=? WHERE id=?').bind(name,category,description,price,image,stock,sku,active,now(),id).run();if(!r.meta?.changes)return fail('nao_encontrado',404);return json({ok:true})}catch(e){if(String(e).includes('UNIQUE'))return fail('sku_duplicado',409);throw e}
+  }
+  if(path==='/api/admin/settings'&&method==='GET'){const r=await env.DB.prepare('SELECT setting_key,setting_value,updated_at FROM store_settings ORDER BY setting_key').all();return json({settings:r.results||[]})}
+  if(path==='/api/admin/settings'&&method==='PUT'){const p=await body(req);if(!p||typeof p.settings!=='object'||Array.isArray(p.settings))return fail('dados_invalidos');const allowed=new Set(['store_name','whatsapp','store_email','instagram','address','delivery_notes','payment_methods']);for(const [k,v] of Object.entries(p.settings)){if(!allowed.has(k)||typeof v!=='string'||v.length>1000)return fail('configuracao_invalida');await env.DB.prepare('INSERT INTO store_settings(setting_key,setting_value,updated_at) VALUES(?,?,?) ON CONFLICT(setting_key) DO UPDATE SET setting_value=excluded.setting_value,updated_at=excluded.updated_at').bind(k,v,now()).run()}return json({ok:true})}
+
   if(path==='/api/admin/orders'&&method==='GET'){
    const status=url.searchParams.get('status')||'',group=url.searchParams.get('group')||'',q=(url.searchParams.get('q')||'').trim().slice(0,100),limit=Math.min(10,Math.max(1,Number(url.searchParams.get('limit')||10)));
    const beforeDate=url.searchParams.get('beforeDate')||'',beforeId=url.searchParams.get('beforeId')||'';

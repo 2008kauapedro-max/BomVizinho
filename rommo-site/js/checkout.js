@@ -1,4 +1,4 @@
-/* ROMMO – checkout: registra pedido na API Cloudflare e abre WhatsApp para continuidade do atendimento. */
+/* BomVizinho – checkout: registra pedido na API Cloudflare e abre WhatsApp para continuidade do atendimento. */
 const ck=document.getElementById("ck"),ckc=document.getElementById("ckc");
 let ckSent=false,ckMsg="";
 const $f=id=>document.getElementById("f-"+id),val=id=>($f(id)?$f(id).value.trim():"");
@@ -31,7 +31,7 @@ function ckDraw(){
  <section class="cks"><h3><span>3</span>Pagamento</h3>
   <div class="ops" id="ops-pag">${PAGAMENTOS.map(p=>`<label class="op"><input type="radio" name="pag" value="${p}"><b>${p}</b></label>`).join("")}</div>
   <div id="trocobox" hidden>${lbl("troco","Precisa de troco? Para quanto?",`type="text" inputmode="decimal" placeholder="Ex.: 200,00"`)}</div>
-  <p class="nota">O pagamento é combinado com a nossa equipe no WhatsApp, junto com o valor do frete.</p>
+  <p class="nota">O valor do frete e as opções de pagamento serão confirmados antes da conclusão da compra. O pagamento ainda não é processado automaticamente pelo site.</p>
   <p id="pagerr" style="color:#c63b32;font-size:13px;font-weight:600;margin-top:8px" hidden>Escolha uma forma de pagamento.</p></section>
  </form>
  <aside class="cksum"><h3>Resumo do pedido</h3><div class="rs">${itens}</div>
@@ -70,7 +70,7 @@ function ckValida(){
 function ckMonta(codigo=""){
  const ent=document.querySelector('#ckf input[name="ent"]:checked').value,casa=ent===ENTREGAS[0].v,pag=document.querySelector('#ckf input[name="pag"]:checked').value;
  const total=totalCarrinho(),qtd=cart.reduce((a,i)=>a+i.q,0);
- const linhas=[`PEDIDO ROMMO ${codigo}`,`Cliente: ${val("nome")}`,`WhatsApp: ${val("tel")}`,`Entrega: ${casa?"Entrega em endereço":"Retirada na loja"}`,`Pagamento: ${pag}`,`Itens: ${qtd} unidade(s) em ${cart.length} produto(s)`,`Produtos: ${brl(total)}`,`Frete: ${casa?"a combinar":"não se aplica (retirada)"}`,"Consulte os dados completos pelo código no painel ROMMO."];
+ const linhas=[`PEDIDO BomVizinho ${codigo}`,`Cliente: ${val("nome")}`,`WhatsApp: ${val("tel")}`,`Entrega: ${casa?"Entrega em endereço":"Retirada na loja"}`,`Pagamento: ${pag}`,`Itens: ${qtd} unidade(s) em ${cart.length} produto(s)`,`Produtos: ${brl(total)}`,`Frete: ${casa?"a combinar":"não se aplica (retirada)"}`,"Consulte os dados completos pelo código no painel BomVizinho."];
  return linhas.filter(Boolean).join("\n");
 }
 let ckBusy=false;
@@ -83,8 +83,8 @@ async function ckEnviar(){
   const payload={idempotencyKey:(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2)),customer:{name:val("nome"),phone:dig(val("tel")),email:val("email")},customerNote:[val("observacao")?`Observação do pedido: ${val("observacao")}`:"",casa&&val("referencia")?`Ponto de referência: ${val("referencia")}`:"",casa&&val("obsentrega")?`Observação da entrega: ${val("obsentrega")}` : ""].filter(Boolean).join("\n").slice(0,1000),delivery:{type:ent,postalCode:dig(val("cep")),street:val("rua"),number:val("num"),complement:val("comp"),district:val("bairro"),city:val("cidade"),state:val("uf")},payment:{method:pag,change:val("troco")},items:cart.map(i=>({productId:i.id,quantity:i.q,unitPriceCents:Math.round(P.find(p=>p.id===i.id).p*100),note:i.obs||""}))};
   const resp=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});let result={};try{result=await resp.json()}catch(e){}
   if(!resp.ok||!result.ok)throw new Error(result.error||'erro_registro');
-  gravaSalvo();ckMsg=ckMonta(`#${result.code}`);if(waTab){waTab.location.href=`https://api.whatsapp.com/send?phone=${WHATS}&text=${encodeURIComponent(ckMsg)}`}else{wa(ckMsg)}ckSent=true;
-  ckc.innerHTML=`<div class="ok2"><div class="ok"><svg class="ic"><use href="#i-ok"/></svg></div><h2>Pedido registrado!</h2><p>Seu pedido <strong>#${esc(result.code)}</strong> foi registrado. O WhatsApp vai abrir para você continuar o atendimento.</p><button class="btn wa" onclick="wa(ckMsg)"><svg class="ic"><use href="#i-wa"/></svg>Abrir WhatsApp novamente</button><button class="btn o" onclick="closeCheckout()">Voltar à loja</button></div>`;ck.scrollTop=0;
+  gravaSalvo();ckMsg=ckMonta(`#${result.code}`);if(WHATS){if(waTab){waTab.location.href=`https://api.whatsapp.com/send?phone=${WHATS}&text=${encodeURIComponent(ckMsg)}`}else{wa(ckMsg)}}else if(waTab){waTab.close()}ckSent=true;
+  ckc.innerHTML=`<div class="ok2"><div class="ok"><svg class="ic"><use href="#i-ok"/></svg></div><h2>Pedido registrado!</h2><p>Seu pedido <strong>#${esc(result.code)}</strong> foi registrado. ${WHATS?"O WhatsApp vai abrir para você continuar o atendimento.":"O pedido foi registrado. O contato oficial da loja ainda precisa ser configurado; guarde o código do pedido."}</p>${WHATS?`<button class="btn wa" onclick="wa(ckMsg)"><svg class="ic"><use href="#i-wa"/></svg>Abrir WhatsApp novamente</button>`:`<p class="nota">Contato oficial pendente de configuração. O código do pedido é a referência para localizar a solicitação.</p>`}<button class="btn o" onclick="closeCheckout()">Voltar à loja</button></div>`;ck.scrollTop=0;
  }catch(e){if(waTab)waTab.close();const msg={dados_invalidos:'Confira os dados e tente novamente.',produto_invalido:'Um produto não está mais disponível. Atualize a página.',preco_desatualizado:'O preço mudou. Atualize a página e tente novamente.',quantidade_invalida:'Confira as quantidades do carrinho.',preco_desatualizado:'O preço mudou. Atualize a página.'}[e.message]||'Não foi possível registrar o pedido agora. Seus dados continuam nesta tela. Tente novamente ou fale com a equipe pelo WhatsApp.';let err=document.getElementById('ck-api-err');if(!err){err=document.createElement('p');err.id='ck-api-err';err.style.cssText='color:#b42318;font-weight:600;margin-top:12px';btn?.insertAdjacentElement('afterend',err)}err.textContent=msg;
  }finally{ckBusy=false;if(btn){btn.disabled=false;btn.innerHTML='<svg class="ic"><use href="#i-wa"/></svg>Registrar pedido e abrir WhatsApp'}}
 }

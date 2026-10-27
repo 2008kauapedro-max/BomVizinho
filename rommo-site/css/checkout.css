@@ -1,4 +1,4 @@
-/* ROMMO – tela de finalização (dados, entrega e pagamento) */
+/* BomVizinho – tela de finalização (dados, entrega e pagamento) */
 .ckh{background:var(--k);color:#fff;padding:30px 0 26px}.ckh h1{font-size:clamp(26px,4vw,38px);font-weight:800;padding-left:14px;border-left:6px solid var(--gl)}.ckh p{color:#b4b4b0;margin:6px 0 0 20px}
 .ckw{display:grid;grid-template-columns:1fr 390px;gap:24px;padding-block:26px 60px;align-items:start}
 .cks{background:#fff;border:1px solid var(--ln);border-radius:12px;padding:22px;margin-bottom:16px}

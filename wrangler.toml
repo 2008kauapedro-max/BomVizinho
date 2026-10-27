@@ -14,4 +14,4 @@ database_id = "ed21d947-64de-4a0b-aeb8-b73979fca919"
 migrations_dir = "migrations"
 
 [vars]
-STORE_NAME = "ROMMO"
+STORE_NAME = "BomVizinho"

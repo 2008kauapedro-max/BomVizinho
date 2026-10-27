@@ -1,4 +1,4 @@
-/* ROMMO – tela de carregamento: a logo se monta na tela (quadradinhos, nome, slogan) */
+/* BomVizinho – tela de carregamento: a logo se monta na tela (quadradinhos, nome, slogan) */
 #ld{position:fixed;inset:0;z-index:999;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(30px,6vh,56px);padding:24px;transition:transform .9s cubic-bezier(.76,0,.24,1),visibility 0s .9s}
 #ld.out{transform:translateY(-100%);visibility:hidden}
 #ld .lm{--w:min(560px,86vw);width:var(--w);display:flex;flex-direction:column;align-items:center;gap:calc(var(--w)*.045)}
@@ -30,3 +30,32 @@ body.ldg{overflow:hidden}
 @keyframes ldsh{0%{transform:translateX(-140%)}55%,100%{transform:translateX(140%)}}
 @keyframes ldq{from{background-position:-70px 0}to{background-position:calc(100% + 70px) 0}}
 @keyframes ldout{to{opacity:0;transform:scale(1.14)}}
+
+/* BomVizinho: loader com logo real, sem os quadrantes da marca anterior */
+#ld{background:linear-gradient(145deg,#eaf8ff,#ffffff 58%,#d7f0ff);color:#06356b}#ld .lm{width:min(400px,76vw);gap:0;padding:18px;background:#fff;border:1px solid #d7eaf6;border-radius:22px;box-shadow:0 22px 70px #06356b12}#ld .brand-loader{display:block;width:100%;height:auto;max-height:220px;object-fit:contain;border-radius:10px;animation:brandPulse 2.6s ease-in-out infinite}#ld .pg{margin-top:8px}#ld .bar2{background:#dcecf7}#ld .bar2 i{background:linear-gradient(90deg,#70c7f2,#06356b)}#ld .inf{color:#06356b}@keyframes brandPulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+
+
+/* BomVizinho — identidade visual revisada da tela de carregamento */
+#ld{
+ background:
+  radial-gradient(ellipse at 18% 18%,rgba(77,183,235,.22),transparent 38%),
+  radial-gradient(ellipse at 85% 82%,rgba(20,105,174,.28),transparent 42%),
+  linear-gradient(135deg,#061b36 0%,#0a315b 52%,#07172d 100%);
+ color:#edf8ff; gap:clamp(22px,4vh,38px);
+}
+#ld::before{
+ content:"";position:absolute;inset:0;pointer-events:none;opacity:.18;
+ background-image:linear-gradient(rgba(139,211,245,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(139,211,245,.16) 1px,transparent 1px);
+ background-size:36px 36px;
+ mask-image:linear-gradient(135deg,#000,transparent 85%);
+}
+#ld .lm{position:relative;width:min(330px,72vw);padding:0;background:transparent;border:0;border-radius:0;box-shadow:none}
+#ld .brand-loader{width:100%;max-height:190px;object-fit:contain;border-radius:16px;box-shadow:0 14px 45px rgba(0,0,0,.2);animation:none}
+#ld .pg{position:relative;width:min(360px,72vw);margin-top:0;opacity:1;animation:none}
+#ld .bar2{height:5px;background:rgba(211,239,255,.18);overflow:hidden}
+#ld .bar2 i{background:linear-gradient(90deg,#56c8f4,#a8e7ff,#3b9bd8);box-shadow:0 0 18px rgba(86,200,244,.4)}
+#ld .bar2 i::after{width:10px;height:10px;margin-top:-5px;background:#eafaff;box-shadow:0 0 0 3px rgba(113,206,247,.18)}
+#ld .bar2 i::before{display:none}
+#ld .inf{color:#d5efff;font-size:11px;letter-spacing:.18em;margin-top:10px}
+#ld.out{transform:translateY(-100%);transition:transform .55s cubic-bezier(.76,0,.24,1),visibility 0s .55s}
+@media(prefers-reduced-motion:reduce){#ld,#ld *{animation:none!important;transition-duration:.01ms!important}}

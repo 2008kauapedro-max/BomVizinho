@@ -1,0 +1,76 @@
+/* BomVizinho — seção "Engenharia em cada detalhe" (vista explodida sincronizada com a rolagem).
+   Tudo com prefixo .eng-* para não interferir no restante do site. */
+.eng{position:relative;background:#041a33;color:#eaf4fc;isolation:isolate;border-top:1px solid #0d3a6e}
+.eng-sticky{position:relative;display:flex;flex-direction:column;min-height:560px;overflow:hidden;
+ background:radial-gradient(62% 60% at 66% 46%,#0e3f75 0%,#093262 36%,#06264a 62%,#041a33 100%)}
+.eng-in{position:relative;flex:1;display:grid;grid-template-columns:minmax(290px,370px) minmax(0,1fr);gap:20px;align-items:center;width:100%;min-height:0}
+.eng-copy{position:relative;z-index:2;padding:28px 0}
+.eng-eyebrow{display:flex;align-items:center;gap:12px;font:700 11px Archivo,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#f8bd26;margin-bottom:20px}
+.eng-eyebrow i{display:block;width:26px;height:2px;background:#f8bd26}
+.eng h2{font:800 clamp(34px,4.1vw,56px)/1.02 Archivo,sans-serif;letter-spacing:-.02em;color:#fff;margin:0 0 16px}
+.eng-copy p{font-size:16px;line-height:1.55;color:#b4cde1;max-width:310px;margin:0 0 26px}
+.btn.eng-cta{background:#f8bd26;color:#1a1100;padding:14px 26px;box-shadow:0 10px 30px rgba(248,189,38,.18)}
+.btn.eng-cta:hover{background:#ffd15d;transform:translateY(-2px)}
+.btn.eng-cta span{font-size:19px;line-height:12px}
+.eng-steps{list-style:none;margin:34px 0 0;padding:0;display:grid;gap:9px;counter-reset:s}
+.eng-steps li{counter-increment:s;display:flex;align-items:center;gap:12px;font:600 11px Archivo,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#5f86a8;transition:color .3s}
+.eng-steps li:before{content:"0" counter(s);color:inherit;opacity:.8}
+.eng-steps li:after{content:"";height:1px;width:22px;background:currentColor;opacity:.5;transition:width .3s}
+.eng-steps li.on{color:#fff}.eng-steps li.on:after{width:44px;background:#f8bd26;opacity:1}
+/* palco */
+.eng-frame{position:relative;align-self:stretch;min-height:380px;overflow:hidden;margin-right:calc(-1 * max(24px, 50vw - 596px));
+ -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 7%);mask-image:linear-gradient(90deg,transparent 0,#000 7%)}
+.eng-scene{position:absolute;left:50%;top:50%;width:min(94%,calc(86vh * 1.39));aspect-ratio:820/590;transform:translate(-50%,-50%)}
+.eng-cam{position:absolute;inset:0;transform-origin:0 0;will-change:transform}
+.eng-poster,.eng-part{position:absolute;display:block;max-width:none;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.eng-poster{left:0;top:0;width:100%;height:100%}
+.eng-part{visibility:hidden;will-change:transform}
+.eng.eng-live .eng-part{visibility:visible}
+.eng.eng-live .eng-poster{opacity:0}
+.eng-floor{position:absolute;left:46%;top:91.6%;width:50%;height:6.4%;border-radius:50%;
+ background:radial-gradient(closest-side,rgba(0,6,16,.62),rgba(0,6,16,.28) 55%,transparent);filter:blur(3px);transform-origin:50% 50%}
+/* rótulos */
+.eng-labels{position:absolute;inset:0;pointer-events:none}
+.eng-lab{position:absolute;left:0;top:0;opacity:0;will-change:transform,opacity;font:600 11px Archivo,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#d9ecfa}
+.eng-lab:before{content:"";position:absolute;left:-3.5px;top:-3.5px;width:7px;height:7px;border-radius:50%;background:#f8bd26;box-shadow:0 0 0 4px rgba(248,189,38,.2)}
+.eng-lab .l{position:absolute;background:rgba(217,236,250,.5)}
+.eng-lab .t{position:absolute;white-space:nowrap}
+.eng-lab .n{display:none}
+.eng-lab[data-dir=up] .l{left:0;top:-36px;width:1px;height:36px}
+.eng-lab[data-dir=up] .t{left:0;top:-42px;transform:translate(calc(-50% - var(--sx,0px)),-100%)}
+.eng-lab[data-dir=left] .l{right:0;top:0;width:36px;height:1px}
+.eng-lab[data-dir=left] .t{right:42px;top:0;transform:translateY(-50%)}
+.eng-lab[data-dir=right] .l{left:0;top:0;width:36px;height:1px}
+.eng-lab[data-dir=right] .t{left:42px;top:0;transform:translateY(-50%)}
+.eng-legend{display:none;list-style:none;margin:0;padding:0}
+.eng-prog{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(112,199,242,.14);z-index:3}
+.eng-prog i{display:block;height:100%;background:#f8bd26;transform-origin:0 50%;transform:scaleX(0)}
+/* modo com rolagem sincronizada (ativado por JS): a seção ganha uma "pista" e o palco fica fixo */
+.eng.eng-scroll{height:var(--eng-track,240vh)}
+.eng.eng-scroll .eng-sticky{position:sticky;top:var(--eng-top,0px);height:calc(100vh - var(--eng-top,0px) - var(--eng-bot,0px));min-height:0}
+@supports(height:100svh){.eng.eng-scroll .eng-sticky{height:calc(100svh - var(--eng-top,0px) - var(--eng-bot,0px))}}
+@media(max-width:900px){
+ .eng-sticky{min-height:0}
+ .eng-in{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;gap:0;padding:0 18px}
+ .eng-copy{padding:20px 0 6px}
+ .eng-eyebrow{margin-bottom:10px;font-size:10px}
+ .eng h2{font-size:28px;margin-bottom:8px}
+ .eng-copy p{font-size:14px;max-width:none;margin:0 0 14px}
+ .eng-steps{display:none}
+ .btn.eng-cta{width:100%;padding:12px 20px}
+ .eng-frame{min-height:0;margin:0 -18px;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 7%,#000 93%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 7%,#000 93%,transparent 100%)}
+ .eng-scene{width:94%}
+ .eng-lab{letter-spacing:0}
+ .eng-lab:before,.eng-lab .l,.eng-lab .t{display:none}
+ .eng-lab .n{display:grid;place-items:center;position:absolute;left:-10px;top:-10px;width:20px;height:20px;border-radius:50%;background:#f8bd26;color:#1a1100;font:800 11px Archivo,sans-serif}
+ .eng-legend{opacity:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 10px;padding:8px 66px 14px 0;font:600 10.5px Archivo,sans-serif;color:#b4cde1;transition:opacity .3s}
+ .eng-legend li{display:flex;align-items:center;gap:6px;white-space:nowrap}
+ .eng-legend b{display:grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#f8bd26;color:#1a1100;font-size:10px}
+}
+/* sem animação: composição estática, sem pista de rolagem */
+@media(prefers-reduced-motion:reduce){
+ .eng.eng-scroll{height:auto}
+ .eng.eng-scroll .eng-sticky{position:relative;top:auto;height:auto;min-height:560px}
+ .eng-prog{display:none}
+}
+@media(prefers-reduced-motion:reduce) and (max-width:900px){.eng.eng-scroll .eng-sticky{min-height:0}.eng-frame{height:340px}}
