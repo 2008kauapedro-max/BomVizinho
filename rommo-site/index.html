@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#72c8f2">
 <link rel="icon" type="image/png" href="assets/bomvizinho-icon.png"><link rel="apple-touch-icon" href="assets/bomvizinho-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=mobile-polish-2">
+<link rel="stylesheet" href="css/style.css?v=mobile-polish-3">
 <link rel="stylesheet" href="css/animacoes.css?v=5">
 <link rel="stylesheet" href="css/loader.css?v=6">
 <link rel="stylesheet" href="css/paginas.css?v=5">
@@ -43,7 +43,7 @@
 
 <div class="tb"><div class="w"><span><svg class="ic"><use href="#i-wa"/></svg>Atendimento próximo e confiável</span><span><svg class="ic"><use href="#i-pin"/></svg>Consulte opções de entrega para seu CEP</span></div></div>
 <header><div class="hs"><div class="hd">
- <a href="#" class="lk header-brand" aria-label="BomVizinho"><img class="header-brand-icon" src="assets/bomvizinho-icon-blue.png" alt=""><span class="header-brand-name">BomVizinho</span></a>
+ <a href="#" class="lk header-brand" aria-label="BomVizinho"><img class="header-brand-icon" src="assets/bomvizinho-icon.png" alt=""><span class="header-brand-name">BomVizinho</span></a>
  <form class="sb" onsubmit="return false"><input id="q" type="search" placeholder="Busque por produtos, marcas ou categorias" aria-label="Buscar"><button aria-label="Buscar"><svg class="ic"><use href="#i-search"/></svg></button></form>
  <div class="act"><a href="#" class="hide" onclick="wa('Olá! Preciso de atendimento da BomVizinho.');return false"><svg class="ic"><use href="#i-headset"/></svg><span>Atendimento<b>(61) 9594-4857</b></span></a>
  <button class="cb" onclick="openCart()" aria-label="Carrinho"><svg class="ic"><use href="#i-cart"/></svg><span class="cnt" id="cnt">0</span></button></div>
@@ -67,7 +67,7 @@
 <div class="cta"><div class="w"><h2>Precisa de ajuda para escolher?</h2><p>Fale direto com nossa equipe e receba atendimento personalizado.</p><a href="#" class="btn wa" onclick="wa('Olá! Preciso de ajuda para escolher um produto na BomVizinho.');return false"><svg class="ic"><use href="#i-wa"/></svg>Chamar no WhatsApp</a></div></div>
 <div class="tape"></div>
 <footer><div class="w"><div class="fg">
- <div><a href="#" class="lk footer-brand" aria-label="BomVizinho"><img class="footer-brand-icon" src="assets/bomvizinho-icon-blue.png" alt=""><span><strong>BomVizinho</strong><small>FERRAGISTA</small></span></a><p style="max-width:300px;font-size:14px">Produtos, ferramentas e equipamentos para diferentes necessidades. Qualidade e confiança, sempre com você.</p></div>
+ <div><a href="#" class="lk footer-brand" aria-label="BomVizinho"><img class="footer-brand-icon" src="assets/bomvizinho-icon.png" alt=""><span><strong>BomVizinho</strong></span></a><p style="max-width:300px;font-size:14px">Produtos, ferramentas e equipamentos para diferentes necessidades. Qualidade e confiança, sempre com você.</p></div>
  <div><h4>Institucional</h4><a href="#/sobre">Sobre a BomVizinho</a><a href="privacidade.html">Política de privacidade</a><a href="termos.html">Termos de uso</a></div>
  <div><h4>Ajuda</h4><a href="#" onclick="centralWA();return false">Central de atendimento</a><a href="#" onclick="trocasWA();return false">Trocas e devoluções</a><a href="#/como-comprar">Como comprar</a></div>
  <div><h4>Contato</h4><span class="r"><svg class="ic"><use href="#i-pin"/></svg>Atendimento para todo o Brasil</span><span class="r"><svg class="ic"><use href="#i-headset"/></svg>(61) 9594-4857</span><span class="r"><svg class="ic"><use href="#i-mail"/></svg>bomvizinhobve@gmail.com</span><a class="r" href="https://www.instagram.com/bomvizinho.bve/" target="_blank" rel="noopener noreferrer"><svg class="ic"><use href="#i-insta"/></svg>@bomvizinho.bve</a><a class="r" href="https://lista.mercadolivre.com.br/_CustId_73439697?item_id=MLB4986520416&category_id=MLB253383&seller_id=73439697" target="_blank" rel="noopener noreferrer">Loja 1 no Mercado Livre ↗</a><a class="r" href="https://lista.mercadolivre.com.br/_CustId_1686836728?item_id=MLB3894453987&category_id=MLB269955&seller_id=1686836728" target="_blank" rel="noopener noreferrer">Loja 2 no Mercado Livre ↗</a><a class="r" href="https://wa.me/message/PHDJFZKTDJ2AD1" target="_blank" rel="noopener noreferrer">Catálogo no WhatsApp ↗</a></div>
@@ -80,8 +80,8 @@
 <div class="df"><div class="tot"><span>Total</span><b id="tt">R$ 0,00</b></div><button class="btn" id="snd" onclick="openCheckout()">Continuar para entrega e pagamento<svg class="ic"><use href="#i-r"/></svg></button></div></aside>
 <div class="md" id="md" role="dialog" aria-modal="true"><div class="ok"><svg class="ic"><use href="#i-ok"/></svg></div><h3>Adicionado ao carrinho</h3><p id="mn"></p><button class="btn" onclick="closeAll();openCart()">Ir para o carrinho</button><button class="btn o" onclick="closeAll()">Continuar comprando</button></div>
 
-<div id="pgv" class="pgv" aria-hidden="true"><div class="pgt"><div class="w pgb"><a href="#" class="lk checkout-brand" onclick="fechaPg();return false" aria-label="BomVizinho"><img class="checkout-brand-icon" src="assets/bomvizinho-icon-blue.png" alt=""><span>BomVizinho</span></a><button class="btn o sm" onclick="fechaPg()"><svg class="ic"><use href="#i-l"/></svg>Voltar à loja</button></div></div><div id="pgc"></div></div>
-<div id="ck" class="ck" aria-hidden="true"><div class="pgt"><div class="w pgb"><a href="#" class="lk checkout-brand" onclick="closeCheckout();return false" aria-label="BomVizinho"><img class="checkout-brand-icon" src="assets/bomvizinho-icon-blue.png" alt=""><span>BomVizinho</span></a><button class="btn o sm" onclick="backToCart()"><svg class="ic"><use href="#i-l"/></svg>Voltar ao carrinho</button></div></div><div id="ckc"></div></div>
+<div id="pgv" class="pgv" aria-hidden="true"><div class="pgt"><div class="w pgb"><a href="#" class="lk checkout-brand" onclick="fechaPg();return false" aria-label="BomVizinho"><img class="checkout-brand-icon" src="assets/bomvizinho-icon.png" alt=""><span>BomVizinho</span></a><button class="btn o sm" onclick="fechaPg()"><svg class="ic"><use href="#i-l"/></svg>Voltar à loja</button></div></div><div id="pgc"></div></div>
+<div id="ck" class="ck" aria-hidden="true"><div class="pgt"><div class="w pgb"><a href="#" class="lk checkout-brand" onclick="closeCheckout();return false" aria-label="BomVizinho"><img class="checkout-brand-icon" src="assets/bomvizinho-icon.png" alt=""><span>BomVizinho</span></a><button class="btn o sm" onclick="backToCart()"><svg class="ic"><use href="#i-l"/></svg>Voltar ao carrinho</button></div></div><div id="ckc"></div></div>
 <section class="product-detail" id="productDetail" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="detailTitle"><div class="detail-top"><button class="detail-back" onclick="closeProduct()" aria-label="Voltar ao catálogo">← <span>Voltar à loja</span></button><span class="detail-breadcrumb">BomVizinho / Produto</span></div><div class="detail-content" id="detailContent"></div></section>
 <script src="js/data.js?v=catalog-sync-1"></script>
 <script src="js/app.js?v=catalog-sync-1"></script>

@@ -1,4 +1,4 @@
-﻿/* BomVizinho â€” design system responsivo */
+/* BomVizinho â€” design system responsivo */
 
 :root{--bg:#f5fbff;--card:#fff;--tx:#102b4d;--mu:#5f7185;--ln:#dceaf4;--k:#08396d;--g:#0a76b9;--gl:#70c7f2;--y:#f4a62a;--b:#1764a5;--blue-deep:#06356b;--blue-light:#70c7f2}
 *{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth;scroll-padding-top:130px}
@@ -588,4 +588,180 @@ footer a,footer .r{overflow-wrap:anywhere}
  .hero .sl .bg{background-size:auto 42%!important}
  footer .fg{gap:22px 12px!important}
  .footer-brand strong{font-size:22px}
+}
+
+
+/* ACABAMENTO MOBILE — logo limpa, cabeçalho estável, banners e preços */
+header .header-brand-icon,
+footer .footer-brand-icon{object-fit:contain;background:transparent!important;border:0!important;outline:0!important;box-shadow:none!important;border-radius:0!important}
+header.sc .header-brand-icon{width:42px!important;height:42px!important}
+header.sc .header-brand-name{font-size:clamp(19px,1.7vw,25px)!important}
+.footer-brand small{display:none!important}
+.footer-brand strong{font-family:Archivo,sans-serif;font-size:23px;line-height:1;font-weight:850;letter-spacing:-.045em;color:#fff}
+
+/* Ofertas: contraste de verdade no fundo claro */
+.band{background:linear-gradient(180deg,#f4f9fd 0%,#e8f2f9 100%)!important;border-top:1px solid #dceaf4;border-bottom:1px solid #dceaf4}
+.band .sh h2{color:#082f59!important;border-color:#f4a62a!important}
+.band .sh a{color:#07558d!important;text-decoration:none!important;background:#fff;border:1px solid #c8dfef;border-radius:8px;padding:9px 13px;font-weight:800;white-space:nowrap}
+.band .sh a:hover{background:#e8f6ff;border-color:#70c7f2}
+
+/* Banners promocionais: transparência real da imagem sobre o gradiente */
+.pb2{background-color:transparent;background-position:right center;background-size:cover;background-repeat:no-repeat}
+.pb2::before{background:linear-gradient(90deg,rgba(2,14,12,.88) 0%,rgba(2,22,16,.64) 42%,rgba(0,0,0,.08) 100%);z-index:1;pointer-events:none}
+.pb2>*{z-index:2}
+.pb2 h3{max-width:48%;text-wrap:balance;text-shadow:0 2px 12px rgba(0,0,0,.25)}
+.pb2 .btn{box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.pb2:nth-child(2)::before{background:linear-gradient(90deg,rgba(3,20,42,.9) 0%,rgba(3,31,61,.68) 42%,rgba(3,31,61,.05) 100%)}
+
+/* Hero: o banner contém somente a foto do produto; manter o texto livre à esquerda */
+.hero{overflow:hidden;isolation:isolate}
+.hero .sl{overflow:hidden;contain:layout paint}
+.hero .sl .bg{background-position:right center!important;background-size:auto 100%!important;background-repeat:no-repeat!important}
+.hero .sl::before{background:linear-gradient(90deg,rgba(3,24,45,.96) 0%,rgba(3,24,45,.82) 37%,rgba(3,24,45,.35) 65%,rgba(3,24,45,.08) 100%)!important}
+
+/* Valores: hierarquia tipográfica consistente entre R$ e preço */
+.pr{display:flex;align-items:baseline;gap:4px;white-space:nowrap;font-size:clamp(17px,2vw,23px);font-weight:850;line-height:1.15;letter-spacing:-.025em;color:#073765;font-variant-numeric:tabular-nums}
+.pr small{font-size:.58em!important;line-height:1;font-weight:800!important;letter-spacing:0;margin:0!important;color:#07558d;flex:none}
+.old{font-variant-numeric:tabular-nums}
+
+/* WhatsApp flutuante deve se destacar sem virar um disco preto */
+.fab{background:#12a86b!important;color:#fff!important;border:2px solid rgba(255,255,255,.88)!important;box-shadow:0 8px 24px rgba(5,54,75,.24)!important}
+.fab .ic{color:#fff!important}
+
+@media(max-width:760px){
+  /* Evita o salto do cabeçalho quando a classe de scroll muda */
+  header{position:sticky;top:0;transform:translateZ(0);backface-visibility:hidden;will-change:auto}
+  header .hd{height:62px!important;min-height:62px!important;transition:none!important}
+  header .header-brand-icon,header.sc .header-brand-icon{width:36px!important;height:36px!important}
+  header .header-brand-name,header.sc .header-brand-name{font-size:19px!important}
+  .hero{height:535px!important}
+  .hero .sl{align-items:flex-start!important}
+  .hero .sl .bg{width:100%!important;height:100%!important;background-size:auto 43%!important;background-position:right bottom!important;opacity:1!important}
+  .hero .sl::before{background:linear-gradient(180deg,rgba(3,24,45,.98) 0%,rgba(3,24,45,.96) 45%,rgba(3,24,45,.45) 72%,rgba(3,24,45,.08) 100%)!important}
+  .hero .sl .w{width:calc(100% - 36px)!important;padding:30px 0 0!important;margin:0 auto!important}
+  .hero .sl h1{font-size:clamp(34px,9vw,45px)!important;max-width:100%!important;line-height:1.02!important}
+  .hero .sl p{font-size:15px!important;line-height:1.55!important;max-width:94%!important;margin:14px 0 17px!important}
+  .hero .sl .hero-cta{padding:12px 16px!important;gap:18px!important}
+  .hero .sl .hero-proof{font-size:11px!important;margin-top:13px!important}
+  .band{padding:24px 0 28px!important}
+  .band .w{padding-top:0!important;padding-bottom:0!important}
+  .band .sh{align-items:center!important;gap:12px!important;margin-bottom:16px!important}
+  .band .sh h2{font-size:clamp(19px,5.2vw,23px)!important;line-height:1.15!important;max-width:60%;padding-left:10px!important;border-left-width:4px!important}
+  .band .sh a{font-size:11px!important;padding:8px 9px!important;white-space:normal!important;text-align:center;max-width:42%;line-height:1.25}
+  .pb2{height:190px!important;padding:0 18px!important;background-size:auto 100%!important;background-position:right center!important}
+  .pb2 h3{font-size:clamp(20px,5.4vw,25px)!important;max-width:56%!important;line-height:1.05!important}
+  .pm{gap:14px!important}
+  .pr{font-size:clamp(16px,4.5vw,20px)!important;gap:3px!important}
+  .pr small{font-size:11px!important}
+  .fab{background:#12a86b!important}
+  footer .fg{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:24px 18px!important}
+  footer .fg>div:first-child{grid-column:1/-1!important}
+}
+@media(max-width:390px){
+ .hero{height:520px!important}
+ .hero .sl .bg{background-size:auto 38%!important;background-position:right bottom!important}
+ .hero .sl .w{padding-top:25px!important}
+ .hero .sl h1{font-size:34px!important}
+ .pb2{height:174px!important;padding:0 14px!important}
+ .pb2 h3{font-size:20px!important;max-width:59%!important}
+ .band .sh h2{font-size:19px!important}
+}
+
+/* === BOMVIZINHO / POLIMENTO VISUAL — cards clean com microinterações === */
+:root{
+ --accent:#ffb51b;
+ --accent-strong:#f29b08;
+ --accent-soft:#fff3d4;
+ --fresh:#0c9b72;
+ --fresh-soft:#e7f7f1;
+ --surface:#ffffff;
+ --surface-tint:#f5faff;
+ --ink:#102e50;
+ --muted:#60758c;
+ --line:#d8e6f1;
+}
+
+/* Cards de produto: aparência editorial, preço com hierarquia e ações bem agrupadas */
+.card{
+ position:relative;
+ display:flex;
+ flex-direction:column;
+ min-width:0;
+ border:1px solid rgba(178,205,225,.78)!important;
+ border-radius:18px!important;
+ background:linear-gradient(155deg,#fff 0%,#fbfdff 72%,#f1f8fd 100%)!important;
+ box-shadow:0 5px 16px rgba(7,42,78,.055),0 1px 2px rgba(7,42,78,.035)!important;
+ overflow:hidden;
+ transition:transform .24s cubic-bezier(.2,.75,.25,1),box-shadow .24s ease,border-color .24s ease!important;
+}
+.card::before{
+ content:"";position:absolute;left:18px;right:18px;top:0;height:3px;border-radius:0 0 5px 5px;
+ background:linear-gradient(90deg,var(--accent),#ffd978 55%,rgba(255,217,120,0));opacity:.85;z-index:2;
+}
+.card:hover,.card:focus-within{
+ transform:translateY(-4px)!important;
+ border-color:#a9cfe8!important;
+ box-shadow:0 15px 32px rgba(7,42,78,.11),0 3px 8px rgba(7,42,78,.04)!important;
+}
+.product-visual-wrap{position:relative;background:linear-gradient(145deg,#fff 0%,#f4f9fd 100%)!important;border-bottom:1px solid #e8f0f6;overflow:hidden}
+.product-visual-wrap::after{content:"";position:absolute;inset:auto 12% 0;height:1px;background:linear-gradient(90deg,transparent,rgba(89,164,208,.3),transparent);pointer-events:none}
+.pi{background:transparent!important;overflow:hidden}
+.pi img{transition:transform .32s cubic-bezier(.2,.75,.25,1),filter .32s ease;mix-blend-mode:multiply}
+.card:hover .pi img{transform:scale(1.045);filter:saturate(1.04)}
+.pb{display:flex;flex:1;flex-direction:column;gap:7px;padding:13px 14px 14px!important;min-width:0}
+.pb>small{display:inline-flex;align-items:center;align-self:flex-start;max-width:100%;padding:4px 8px;border-radius:6px;background:#e9f5fc;color:#176a9d!important;font-size:10px!important;line-height:1.2;font-weight:800;letter-spacing:.035em;text-transform:uppercase}
+.product-title{color:#173956!important;font-size:clamp(13px,1.05vw,15px)!important;line-height:1.38!important;letter-spacing:-.015em!important;font-weight:750!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.76em;margin:0!important;cursor:pointer}
+.product-title:hover{color:#0877b8!important}
+.st{min-height:17px;color:#7a8da0;font-size:11px}
+.old{font-size:11px!important;color:#8293a3!important;min-height:14px}
+.pr{margin-top:auto;padding-top:7px;border-top:1px solid #edf2f7;color:#092f58!important;font-size:clamp(17px,1.45vw,21px)!important;font-weight:850!important;letter-spacing:-.035em!important}
+.pr small{color:#397ba5!important;font-size:11px!important;font-weight:800!important;letter-spacing:0!important}
+.bt{display:grid;grid-template-columns:1fr;gap:7px;margin-top:5px}
+.bt .btn{min-height:38px;border-radius:9px!important;font-size:12px!important;font-weight:800!important;box-shadow:none!important;transition:transform .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease!important}
+.bt .btn:first-child{background:linear-gradient(180deg,#0b6fb0,#07578f)!important;border:1px solid #07578f!important;color:#fff!important;box-shadow:0 4px 10px rgba(7,93,151,.14)!important}
+.bt .btn:first-child:hover{background:linear-gradient(180deg,#1284c9,#08649f)!important;box-shadow:0 7px 15px rgba(7,93,151,.2)!important;transform:translateY(-1px)}
+.bt .btn.ol{background:#fff!important;border:1px solid #c9deed!important;color:#174e78!important}
+.bt .btn.ol:hover{background:#eef8fe!important;border-color:#8dc6e7!important;transform:translateY(-1px)}
+.bd{border-radius:8px!important;box-shadow:0 3px 9px rgba(6,30,55,.12);font-weight:850!important}
+
+/* Categorias: pequenas superfícies brancas, contorno leve e ícone destacado */
+.cat{border-radius:16px!important;background:linear-gradient(160deg,#fff,#f4f9fd)!important;border:1px solid #d5e5f1!important;box-shadow:0 5px 15px rgba(7,42,78,.045)!important;color:#173956!important;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease!important}
+.cat .c{border-radius:13px!important;background:linear-gradient(145deg,#edf8ff,#fff)!important}
+.cat:hover,.cat:focus-visible{transform:translateY(-3px)!important;border-color:#91cce9!important;box-shadow:0 10px 22px rgba(7,42,78,.09)!important}
+.cat.on,.cat.active{border-color:#6ec6ed!important;background:linear-gradient(160deg,#fff,#eaf7ff)!important}
+
+/* Cabeçalhos de seção e filtros com acentos mais vivos, sem poluir a página */
+.sh{gap:14px}
+.sh h2{color:#10375d!important}
+.sh h2::before{background:linear-gradient(180deg,#ffbf35,#f39a08)!important;box-shadow:0 0 0 4px rgba(255,181,27,.13)!important}
+#tabs button{border:1px solid #d4e3ef!important;border-radius:9px!important;background:#fff!important;color:#31516e!important;font-weight:700!important;transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease!important}
+#tabs button:hover{border-color:#83c6e8!important;background:#f0f9ff!important;transform:translateY(-1px)}
+#tabs button.on{background:#0a477e!important;border-color:#0a477e!important;color:#fff!important;box-shadow:0 4px 10px rgba(10,71,126,.16)!important}
+
+/* Banners promocionais: cores ricas, texto com respiro e botão amarelo de ação */
+.pb2{border:1px solid rgba(255,255,255,.2);box-shadow:0 10px 25px rgba(5,31,57,.11);transition:transform .24s ease,box-shadow .24s ease}
+.pb2:hover{transform:translateY(-3px);box-shadow:0 16px 32px rgba(5,31,57,.16)}
+.pb2 .btn{background:linear-gradient(180deg,#ffc13c,#f5a20b)!important;color:#102e50!important;border:1px solid rgba(255,255,255,.28)!important;border-radius:9px!important;font-weight:850!important;box-shadow:0 5px 13px rgba(0,0,0,.16)!important}
+.pb2 .btn:hover{background:linear-gradient(180deg,#ffd16b,#ffb31b)!important;transform:translateY(-1px)}
+
+/* Foco visível e movimento suave sem animações exageradas */
+:where(button,a,[role="button"],.product-title):focus-visible{outline:3px solid rgba(39,166,222,.65)!important;outline-offset:3px}
+@media(prefers-reduced-motion:no-preference){
+ .card,.cat,.pb2{animation:cardArrive .42s both;animation-timing-function:cubic-bezier(.2,.75,.25,1)}
+ .grid .card:nth-child(2),.pm .card:nth-child(2){animation-delay:35ms}
+ .grid .card:nth-child(3),.pm .card:nth-child(3){animation-delay:70ms}
+ .grid .card:nth-child(4),.pm .card:nth-child(4){animation-delay:105ms}
+}
+@keyframes cardArrive{from{opacity:.82;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.card,.cat,.pb2{animation:none!important;transition:none!important}}
+@media(max-width:760px){
+ .card{border-radius:14px!important}
+ .pb{padding:10px 10px 11px!important;gap:6px}
+ .pb>small{font-size:9px!important;padding:4px 6px}
+ .product-title{font-size:12px!important;line-height:1.35!important}
+ .pr{font-size:17px!important;padding-top:6px}
+ .bt{gap:6px}
+ .bt .btn{min-height:35px;font-size:11px!important;padding:8px 7px!important}
+ .cat{border-radius:13px!important}
+ .pb2{border-radius:15px!important}
 }

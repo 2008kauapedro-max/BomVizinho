@@ -37,3 +37,23 @@ Thumbs.db
 # Estado local do Wrangler
 .wrangler/
 **/.wrangler/
+
+# Documentação interna e relatórios de desenvolvimento
+/ATUALIZACAO-SEM-EMOJIS.txt
+/GUIA-APRESENTACAO-ROMMO.md
+/INSTRUCOES-PAINEL.txt
+/LEIA-ME-ORGANIZACAO.txt
+/README-CLOUDFLARE.md
+/README-ESTRUTURA.txt
+/painel-atual.txt
+/ENGENHARIA-LEIA-ME.txt
+/ENTREGA-IMPLEMENTACOES.md
+/IMPLEMENTACAO-CHECKOUT-PAINEL.md
+/PLANO-IMPLEMENTACAO-BOMVIZINHO.md
+/PROXIMOS-PASSOS-CATALOGO.txt
+/REVISAO-FINAL-27-10.md
+/REVISAO-ULTIMA-RODADA.md
+
+# Cópias antigas e arquivos de desenvolvimento
+/rommo-painel-correto.zip
+/BomVizinho-Projeto-Preparado/

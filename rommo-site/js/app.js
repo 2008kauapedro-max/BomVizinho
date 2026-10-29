@@ -15,7 +15,7 @@ const pct=p=>p.o?Math.round((1-p.p/p.o)*100):0;
 /* imagens: aceita .jpg .jpeg .png .webp (testa uma por uma) */
 const EXTS=[".jpg",".jpeg",".png",".webp"];
 function achaImg(src,cb){const base=src.replace(/\.(jpe?g|png|webp)$/i,""),l=[src,...EXTS.map(e=>base+e)];(function t(i){if(i>=l.length)return;const im=new Image();im.onload=()=>cb(l[i]);im.onerror=()=>t(i+1);im.src=l[i]})(0)}
-function aplicaImgs(){document.querySelectorAll("[data-img]").forEach(el=>{achaImg(el.dataset.img,u=>{el.style.backgroundImage=`url("${u}")`+(el.dataset.fb?","+el.dataset.fb:"");el.classList.add("carregou")})})}
+function aplicaImgs(){document.querySelectorAll("[data-img]").forEach(el=>{achaImg(el.dataset.img,u=>{el.style.backgroundImage=`url("${u}")`;el.classList.add("carregou")})})}
 function imgErr(el){const b=el.dataset.b;if(!b){el.remove();return}const L=[".png",".jpg",".jpeg",".webp"],n=(+el.dataset.n||0)+1;if(n>=L.length){el.remove();return}el.dataset.n=n;el.src=b+L[n]}
 const productImageFor=p=>{
  const s=String(p.n||"").toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g,"");

@@ -1,7 +1,0 @@
-ROMMO — Atualização visual sem emojis
-
-- Ícones do painel e da área de instalação substituídos por símbolos tipográficos.
-- Mensagem do checkout/WhatsApp usa rótulos textuais em vez de emojis.
-- Cache do service worker atualizado para v4.
-
-Após substituir os arquivos no projeto local, execute npm run dev e faça Ctrl+F5 no navegador. Esta alteração visual não implementa nem valida recursos adicionais.
