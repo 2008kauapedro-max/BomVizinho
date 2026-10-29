@@ -539,3 +539,53 @@ header .header-brand-icon{display:block;width:42px;height:42px;object-fit:contai
 header .header-brand-name{font-family:inherit;font-size:clamp(19px,1.7vw,25px);font-weight:850;letter-spacing:-.055em;color:#073765;line-height:1}
 header.sc .header-brand-icon{width:34px;height:34px}
 @media(max-width:760px){header .header-brand-icon{width:34px;height:34px}header .header-brand-name{font-size:18px}header .lk.header-brand{gap:6px}}
+
+/* ACABAMENTO RESPONSIVO FINAL — cabeçalho estável, hero enquadrada e rodapé organizado */
+header{position:sticky;top:0;z-index:80;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;transform:translateZ(0);-webkit-transform:translateZ(0);will-change:auto;contain:paint}
+.hs{overflow:visible}
+.hero{isolation:isolate;overflow:hidden;scroll-margin-top:0}
+.hero .sl{min-height:100%;align-items:center}
+.hero .sl .w{align-self:center}
+.hero .sl .bg{background-repeat:no-repeat!important;background-position:right center!important}
+.footer-brand{display:inline-flex;gap:11px;align-items:center;margin:0 0 16px!important;color:#fff}
+.footer-brand-icon{display:block!important;width:44px!important;height:44px!important;object-fit:contain;background:transparent!important;border-radius:0!important}
+.footer-brand strong{display:block;font:800 25px/1 Archivo,sans-serif;color:#fff;letter-spacing:-.04em}
+.footer-brand small{display:block;margin-top:4px;font-size:9px;letter-spacing:.18em;font-weight:800;color:#8fdcff}
+footer .fg>div:first-child p{color:#b9cce0;line-height:1.65}
+footer .fg>div:not(:first-child){min-width:0}
+footer h4{font-size:14px;letter-spacing:.02em}
+footer a,footer .r{overflow-wrap:anywhere}
+@media(max-width:760px){
+  header{position:sticky;top:0;z-index:80;box-shadow:0 3px 12px rgba(6,43,85,.09)}
+  .hs{overflow:visible}
+  .hd{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:10px 14px!important}
+  header .lk.header-brand{min-width:0;gap:7px}
+  header .header-brand-icon{width:32px!important;height:32px!important;object-fit:contain}
+  header .header-brand-name{font-size:18px!important;white-space:nowrap}
+  .act{grid-column:2;grid-row:1;margin:0}
+  .sb{grid-column:1/-1;grid-row:2;order:initial;width:100%;min-width:0;margin:0;height:42px}
+  .hero{height:auto!important;min-height:610px!important;max-height:none!important}
+  .hero .sl{align-items:flex-start!important;padding-top:0!important;padding-bottom:0!important}
+  .hero .sl .w{width:calc(100% - 40px)!important;padding:40px 0 210px!important;margin:0 auto!important;align-self:flex-start}
+  .hero .sl .bg{width:100%!important;height:100%!important;inset:0!important;background-size:auto 48%!important;background-position:right bottom!important;opacity:.9!important}
+  .hero .sl::before{background:linear-gradient(180deg,rgba(4,21,45,.98) 0%,rgba(4,21,45,.94) 44%,rgba(4,21,45,.50) 72%,rgba(4,21,45,.14) 100%)!important}
+  .hero .sl h1{font-size:clamp(34px,9vw,46px)!important;line-height:1.02!important;max-width:100%!important;letter-spacing:-.045em!important}
+  .hero .sl p{font-size:15px!important;line-height:1.55!important;max-width:100%!important;margin:16px 0 20px!important}
+  .hero .sl .hero-cta{max-width:100%;padding:14px 17px!important;gap:14px!important;font-size:14px!important}
+  .hero .sl .hero-proof{display:flex;flex-wrap:wrap;gap:7px 12px;margin-top:18px!important;font-size:10px!important}
+  footer{padding:32px 0 22px!important}
+  footer .fg{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:26px 18px!important}
+  footer .fg>div:first-child{grid-column:1/-1;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.14)}
+  footer .fg>div:last-child{grid-column:1/-1;padding-top:16px;border-top:1px solid rgba(255,255,255,.14)}
+  footer h4{margin-bottom:12px!important}
+  footer a,footer .r{font-size:12px!important;line-height:1.5;margin-bottom:10px!important;align-items:flex-start!important}
+  footer .cp{font-size:11px;line-height:1.5;margin-top:22px;padding-top:15px}
+  .cta{padding:36px 0!important}
+}
+@media(max-width:380px){
+ .hero{min-height:630px!important}
+ .hero .sl .w{width:calc(100% - 32px)!important;padding-top:32px!important}
+ .hero .sl .bg{background-size:auto 42%!important}
+ footer .fg{gap:22px 12px!important}
+ .footer-brand strong{font-size:22px}
+}
