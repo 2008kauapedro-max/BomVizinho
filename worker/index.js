@@ -5,9 +5,13 @@ const fail = (code,status=400) => json({error:code},status);
 const now = () => new Date().toISOString();
 const uuid = () => crypto.randomUUID();
 async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
-function cookieVal(req,name){const raw=req.headers.get('Cookie')||'';const m=raw.match(new RegExp('(?:^|;\\s*)'+name+'=([^;]+)'));return m?decodeURIComponent(m[1]):''}
+function cookieVal(req,name){const raw=req.headers.get('Cookie')||'';const m=raw.match(new RegExp('(?:^|;\\s*)'+name+'=([^;]+)'));if(!m)return '';try{return decodeURIComponent(m[1])}catch{return ''}}
+function safeEqual(left,right){const a=new TextEncoder().encode(String(left)),b=new TextEncoder().encode(String(right));let diff=a.length^b.length;for(let i=0;i<Math.max(a.length,b.length);i++)diff|=(a[i]||0)^(b[i]||0);return diff===0}
 function setCookie(value,maxAge){return `rommo_session=${encodeURIComponent(value)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${maxAge}`}
 async function body(req){try{return await req.json()}catch{return null}}
+async function requireCustomer(req,env){const raw=cookieVal(req,'bv_customer');if(!raw)return null;const hash=await sha256(raw);const row=await env.DB.prepare('SELECT customer_id,expires_at FROM customer_sessions WHERE token_hash=?').bind(hash).first();if(!row||row.expires_at<Math.floor(Date.now()/1000)){if(row)await env.DB.prepare('DELETE FROM customer_sessions WHERE token_hash=?').bind(hash).run();return null}return {id:row.customer_id,hash}}
+async function passwordHash(password,salt){const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveBits']);const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:new TextEncoder().encode(salt),iterations:210000,hash:'SHA-256'},key,256);return [...new Uint8Array(bits)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+const customerCookie=(value,maxAge)=>`bv_customer=${encodeURIComponent(value)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
 async function requireAdmin(req,env){const raw=cookieVal(req,'rommo_session');if(!raw)return null;const hash=await sha256(raw);const row=await env.DB.prepare('SELECT email, expires_at FROM admin_sessions WHERE token_hash=?').bind(hash).first();if(!row||row.expires_at<Math.floor(Date.now()/1000)){if(row)await env.DB.prepare('DELETE FROM admin_sessions WHERE token_hash=?').bind(hash).run();return null}return {email:row.email,hash}}
 async function route(req,env){const url=new URL(req.url),path=url.pathname,method=req.method;
  if(method==='OPTIONS')return new Response(null,{status:204,headers:{...corsHeaders,'Access-Control-Allow-Methods':'GET,POST,PATCH,OPTIONS','Access-Control-Allow-Headers':'Content-Type'}});
@@ -32,6 +36,38 @@ async function route(req,env){const url=new URL(req.url),path=url.pathname,metho
    await env.DB.prepare("INSERT INTO order_history(order_id,event_type,detail) VALUES(?,'pedido_criado','Pedido recebido pelo site')").bind(id).run();
   }catch(e){if(String(e).includes('UNIQUE')){const old=await env.DB.prepare('SELECT code FROM orders WHERE idempotency_key=?').bind(key).first();if(old)return json({ok:true,code:old.code,duplicate:true})}return fail('erro_interno',500)}
   return json({ok:true,code,id},201);
+ }
+ // Customer account and persistent cart API
+ if(path==='/api/customer/register'&&method==='POST'){
+  const p=await body(req),name=String(p?.name||'').trim(),email=String(p?.email||'').trim().toLowerCase(),phone=String(p?.phone||'').replace(/\D/g,''),password=String(p?.password||'');
+  if(name.length<2||name.length>120||email.length>160||! /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||phone.length<10||phone.length>13||password.length<10||password.length>128)return fail('dados_invalidos');
+  const id=uuid(),salt=Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,'0')).join(''),hash=await passwordHash(password,salt);
+  try{await env.DB.prepare('INSERT INTO customers(id,name,email,phone,password_hash,password_salt,marketing_consent) VALUES(?,?,?,?,?,?,?)').bind(id,name,email,phone,hash,salt,p.marketingConsent===true?1:0).run()}catch(e){if(String(e).includes('UNIQUE'))return fail('email_ja_cadastrado',409);throw e}
+  const token=Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join(''),tokenHash=await sha256(token),expires=Math.floor(Date.now()/1000)+60*60*24*30;
+  await env.DB.prepare('INSERT INTO customer_sessions(token_hash,customer_id,expires_at) VALUES(?,?,?)').bind(tokenHash,id,expires).run();
+  return json({ok:true,customer:{id,name,email,phone,marketingConsent:p.marketingConsent===true}},201,{'Set-Cookie':customerCookie(token,60*60*24*30)});
+ }
+ if(path==='/api/customer/login'&&method==='POST'){
+  const p=await body(req),email=String(p?.email||'').trim().toLowerCase(),password=String(p?.password||'');if(email.length>160||password.length>128)return fail('credenciais_invalidas',401);const c=await env.DB.prepare('SELECT id,name,email,phone,password_hash,password_salt,marketing_consent FROM customers WHERE email=?').bind(email).first();
+  if(!c){if(password)await passwordHash(password,'bomvizinho-login-dummy-salt-v1');return fail('credenciais_invalidas',401)}
+  if(!password||!safeEqual(await passwordHash(password,c.password_salt),c.password_hash))return fail('credenciais_invalidas',401);
+  const token=Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join(''),expires=Math.floor(Date.now()/1000)+60*60*24*30;await env.DB.prepare('INSERT INTO customer_sessions(token_hash,customer_id,expires_at) VALUES(?,?,?)').bind(await sha256(token),c.id,expires).run();
+  return json({ok:true,customer:{id:c.id,name:c.name,email:c.email,phone:c.phone,marketingConsent:!!c.marketing_consent}},200,{'Set-Cookie':customerCookie(token,60*60*24*30)});
+ }
+ if(path==='/api/customer/logout'&&method==='POST'){const raw=cookieVal(req,'bv_customer');if(raw)await env.DB.prepare('DELETE FROM customer_sessions WHERE token_hash=?').bind(await sha256(raw)).run();return json({ok:true},200,{'Set-Cookie':customerCookie('',0)});}
+ if(path.startsWith('/api/customer/')){
+  const customer=await requireCustomer(req,env);if(!customer)return fail('nao_autorizado',401);
+  if(path==='/api/customer/me'&&method==='GET'){const c=await env.DB.prepare('SELECT id,name,email,phone,marketing_consent FROM customers WHERE id=?').bind(customer.id).first();return c?json({customer:{id:c.id,name:c.name,email:c.email,phone:c.phone,marketingConsent:!!c.marketing_consent}}):fail('nao_encontrado',404)}
+  if(path==='/api/customer/preferences'&&method==='PATCH'){
+   const p=await body(req);if(typeof p?.marketingConsent!=='boolean')return fail('dados_invalidos');const r=await env.DB.prepare('UPDATE customers SET marketing_consent=?,updated_at=? WHERE id=?').bind(p.marketingConsent?1:0,now(),customer.id).run();if(!r.meta?.changes)return fail('nao_encontrado',404);return json({ok:true,marketingConsent:p.marketingConsent});
+  }
+  if(path==='/api/customer/cart'&&method==='GET'){const activity=now();await env.DB.prepare('UPDATE customer_carts SET updated_at=?,recovered_at=? WHERE customer_id=?').bind(activity,activity,customer.id).run();const r=await env.DB.prepare('SELECT i.product_id,i.quantity,i.note,p.name,p.category,p.price_cents,p.image_url,p.active FROM customer_cart_items i JOIN products p ON p.id=i.product_id WHERE i.customer_id=? ORDER BY p.name').bind(customer.id).all();return json({items:r.results||[]})}
+  if(path==='/api/customer/cart'&&method==='PUT'){
+   const p=await body(req);if(!Array.isArray(p?.items))return fail('carrinho_invalido');const items=p.items;if(items.length>100)return fail('carrinho_invalido');const byId=new Map();
+   for(const x of items){if(!x||typeof x!=='object')return fail('carrinho_invalido');const id=Number(x.productId),quantity=Number(x.quantity);if(!Number.isInteger(id)||id<1||!Number.isInteger(quantity)||quantity<1||quantity>999)return fail('carrinho_invalido');const existing=byId.get(id);if(existing&&existing.quantity+quantity>999)return fail('carrinho_invalido');byId.set(id,{id,quantity:(existing?.quantity||0)+quantity,note:String(x.note||existing?.note||'').slice(0,500)})}
+   if(byId.size>50)return fail('carrinho_invalido');for(const x of byId.values()){const prod=await env.DB.prepare('SELECT id FROM products WHERE id=? AND active=1').bind(x.id).first();if(!prod)return fail('produto_invalido',409)}
+   const statements=[env.DB.prepare('INSERT INTO customer_carts(customer_id,updated_at,reminder_sent_at,recovered_at) VALUES(?,?,NULL,NULL) ON CONFLICT(customer_id) DO UPDATE SET updated_at=excluded.updated_at,reminder_sent_at=NULL,recovered_at=NULL').bind(customer.id,now()),env.DB.prepare('DELETE FROM customer_cart_items WHERE customer_id=?').bind(customer.id),...Array.from(byId.values(),x=>env.DB.prepare('INSERT INTO customer_cart_items(customer_id,product_id,quantity,note) VALUES(?,?,?,?)').bind(customer.id,x.id,x.quantity,x.note))];await env.DB.batch(statements);return json({ok:true,count:byId.size});
+  }
  }
  if(path.startsWith('/api/admin/')){
   if(path==='/api/admin/login'&&method==='POST'){
@@ -99,6 +135,14 @@ async function route(req,env){const url=new URL(req.url),path=url.pathname,metho
   if(upd&&method==='PATCH'){
    const p=await body(req),status=String(p?.status||'');if(!STATUSES.has(status))return fail('status_invalido');const order=await env.DB.prepare('SELECT status,version FROM orders WHERE id=?').bind(upd[1]).first();if(!order)return fail('nao_encontrado',404);if(p?.version!==undefined&&Number(p.version)!==order.version)return fail('conflito',409);
    await env.DB.prepare('UPDATE orders SET status=?,updated_at=?,version=version+1 WHERE id=?').bind(status,now(),upd[1]).run();await env.DB.prepare('INSERT INTO order_history(order_id,actor,event_type,detail) VALUES(?,?,?,?)').bind(upd[1],admin.email,'status',`${order.status} → ${status}${p?.note?': '+String(p.note).slice(0,500):''}`).run();return json({ok:true});
+  }
+  if(path==='/api/admin/abandoned-carts'&&method==='GET'){
+   const requestedMinutes=Number(url.searchParams.get('minutes')||60),minutes=Number.isFinite(requestedMinutes)?Math.min(10080,Math.max(30,Math.floor(requestedMinutes))):60;const cutoff=new Date(Date.now()-minutes*60000).toISOString();
+   const r=await env.DB.prepare(`SELECT c.id,c.name,c.email,c.phone,c.marketing_consent,cc.updated_at,cc.reminder_sent_at,COUNT(ci.product_id) AS product_count,COALESCE(SUM(ci.quantity),0) AS unit_count FROM customer_carts cc JOIN customers c ON c.id=cc.customer_id JOIN customer_cart_items ci ON ci.customer_id=c.id WHERE cc.updated_at<=? AND cc.recovered_at IS NULL AND c.marketing_consent=1 GROUP BY c.id ORDER BY cc.updated_at ASC LIMIT 200`).bind(cutoff).all();
+   const rows=[];for(const c of r.results||[]){const items=await env.DB.prepare('SELECT p.name,ci.quantity FROM customer_cart_items ci JOIN products p ON p.id=ci.product_id WHERE ci.customer_id=? ORDER BY p.name').bind(c.id).all();rows.push({...c,items:items.results||[]})}return json({carts:rows,minimum_idle_minutes:minutes});
+  }
+  if(path.match(/^\/api\/admin\/abandoned-carts\/[0-9a-f-]+\/reminded$/i)&&method==='POST'){
+   const id=path.split('/')[4];const r=await env.DB.prepare('UPDATE customer_carts SET reminder_sent_at=? WHERE customer_id=? AND recovered_at IS NULL AND EXISTS (SELECT 1 FROM customers WHERE customers.id=customer_carts.customer_id AND marketing_consent=1)').bind(now(),id).run();if(!r.meta?.changes)return fail('nao_encontrado',404);return json({ok:true});
   }
   if(path==='/api/admin/summary'&&method==='GET'){
    const c=await env.DB.prepare("SELECT COUNT(*) AS total, SUM(CASE WHEN status='recebido' THEN 1 ELSE 0 END) AS novos, SUM(CASE WHEN status NOT IN ('concluido','cancelado') THEN 1 ELSE 0 END) AS abertos FROM orders").first();return json(c||{total:0,novos:0,abertos:0});

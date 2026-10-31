@@ -103,6 +103,6 @@ async function ckEnviar(){
  }finally{ckBusy=false;if(btn){btn.disabled=false;btn.innerHTML='<svg class="ic"><use href="#i-wa"/></svg>Registrar pedido e abrir WhatsApp'}}
 }
 function openCheckout(){if(!cart.length)return;closeAll();ckSent=false;ckDraw();ck.classList.add("on");ck.setAttribute("aria-hidden","false");ck.scrollTop=0;trava()}
-function closeCheckout(){if(ckSent){cart=[];save();drawCart();ckSent=false}ck.classList.remove("on");ck.setAttribute("aria-hidden","true");trava()}
+function closeCheckout(){if(ckSent){cart=[];save({guestEdit:true});drawCart();ckSent=false}ck.classList.remove("on");ck.setAttribute("aria-hidden","true");trava()}
 function backToCart(){if(ckSent){closeCheckout();return}ck.classList.remove("on");ck.setAttribute("aria-hidden","true");trava();openCart()}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&ck.classList.contains("on")&&!document.getElementById("pgv").classList.contains("on"))backToCart()});
