@@ -137,6 +137,12 @@ class BomVizinhoQA(unittest.TestCase):
         self.open_store()
         self.assertTrue(self.page.locator("body").is_visible())
         self.assertGreater(self.page.locator("#grid article").count(), 0)
+        account = self.page.get_by_role("button", name="Minha conta")
+        self.assertTrue(account.is_visible(), "Minha conta deve continuar visível em celular")
+        account.click()
+        self.assertTrue(self.page.locator("#customerModal.open").is_visible())
+        self.assertTrue(self.page.locator('#customerModal input[name="email"]').is_visible())
+        self.page.locator("#customerModal .customer-close").click()
         width = self.page.locator("body").evaluate("(e)=>e.scrollWidth")
         self.assertLessEqual(width, 430, f"Possível overflow horizontal: body.scrollWidth={width}px")
 
@@ -147,7 +153,7 @@ class BomVizinhoQA(unittest.TestCase):
                       "/api/admin/settings", "/api/admin/orders", "/api/admin/summary",
                       "/api/customer/register", "/api/customer/login",
                       "/api/customer/logout", "/api/customer/cart",
-                      "/api/admin/abandoned-carts"):
+                      "/api/admin/abandoned-carts", "/api/admin/customer-carts"):
             with self.subTest(route=route):
                 self.assertIn(route, worker)
 

@@ -47,15 +47,20 @@ function createEnv() {
   databases.add(db);
   db.exec('PRAGMA foreign_keys=ON');
   const migrations = readdirSync(join(root, 'migrations')).filter(name => name.endsWith('.sql')).sort();
-  for (const name of migrations.filter(name => name !== '0005_customer_accounts_and_carts.sql')) {
+  for (const name of migrations.filter(name => !['0005_customer_accounts_and_carts.sql', '0006_customer_cart_order_link.sql'].includes(name))) {
     db.exec(readFileSync(join(root, 'migrations', name), 'utf8'));
   }
   db.exec(readFileSync(join(root, 'seed_products.sql'), 'utf8'));
   const before = db.prepare('SELECT COUNT(*) AS total FROM products').get().total;
   const firstProduct = db.prepare('SELECT id,name,price_cents FROM products WHERE id=1').get();
   db.exec(readFileSync(join(root, 'migrations/0005_customer_accounts_and_carts.sql'), 'utf8'));
+  db.prepare("INSERT INTO orders(id,code,idempotency_key,customer_name,customer_phone,delivery_type,payment_method,subtotal_cents) VALUES('historic-order','HIST-1','historic-order-key','Cliente histórico','61999990000','Retirada na loja','Pix',100)").run();
+  db.exec(readFileSync(join(root, 'migrations/0006_customer_cart_order_link.sql'), 'utf8'));
   assert.equal(Number(db.prepare('SELECT COUNT(*) AS total FROM products').get().total), Number(before), 'a migração de contas não apaga produtos');
   assert.deepEqual(db.prepare('SELECT id,name,price_cents FROM products WHERE id=1').get(), firstProduct, 'a migração preserva os produtos existentes');
+  const preservedOrder = db.prepare('SELECT id,customer_id FROM orders WHERE id=?').get('historic-order');
+  assert.equal(preservedOrder.id, 'historic-order');
+  assert.equal(preservedOrder.customer_id, null, 'a nova migração preserva pedidos anteriores sem inventar um cliente associado');
   return {
     DB: new LocalD1(db),
     ADMIN_EMAIL: 'equipe.qa@example.test',
@@ -108,6 +113,9 @@ test('a loja expõe Minha conta e mantém o acesso no layout de celular', () => 
   assert.match(css, /@media\(max-width:380px\)\{\.account-trigger/);
   assert.match(app, /catalogReady\.then\(\(\)=>loadCustomerAccount\(\)\)/);
   assert.match(app, /rommo_cart_owner/);
+  assert.match(app, /experience-track/);
+  assert.match(app, /prefers-reduced-motion/);
+  assert.match(html, /css\/experience\.css/);
   assert.match(html, /name="name"[^>]*minlength="2"/);
   assert.match(html, /name="phone" type="tel"/);
   assert.match(html, /name="email" type="email"/);
@@ -126,6 +134,8 @@ test('abrir o WhatsApp não registra envio; o registro exige ação separada', (
   const markHandler = panel.slice(markAt);
   assert.match(markHandler, /confirm\(/);
   assert.match(markHandler, /\/reminded/);
+  assert.match(panel, /canMessage=c\.cart_status==='abandoned'&&consented/);
+  assert.match(panel, /cart_status==='ordered'/);
 });
 
 test('cadastro valida dados, impede e-mail duplicado e nunca grava senha em texto puro', async () => {
@@ -206,10 +216,70 @@ test('todas as rotas privadas de cliente e de administração exigem uma sessão
     const result = await call(env, path, { method: path.endsWith('/preferences') ? 'PATCH' : 'GET', body: path.endsWith('/preferences') ? { marketingConsent: true } : undefined });
     assert.equal(result.response.status, 401, path);
   }
-  for (const path of ['/api/admin/me', '/api/admin/products', '/api/admin/settings', '/api/admin/orders', '/api/admin/summary', '/api/admin/abandoned-carts']) {
+  for (const path of ['/api/admin/me', '/api/admin/products', '/api/admin/settings', '/api/admin/orders', '/api/admin/summary', '/api/admin/abandoned-carts', '/api/admin/customer-carts']) {
     const result = await call(env, path);
     assert.equal(result.response.status, 401, path);
   }
+});
+
+test('painel lista estados reais de carrinhos e só registra pedido após compra autenticada', async () => {
+  const env = createEnv();
+  const active = await register(env, { email: 'ativo.qa@example.test' });
+  const abandoned = await register(env, { email: 'abandonado.qa@example.test' });
+  const recovered = await register(env, { email: 'recuperado.qa@example.test' });
+  const ordered = await register(env, { email: 'pedido.qa@example.test' });
+  const optedOut = await register(env, { email: 'sem-consentimento.qa@example.test', marketingConsent: false });
+  for (const account of [active, abandoned, recovered, ordered, optedOut]) {
+    const saved = await call(env, '/api/customer/cart', {
+      method: 'PUT', cookie: account.cookie, body: { items: [{ productId: 1, quantity: 2 }] },
+    });
+    assert.equal(saved.response.status, 200);
+  }
+  const stale = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
+  env.db.prepare('UPDATE customer_carts SET updated_at=? WHERE customer_id IN (?,?,?)').run(stale, abandoned.customer.id, recovered.customer.id, optedOut.customer.id);
+  const restored = await call(env, '/api/customer/cart', { cookie: recovered.cookie });
+  assert.equal(restored.response.status, 200);
+  assert.ok(env.db.prepare('SELECT recovered_at FROM customer_carts WHERE customer_id=?').get(recovered.customer.id).recovered_at);
+
+  const product = env.db.prepare('SELECT price_cents FROM products WHERE id=1').get();
+  const order = await call(env, '/api/orders', {
+    method: 'POST', cookie: ordered.cookie,
+    body: {
+      idempotencyKey: 'qa-order-1234567890',
+      customer: { name: sampleCustomer.name, phone: sampleCustomer.phone, email: ordered.customer.email },
+      delivery: { type: 'Retirada na loja' }, payment: { method: 'Pix' },
+      items: [{ productId: 1, quantity: 2, unitPriceCents: product.price_cents }],
+    },
+  });
+  assert.equal(order.response.status, 201, JSON.stringify(order.data));
+  const orderRow = env.db.prepare('SELECT customer_id FROM orders WHERE id=?').get(order.data.id);
+  assert.equal(orderRow.customer_id, ordered.customer.id);
+  const completed = env.db.prepare('SELECT completed_order_id FROM customer_carts WHERE customer_id=?').get(ordered.customer.id);
+  assert.equal(completed.completed_order_id, order.data.id);
+  const clear = await call(env, '/api/customer/cart', { method: 'PUT', cookie: ordered.cookie, body: { items: [] } });
+  assert.equal(clear.response.status, 200);
+  assert.equal(env.db.prepare('SELECT completed_order_id FROM customer_carts WHERE customer_id=?').get(ordered.customer.id).completed_order_id, order.data.id, 'limpar o carrinho após checkout preserva o vínculo do pedido real');
+
+  const admin = await adminCookie(env);
+  const all = await call(env, '/api/admin/customer-carts?status=all&minutes=60', { cookie: admin });
+  assert.equal(all.response.status, 200, JSON.stringify(all.data));
+  const byId = new Map(all.data.carts.map(row => [row.id, row]));
+  assert.equal(byId.get(active.customer.id).cart_status, 'active');
+  assert.equal(byId.get(abandoned.customer.id).cart_status, 'abandoned');
+  assert.equal(byId.get(recovered.customer.id).cart_status, 'recovered');
+  assert.equal(byId.get(ordered.customer.id).cart_status, 'ordered');
+  assert.equal(byId.get(ordered.customer.id).order_code, order.data.code);
+  assert.equal(byId.get(ordered.customer.id).items[0].quantity, 2, 'a lista mantém os itens comprados após o carrinho local ser esvaziado');
+  assert.equal(byId.get(ordered.customer.id).unit_count, 2, 'a lista exibe a quantidade do pedido registrado');
+  assert.equal(byId.get(optedOut.customer.id).marketing_consent, 0, 'a equipe vê o estado administrativo sem habilitar mensagem de marketing');
+  const abandonedList = await call(env, '/api/admin/customer-carts?status=abandoned&minutes=60', { cookie: admin });
+  assert.equal(abandonedList.data.carts.length, 2);
+  assert.equal(abandonedList.data.carts.some(row => row.id === optedOut.customer.id && row.marketing_consent === 0), true);
+
+  const markActive = await call(env, `/api/admin/customer-carts/${active.customer.id}/reminded?minutes=60`, { method: 'POST', cookie: admin, body: {} });
+  assert.equal(markActive.response.status, 404, 'não permite registrar lembrete num carrinho ativo');
+  const markAbandoned = await call(env, `/api/admin/customer-carts/${abandoned.customer.id}/reminded?minutes=60`, { method: 'POST', cookie: admin, body: {} });
+  assert.equal(markAbandoned.response.status, 200);
 });
 
 test('clientes podem atualizar ou retirar o consentimento de mensagens', async () => {

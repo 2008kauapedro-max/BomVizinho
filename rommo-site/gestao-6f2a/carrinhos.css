@@ -1,0 +1,14 @@
+.cart-state{display:inline-flex;align-items:center;min-height:24px;padding:4px 9px;border:1px solid #d5e4ee;border-radius:999px;background:#f2f7fa;color:#38566e;font-size:10px;font-weight:850;letter-spacing:.045em}
+.cart-state-active{border-color:#b9ddc8;background:#eef8f1;color:#247243}
+.cart-state-abandoned{border-color:#f1d99e;background:#fff8e6;color:#8a5a00}
+.cart-state-recovered{border-color:#c2d8f1;background:#f0f6fd;color:#315d8b}
+.cart-state-ordered{border-color:#b8d8ed;background:#edf7fc;color:#075b91}
+.cart-order-meta{margin:6px 0 0;color:#175b87!important;font-size:12px;font-weight:750}
+.cart-consent-note{display:block;color:#667d90;font-size:11px;line-height:1.5}
+.customer-cart-card>div:first-child{min-width:0}
+.customer-cart-card .abandoned-head h3{overflow-wrap:anywhere}
+.customer-cart-card .abandoned-actions{max-width:250px}
+.abandoned-toolbar .toolbar{align-items:end}
+.abandoned-toolbar .toolbar label{display:grid;gap:5px;color:#526b80;font-size:12px;font-weight:750}
+.abandoned-toolbar .toolbar select{min-width:140px;min-height:42px}
+@media(max-width:650px){.abandoned-toolbar .toolbar{display:grid;grid-template-columns:1fr 1fr;align-items:end}.abandoned-toolbar .toolbar label{min-width:0}.abandoned-toolbar .toolbar select{width:100%;min-width:0}.abandoned-toolbar .toolbar button{grid-column:1/-1;min-height:42px}.customer-cart-card .abandoned-actions{max-width:none}}

@@ -7,6 +7,9 @@ function reveal(){if(!ready||!io)return;
   el.style.transitionDelay=Math.min([...el.parentNode.children].indexOf(el),8)*70+"ms";el.classList.add("rv");io.observe(el)})}
 addEventListener("loaderdone",()=>{ready=true;reveal()},{once:true});setTimeout(()=>{if(!ready){ready=true;reveal()}},8000);
 addEventListener("scroll",()=>document.querySelector("header").classList.toggle("sc",scrollY>60),{passive:true});
+let experienceFrame=0;
+function updateExperience(){if(experienceFrame)return;experienceFrame=requestAnimationFrame(()=>{experienceFrame=0;const track=$("#hero .experience-track");if(!track)return;const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;const distance=Math.max(1,track.offsetHeight-innerHeight);const progress=reduced?0:Math.min(1,Math.max(0,-track.getBoundingClientRect().top/distance));track.style.setProperty("--experience-progress",progress.toFixed(3));track.setAttribute("aria-valuenow",String(Math.round(progress*100)))})}
+addEventListener("scroll",updateExperience,{passive:true});addEventListener("resize",updateExperience,{passive:true});
 const $=s=>document.querySelector(s),brl=n=>n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const ic=(n)=>`<svg class="ic"><use href="#i-${n}"/></svg>`,cc=id=>CATS.find(c=>c.id===id)||{id,n:String(id||"Outros").replace(/-/g," "),i:"box"};
 let cat="todos",term="",cart=[],customerAccount=null,cartSyncTimer=null,cartSyncPending=false,cartSyncInFlight=false,customerMode="login",catalogReady=Promise.resolve(false);try{cart=JSON.parse(localStorage.getItem("rommo_cart")||"[]")}catch(e){}
@@ -62,11 +65,17 @@ function drawStatic(){
  $("#cg").innerHTML=CATS.slice(1).map(c=>`<button class="cat" onclick="setCat('${c.id}')"><div class="c">${ic(c.i)}<img src="assets/categorias/${c.id}.png" data-b="assets/categorias/${c.id}" alt="" onerror="imgErr(this)"></div>${c.n}</button>`).join("");
  drawOffers();
 }
+let offersOpen=false,offersCap=0;
+const offerCap=()=>innerWidth>1024?4:innerWidth>760?3:2;
 function drawOffers(){
- const offers=P.filter(p=>Number(p.o)>Number(p.p)&&Number(p.o)>0).slice(0,3);
- $("#og").innerHTML=offers.length?offers.map(card).join(""):`<div class="offers-empty"><strong>Novidades chegando</strong><span>As ofertas serão exibidas aqui assim que houver descontos cadastrados.</span><button class="btn ol" onclick="setCat('todos')">Ver todos os produtos</button></div>`;
+ const offers=P.filter(p=>Number(p.o)>Number(p.p)&&Number(p.o)>0),og=$("#og"),more=$("#ogMore"),cap=offersCap=offerCap();if(!og)return;
+ if(!offers.length){og.innerHTML=`<div class="offers-empty"><strong>Novidades chegando</strong><span>As ofertas serão exibidas aqui assim que houver descontos cadastrados.</span><button class="btn ol" onclick="setCat('todos')">Ver todos os produtos</button></div>`;if(more)more.innerHTML="";return}
+ og.innerHTML=offers.map(card).join("");[...og.children].forEach((c,i)=>{c.hidden=!offersOpen&&i>=cap});
+ if(more)more.innerHTML=offers.length>cap?`<button class="btn offers-more" type="button" onclick="toggleOffers()" aria-expanded="${offersOpen}">${offersOpen?"Recolher ofertas":`Expandir · ver as ${offers.length} ofertas`}<span aria-hidden="true">${offersOpen?"−":"+"}</span></button>`:"";
 }
-function showOffers(){drawOffers();go("ofertas")}
+function toggleOffers(){offersOpen=!offersOpen;drawOffers();if(!offersOpen)go("ofertas")}
+function showOffers(){offersOpen=true;drawOffers();go("ofertas")}
+addEventListener("resize",()=>{if(offerCap()!==offersCap)drawOffers()});
 function drawProducts(){
  $("#tabs").innerHTML=CATS.map(c=>`<button class="${c.id===cat?"on":""}" onclick="setCat('${c.id}',1)">${c.n}</button>`).join("");
  const l=P.filter(p=>(cat==="todos"||p.cat===cat)&&(p.n+" "+cc(p.cat).n).toLowerCase().includes(term));
@@ -74,13 +83,14 @@ function drawProducts(){
  $("#grid").innerHTML=l.length?l.map(card).join(""):`<p class="empty">Nenhum produto encontrado. Tente outra busca.</p>`;
  reveal();
 }
-const go=id=>document.getElementById(id).scrollIntoView({behavior:"smooth"});
+const go=id=>{const el=document.getElementById(id);if(window.bvScrollTo)bvScrollTo(el);else el.scrollIntoView({behavior:"smooth"})};
 function setCat(id,stay){cat=id;term="";const q=$("#q");if(q)q.value="";drawProducts();if(!stay)go("produtos")}
 /* banner */
 let hi=0,ht;
 function drawHero(){
- $("#hero").innerHTML=HERO.map((s,i)=>`<div class="sl ${i?"":"on"} ${s.soImagem?"io":""}" style="--c:${s.c}"><div class="bg" data-img="${s.img}"></div><div class="w"><span class="hero-eyebrow"><i></i> BOM VIZINHO <b>•</b> FERRAMENTAS & EQUIPAMENTOS</span><h1>${s.t}</h1><p>${s.p}</p><button class="btn hero-cta" onclick="setCat('${s.cat}')">${s.b}<span aria-hidden="true">↗</span></button><div class="hero-proof"><span>●</span> Produtos para casa, obra e agro</div></div></div>`).join("");
- aplicaImgs();ht=setInterval(()=>hg(hi+1),6500);
+  const s=HERO[0]||{img:"assets/bomvizinho-drill-hero.png",t:"Ferramentas certas. Trabalho bem feito.",p:"Encontre ferramentas e equipamentos para o seu próximo projeto.",b:"Explorar ferramentas",cat:"eletricas"};
+  $("#hero").innerHTML=`<div class="experience-track" role="progressbar" aria-label="Abertura da loja" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="experience-stage"><div class="experience-image" data-img="${s.img}" role="img" aria-label="Ferramenta em destaque da BomVizinho"></div><div class="experience-shade"></div><div class="experience-copy"><span class="experience-eyebrow"><i></i> BOMVIZINHO <b>•</b> FERRAMENTAS & EQUIPAMENTOS</span><h1>${s.t}</h1><p>${s.p}</p><button class="btn experience-cta" onclick="setCat('${s.cat}')">${s.b}<span aria-hidden="true">↗</span></button><div class="experience-proof"><span>●</span> Produtos para casa, obra e agro</div></div><button class="experience-product" type="button" onclick="openProduct(1)" aria-label="Ver produto em destaque: parafusadeira furadeira de impacto"><span class="experience-product-image"><img src="assets/produtos/1.png" alt="" onerror="imgErr(this)"></span><span class="experience-product-copy"><small>DESTAQUE DA LOJA</small><strong>Parafusadeira Furadeira 20V</strong><em>Ver produto <b aria-hidden="true">↗</b></em></span></button><div class="experience-scroll"><span>ROLE PARA EXPLORAR</span><i aria-hidden="true"></i></div><span class="experience-index" aria-hidden="true">01 <b>/</b> 04</span></div></div>`;
+  aplicaImgs();updateExperience();
 }
 function hg(n){hi=(n+HERO.length)%HERO.length;document.querySelectorAll(".sl").forEach((e,i)=>e.classList.toggle("on",i===hi));document.querySelectorAll(".dots button").forEach((e,i)=>e.classList.toggle("on",i===hi));clearInterval(ht);ht=setInterval(()=>hg(hi+1),6500)}
 /* carrinho */

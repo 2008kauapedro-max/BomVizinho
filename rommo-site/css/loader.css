@@ -58,4 +58,4 @@ body.ldg{overflow:hidden}
 #ld .bar2 i::before{display:none}
 #ld .inf{color:#d5efff;font-size:11px;letter-spacing:.18em;margin-top:10px}
 #ld.out{transform:translateY(-100%);transition:transform .55s cubic-bezier(.76,0,.24,1),visibility 0s .55s}
-@media(prefers-reduced-motion:reduce){#ld,#ld *{animation:none!important;transition-duration:.01ms!important}}
+
