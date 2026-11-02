@@ -4,7 +4,7 @@ const c=document.createElement("div");c.id="bvcover";
 c.innerHTML='<div class="bvc-img"></div><div class="bvc-ui"><a class="bvc-logo" href="#" aria-label="BomVizinho"><img src="assets/bomvizinho-icon-256.png" alt=""><span>BomVizinho</span></a><button class="bvc-burger" type="button" aria-label="Abrir menu"><i></i><i></i><i></i></button><div class="bvc-mid"><p>FERRAMENTAS & EQUIPAMENTOS</p><h2>Ferramentas certas.<br>Trabalho bem feito.</h2></div><div class="bvc-hint"><span class="bvc-m">Arraste para cima</span><span class="bvc-d">Role para baixo</span><i class="bvc-arrow"></i></div></div>';
 document.body.appendChild(c);
 const im=c.querySelector(".bvc-img"),ui=c.querySelector(".bvc-ui");
-im.style.backgroundImage='url("assets/bomvizinho-drill-hero.webp")';
+const pic=()=>{im.style.backgroundImage=`url("${matchMedia("(max-width:760px)").matches?"assets/herocelular.png":"assets/bomvizinho-drill-hero.webp"}")`};pic();
 c.querySelector(".bvc-arrow").animate([{transform:"translateY(0) rotate(45deg)",opacity:.3},{transform:"translateY(9px) rotate(45deg)",opacity:1},{transform:"translateY(0) rotate(45deg)",opacity:.3}],{duration:1600,iterations:Infinity});
 /* menu lateral */
 const m=document.createElement("aside");m.id="bvmenu";m.setAttribute("aria-hidden","true");
@@ -22,7 +22,7 @@ document.addEventListener("click",e=>{const t=e.target;
 const act=$(".act");if(act){const b=document.createElement("button");b.className="bvh-burger";b.type="button";b.setAttribute("aria-label","Abrir menu");b.innerHTML="<i></i><i></i><i></i>";act.appendChild(b)}
 /* encolhimento ligado à rolagem */
 let D=600,fr=0;const ease=p=>p*p*(3-2*p);
-function size(){D=Math.round(Math.min(innerHeight*.85,760));hero.style.paddingTop=D+"px";upd()}
+function size(){pic();D=Math.round(Math.min(innerHeight*.85,760));hero.style.paddingTop=D+"px";upd()}
 function upd(){fr=0;const st=$(".experience-stage");if(!st)return;const p=Math.min(1,Math.max(0,scrollY/D));
  if(p>=1){c.style.display="none";return}c.style.display="block";
  const r=st.getBoundingClientRect(),e=ease(p),vw=innerWidth,vh=innerHeight,

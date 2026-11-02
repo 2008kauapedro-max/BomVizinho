@@ -31,3 +31,5 @@ let P=[
 {id:11,cat:"agro",n:"Roçadeira a Gasolina 52cc Profissional",p:1299,o:1599,r:4.8,v:45},
 {id:12,cat:"construcao",n:"Betoneira 400L 220V Monofásica",p:2599.9,r:4.7,v:28}];
 
+
+try{window.BV_DEMO_OFFERS=P.filter(p=>Number(p.o)>Number(p.p)).slice(0,3).map(x=>Object.assign({},x))}catch(e){}

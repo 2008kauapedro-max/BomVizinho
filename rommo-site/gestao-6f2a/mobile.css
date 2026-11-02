@@ -1,0 +1,24 @@
+/* Painel BomVizinho — refinamento para celular */
+@media(max-width:680px){
+ html{-webkit-text-size-adjust:100%}
+ body{padding-bottom:calc(74px + env(safe-area-inset-bottom,0px))}
+ input,select,textarea{font-size:16px!important;min-height:46px}
+ button,.btn,.nav-item{min-height:44px}
+ .main{padding:16px 12px 28px!important}
+ .topbar{gap:10px;flex-wrap:wrap}.top-actions{width:100%;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
+ h1{font-size:23px!important;line-height:1.15}h2{font-size:19px}
+ .stats{grid-template-columns:1fr 1fr!important;gap:10px!important}
+ .stat{display:block!important;padding:14px!important}.stat strong{font-size:23px!important}.stat-icon{display:none}
+ .card,.panel{border-radius:16px}
+ table{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+ .order{padding:14px!important}.order-side{gap:8px}
+ .toolbar{gap:10px!important}.toolbar>*{width:100%}
+ .mobile-nav{box-shadow:0 -8px 28px #06356b24;z-index:50;gap:2px!important}
+ .mobile-nav .nav-item{flex-direction:column;gap:3px;min-width:68px;padding:8px 6px!important;font-size:11px!important;border-radius:12px}
+ .mobile-nav .nav-item.active,.mobile-nav .nav-item[aria-current]{background:#e8f4fc;color:#06356b}
+ .modal-backdrop{padding:0!important;place-items:end stretch!important}
+ .delete-modal,.install-modal{width:100%!important;max-height:92svh;margin:0!important;border-radius:22px 22px 0 0!important;overflow:auto;padding-bottom:calc(22px + env(safe-area-inset-bottom,0px))}
+ .modal-actions{display:grid!important;grid-template-columns:1fr}
+ .live-notice{left:10px;right:10px;bottom:calc(84px + env(safe-area-inset-bottom,0px));min-width:0}
+ .login{width:calc(100% - 24px);margin:12px auto}
+}

@@ -68,10 +68,10 @@ function drawStatic(){
 let offersOpen=false,offersCap=0;
 const offerCap=()=>innerWidth>1024?4:innerWidth>760?3:2;
 function drawOffers(){
- const offers=P.filter(p=>Number(p.o)>Number(p.p)&&Number(p.o)>0),og=$("#og"),more=$("#ogMore"),cap=offersCap=offerCap();if(!og)return;
+ let offers=P.filter(p=>Number(p.o)>Number(p.p)&&Number(p.o)>0),demo=false;if(!offers.length&&window.BV_DEMO_OFFERS){offers=window.BV_DEMO_OFFERS;demo=true;offers.forEach(d=>{if(!P.some(x=>x.id===d.id))P.push(d)})}const og=$("#og"),more=$("#ogMore"),cap=offersCap=offerCap();if(!og)return;
  if(!offers.length){og.innerHTML=`<div class="offers-empty"><strong>Novidades chegando</strong><span>As ofertas serão exibidas aqui assim que houver descontos cadastrados.</span><button class="btn ol" onclick="setCat('todos')">Ver todos os produtos</button></div>`;if(more)more.innerHTML="";return}
  og.innerHTML=offers.map(card).join("");[...og.children].forEach((c,i)=>{c.hidden=!offersOpen&&i>=cap});
- if(more)more.innerHTML=offers.length>cap?`<button class="btn offers-more" type="button" onclick="toggleOffers()" aria-expanded="${offersOpen}">${offersOpen?"Recolher ofertas":`Expandir · ver as ${offers.length} ofertas`}<span aria-hidden="true">${offersOpen?"−":"+"}</span></button>`:"";
+ if(more)more.innerHTML=(demo?`<p class="offers-note">Produtos de exemplo — somem quando você cadastrar ofertas reais.</p>`:"")+(offers.length>cap?`<button class="btn offers-more" type="button" onclick="toggleOffers()" aria-expanded="${offersOpen}">${offersOpen?"Recolher ofertas":`Expandir · ver as ${offers.length} ofertas`}<span aria-hidden="true">${offersOpen?"−":"+"}</span></button>`:"");
 }
 function toggleOffers(){offersOpen=!offersOpen;drawOffers();if(!offersOpen)go("ofertas")}
 function showOffers(){offersOpen=true;drawOffers();go("ofertas")}
