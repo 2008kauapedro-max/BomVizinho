@@ -59,7 +59,7 @@ const card=p=>{const d=pct(p),b=d?`-${d}% OFF`:p.t,bc=d?"":p.tc||"";
  return`<article class="card"><div class="product-visual-wrap">${b?`<span class="bd ${bc}">${b}</span>`:""}${img(p)}</div>
  <div class="pb"><small>${cc(p.cat).n}</small><h3 class="product-title" onclick="openProduct(${p.id})" role="button" tabindex="0" onkeydown="if(event.key==='Enter'){openProduct(${p.id})}">${p.n}</h3><div class="st"><em>Consulte disponibilidade</em></div>
  <div class="old">${p.o?`De: <s>${brl(p.o)}</s>`:""}</div><div class="pr"><small>R$</small>${p.p.toLocaleString("pt-BR",{minimumFractionDigits:2})}</div>
- <div class="bt"><button class="btn" onclick="comprar(${p.id})">Comprar agora</button><button class="btn ol" onclick="add(${p.id})">${ic("cart")}Adicionar ao carrinho</button></div></div></article>`};
+ <div class="bt"><button class="btn" onclick="comprar(${p.id})">Comprar agora</button><button class="btn ol" onclick="add(${p.id})" aria-label="Adicionar ao carrinho">${ic("cart")}Adicionar ao carrinho</button></div></div></article>`};
 function drawStatic(){
  $("#nav").innerHTML=CATS.slice(1).map(c=>`<a href="#" onclick="setCat('${c.id}');return false">${c.n}</a>`).join("");
  $("#cg").innerHTML=CATS.slice(1).map(c=>`<button class="cat" onclick="setCat('${c.id}')"><div class="c">${ic(c.i)}<img src="assets/categorias/${c.id}.png" data-b="assets/categorias/${c.id}" alt="" onerror="imgErr(this)"></div>${c.n}</button>`).join("");
@@ -80,7 +80,10 @@ function drawProducts(){
  $("#tabs").innerHTML=CATS.map(c=>`<button class="${c.id===cat?"on":""}" onclick="setCat('${c.id}',1)">${c.n}</button>`).join("");
  const l=P.filter(p=>(cat==="todos"||p.cat===cat)&&(p.n+" "+cc(p.cat).n).toLowerCase().includes(term));
  $("#pt").textContent=term?`Resultados para “${term}”`:cat==="todos"?"Todos os produtos":cc(cat).n;
- $("#grid").innerHTML=l.length?l.map(card).join(""):`<p class="empty">Nenhum produto encontrado. Tente outra busca.</p>`;
+ const lim=innerWidth>760?9:8;
+ $("#grid").innerHTML=l.length?l.slice(0,lim).map(card).join(""):`<p class="empty">Nenhum produto encontrado. Tente outra busca.</p>`;
+ let gm=$("#gridMore");if(!gm){gm=document.createElement("div");gm.id="gridMore";gm.className="ogm gm";$("#grid").after(gm)}
+ gm.innerHTML=l.length>lim?`<button class="btn bv-more" type="button" onclick="openStore(cat,term)">Ver mais produtos<span>${l.length.toLocaleString("pt-BR")}</span></button>`:"";
  reveal();
 }
 const go=id=>{const el=document.getElementById(id);if(window.bvScrollTo)bvScrollTo(el);else el.scrollIntoView({behavior:"smooth"})};

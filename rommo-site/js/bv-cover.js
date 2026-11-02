@@ -20,16 +20,18 @@ document.addEventListener("click",e=>{const t=e.target;
  if(t.closest(".bvc-logo")){e.preventDefault();scrollTo(0,0)}});
 /* botão de menu no cabeçalho */
 const act=$(".act");if(act){const b=document.createElement("button");b.className="bvh-burger";b.type="button";b.setAttribute("aria-label","Abrir menu");b.innerHTML="<i></i><i></i><i></i>";act.appendChild(b)}
-/* encolhimento ligado à rolagem */
-let D=600,fr=0;const ease=p=>p*p*(3-2*p);
-function size(){pic();D=Math.round(Math.min(innerHeight*.85,760));hero.style.paddingTop=D+"px";upd()}
-function upd(){fr=0;const st=$(".experience-stage");if(!st)return;const p=Math.min(1,Math.max(0,scrollY/D));
- if(p>=1){c.style.display="none";return}c.style.display="block";
- const r=st.getBoundingClientRect(),e=ease(p),vw=innerWidth,vh=innerHeight,
-  T=r.top*e,L=r.left*e,R=Math.max(0,(vw-r.right)*e),B=Math.max(0,(vh-r.bottom)*e);
- im.style.cssText+=`;top:${T}px;left:${L}px;width:${vw-L-R}px;height:${vh-T-B}px;border-radius:${28*e}px`;
+/* encolhimento ligado à rolagem — só clip-path/opacity (sem recalcular layout a cada quadro) */
+let D=600,fr=0,M=null;const ease=p=>p*p*(3-2*p);
+function measure(){const st=$(".experience-stage");if(!st)return;const r=st.getBoundingClientRect();M={t:r.top+scrollY,l:r.left,w:r.width,h:r.height}}
+function size(){pic();D=Math.round(Math.min(innerHeight*.85,760));hero.style.paddingTop=D+"px";measure();upd()}
+function upd(){fr=0;if(!M)measure();if(!M)return;const y=scrollY,p=Math.min(1,Math.max(0,y/D));
+ if(p>=1){if(c.style.display!=="none")c.style.display="none";return}if(c.style.display!=="block")c.style.display="block";
+ const e=ease(p),vw=innerWidth,vh=innerHeight,top=M.t-y,
+  T=Math.max(0,top)*e,L=M.l*e,R=Math.max(0,vw-M.l-M.w)*e,B=Math.max(0,vh-top-M.h)*e;
+ im.style.clipPath=`inset(${T.toFixed(1)}px ${R.toFixed(1)}px ${B.toFixed(1)}px ${L.toFixed(1)}px round ${(28*e).toFixed(1)}px)`;
+ im.style.opacity=p>.86?Math.max(0,1-(p-.86)/.14):1;
  ui.style.opacity=Math.max(0,1-p*3.2);ui.style.pointerEvents=p>.25?"none":"auto"}
-addEventListener("scroll",()=>{if(!fr)fr=requestAnimationFrame(upd)},{passive:true});addEventListener("resize",size);
+addEventListener("scroll",()=>{if(!fr)fr=requestAnimationFrame(upd)},{passive:true});addEventListener("resize",()=>{size()});
 size();addEventListener("load",size);
 /* abertura sempre no topo: sem restaurar rolagem antiga e sem capa "desatualizada" */
 try{history.scrollRestoration="manual"}catch(e){}
@@ -37,7 +39,7 @@ const top=()=>{if(!/^#\//.test(location.hash))scrollTo(0,0)};if(location.hash&&!
 /* trava de abertura: até a pessoa interagir de verdade, a página fica no topo */
 let touched=false;["wheel","touchstart","keydown","pointerdown"].forEach(e=>addEventListener(e,()=>{if(!document.getElementById("ld"))touched=true},{passive:true,capture:true}));
 const t0=Date.now(),guard=setInterval(()=>{if(touched||Date.now()-t0>20000){clearInterval(guard);return}if(scrollY>0&&!/^#\//.test(location.hash))scrollTo(0,0)},80);
-const refresh=()=>{size();upd()};[0,300,1000,2500,4800,6500].forEach(t=>setTimeout(refresh,t));
+const refresh=()=>{size()};[0,300,1000,2500,4800,6500].forEach(t=>setTimeout(refresh,t));
 addEventListener("pageshow",refresh);
 new ResizeObserver(()=>{if(!fr)fr=requestAnimationFrame(upd)}).observe(document.body);
 const mo=new MutationObserver(()=>{if(!document.getElementById("ld")){mo.disconnect();const top=()=>{if(!/^#\//.test(location.hash))scrollTo(0,0)};if(location.hash&&!/^#\//.test(location.hash)){try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}}top();refresh()}});mo.observe(document.body,{childList:true});
