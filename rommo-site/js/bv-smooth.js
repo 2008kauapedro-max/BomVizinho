@@ -5,7 +5,7 @@ const put=y=>{last=y;scrollTo(0,y)};
 function tick(){raf=0;const d=tgt-cur;if(Math.abs(d)<.4){cur=tgt;put(cur);return}cur+=d*.09;put(cur);raf=requestAnimationFrame(tick)}
 function stop(){anim++;}
 function scrollable(el){for(;el&&el!==document.body&&el!==document.documentElement;el=el.parentElement){const s=getComputedStyle(el);if(/(auto|scroll)/.test(s.overflowY)&&el.scrollHeight>el.clientHeight+1)return true;if(/(auto|scroll)/.test(s.overflowX)&&el.scrollWidth>el.clientWidth+1&&Math.abs(0)>1)return true}return false}
-addEventListener("wheel",e=>{if(e.ctrlKey||e.defaultPrevented||scrollable(e.target)||getComputedStyle(document.body).overflow==="hidden")return;
+addEventListener("wheel",e=>{if(document.getElementById("ld")){e.preventDefault();return}if(e.ctrlKey||e.defaultPrevented||scrollable(e.target)||getComputedStyle(document.body).overflow==="hidden")return;
  e.preventDefault();stop();if(!raf){cur=scrollY}
  const k=e.deltaMode===1?32:e.deltaMode===2?innerHeight:1;tgt=clamp((raf?tgt:scrollY)+e.deltaY*k*1.15);if(!raf)raf=requestAnimationFrame(tick)},{passive:false});
 addEventListener("scroll",()=>{if(Math.abs(scrollY-last)>3&&!raf){cur=tgt=last=scrollY}},{passive:true});
