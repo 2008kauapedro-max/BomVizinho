@@ -31,4 +31,11 @@ function upd(){fr=0;const st=$(".experience-stage");if(!st)return;const p=Math.m
  ui.style.opacity=Math.max(0,1-p*3.2);ui.style.pointerEvents=p>.25?"none":"auto"}
 addEventListener("scroll",()=>{if(!fr)fr=requestAnimationFrame(upd)},{passive:true});addEventListener("resize",size);
 size();addEventListener("load",size);
+/* abertura sempre no topo: sem restaurar rolagem antiga e sem capa "desatualizada" */
+try{history.scrollRestoration="manual"}catch(e){}
+if(!location.hash)scrollTo(0,0);
+const refresh=()=>{size();upd()};[0,300,1000,2500,4800,6500].forEach(t=>setTimeout(refresh,t));
+addEventListener("pageshow",refresh);
+new ResizeObserver(()=>{if(!fr)fr=requestAnimationFrame(upd)}).observe(document.body);
+const mo=new MutationObserver(()=>{if(!document.getElementById("ld")){mo.disconnect();if(!location.hash)scrollTo(0,0);refresh()}});mo.observe(document.body,{childList:true});
 })();
