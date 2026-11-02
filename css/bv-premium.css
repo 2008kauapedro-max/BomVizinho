@@ -229,3 +229,5 @@ html{scroll-behavior:auto!important}
  .experience-stage{min-height:min(620px,calc(100svh - 190px));justify-content:flex-start!important;padding:26px 0 18px!important;align-items:stretch!important}
  .experience-product{order:2;margin-top:auto!important;margin-bottom:0!important;align-self:stretch}
 }
+
+#ld{touch-action:none;overscroll-behavior:contain}

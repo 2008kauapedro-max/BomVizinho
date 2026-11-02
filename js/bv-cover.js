@@ -34,6 +34,9 @@ size();addEventListener("load",size);
 /* abertura sempre no topo: sem restaurar rolagem antiga e sem capa "desatualizada" */
 try{history.scrollRestoration="manual"}catch(e){}
 const top=()=>{if(!/^#\//.test(location.hash))scrollTo(0,0)};if(location.hash&&!/^#\//.test(location.hash)){try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}}top();
+/* trava de abertura: até a pessoa interagir de verdade, a página fica no topo */
+let touched=false;["wheel","touchstart","keydown","pointerdown"].forEach(e=>addEventListener(e,()=>{if(!document.getElementById("ld"))touched=true},{passive:true,capture:true}));
+const t0=Date.now(),guard=setInterval(()=>{if(touched||Date.now()-t0>20000){clearInterval(guard);return}if(scrollY>0&&!/^#\//.test(location.hash))scrollTo(0,0)},80);
 const refresh=()=>{size();upd()};[0,300,1000,2500,4800,6500].forEach(t=>setTimeout(refresh,t));
 addEventListener("pageshow",refresh);
 new ResizeObserver(()=>{if(!fr)fr=requestAnimationFrame(upd)}).observe(document.body);
