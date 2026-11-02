@@ -33,9 +33,9 @@ addEventListener("scroll",()=>{if(!fr)fr=requestAnimationFrame(upd)},{passive:tr
 size();addEventListener("load",size);
 /* abertura sempre no topo: sem restaurar rolagem antiga e sem capa "desatualizada" */
 try{history.scrollRestoration="manual"}catch(e){}
-if(!location.hash)scrollTo(0,0);
+const top=()=>{if(!/^#\//.test(location.hash))scrollTo(0,0)};if(location.hash&&!/^#\//.test(location.hash)){try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}}top();
 const refresh=()=>{size();upd()};[0,300,1000,2500,4800,6500].forEach(t=>setTimeout(refresh,t));
 addEventListener("pageshow",refresh);
 new ResizeObserver(()=>{if(!fr)fr=requestAnimationFrame(upd)}).observe(document.body);
-const mo=new MutationObserver(()=>{if(!document.getElementById("ld")){mo.disconnect();if(!location.hash)scrollTo(0,0);refresh()}});mo.observe(document.body,{childList:true});
+const mo=new MutationObserver(()=>{if(!document.getElementById("ld")){mo.disconnect();const top=()=>{if(!/^#\//.test(location.hash))scrollTo(0,0)};if(location.hash&&!/^#\//.test(location.hash)){try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}}top();refresh()}});mo.observe(document.body,{childList:true});
 })();
