@@ -113,7 +113,7 @@ async function route(req,env){const url=new URL(req.url),path=url.pathname,metho
    const totalRow=await env.DB.prepare('SELECT COUNT(*) AS total FROM orders o'+where).bind(...args).first();
    let pageWhere=where,pageArgs=[...args];
    if(beforeDate&&beforeId){pageWhere+=' AND (o.created_at < ? OR (o.created_at = ? AND o.id < ?))';pageArgs.push(beforeDate,beforeDate,beforeId)}
-   const direction=group==='overdue'?'ASC':'DESC';const sql='SELECT o.*, (SELECT COUNT(*) FROM order_items i WHERE i.order_id=o.id) AS item_count, (SELECT COALESCE(SUM(quantity),0) FROM order_items i WHERE i.order_id=o.id) AS unit_count FROM orders o'+pageWhere+' ORDER BY o.created_at '+direction+',o.id '+direction+' LIMIT ?';
+   const direction=group==='overdue'?'ASC':'DESC';const sql='SELECT o.*, (SELECT COUNT(*) FROM order_items i WHERE i.order_id=o.id) AS item_count, (SELECT COALESCE(SUM(quantity),0) FROM order_items i WHERE i.order_id=o.id) AS unit_count, (SELECT group_concat(t,\'|\') FROM (SELECT COALESCE(p.image_url,\'\')||\'~\'||COALESCE(i.product_id,\'\') AS t FROM order_items i LEFT JOIN products p ON p.id=i.product_id WHERE i.order_id=o.id ORDER BY i.id LIMIT 4)) AS thumbs FROM orders o'+pageWhere+' ORDER BY o.created_at '+direction+',o.id '+direction+' LIMIT ?';
    pageArgs.push(limit+1);const result=await env.DB.prepare(sql).bind(...pageArgs).all(),all=result.results||[],hasMore=all.length>limit,orders=all.slice(0,limit),last=orders[orders.length-1];
    return json({orders,total:Number(totalRow?.total||0),hasMore,nextCursor:hasMore&&last?{created_at:last.created_at,id:last.id}:null});
   }
@@ -130,7 +130,7 @@ async function route(req,env){const url=new URL(req.url),path=url.pathname,metho
   const detail=path.match(/^\/api\/admin\/orders\/([0-9a-f-]+)$/i);
   if(detail&&method==='GET'){
    const order=await env.DB.prepare('SELECT * FROM orders WHERE id=?').bind(detail[1]).first();if(!order)return fail('nao_encontrado',404);
-   const items=await env.DB.prepare('SELECT * FROM order_items WHERE order_id=? ORDER BY id').bind(detail[1]).all();const history=await env.DB.prepare('SELECT * FROM order_history WHERE order_id=? ORDER BY id DESC').bind(detail[1]).all();
+   const items=await env.DB.prepare('SELECT oi.*, p.image_url AS image_url FROM order_items oi LEFT JOIN products p ON p.id=oi.product_id WHERE oi.order_id=? ORDER BY oi.id').bind(detail[1]).all();const history=await env.DB.prepare('SELECT * FROM order_history WHERE order_id=? ORDER BY id DESC').bind(detail[1]).all();
    await env.DB.prepare("UPDATE orders SET seen_at=COALESCE(seen_at,?) WHERE id=?").bind(now(),detail[1]).run();return json({order,items:items.results||[],history:history.results||[]});
   }
   const upd=path.match(/^\/api\/admin\/orders\/([0-9a-f-]+)\/status$/i);
