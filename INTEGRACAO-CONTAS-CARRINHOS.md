@@ -2,7 +2,7 @@
 
 ## O que foi integrado
 - API de cadastro, login, logout e consulta da conta do cliente no Worker.
-- Senhas derivadas com PBKDF2-SHA256 (210.000 iterações e salt individual); o token da sessão é armazenado no D1 somente como SHA-256.
+- Senhas derivadas com PBKDF2-SHA256 (100.000 iterações, o máximo aceito pela Cloudflare e salt individual); o token da sessão é armazenado no D1 somente como SHA-256.
 - Cookie de sessão `HttpOnly`, `Secure` e `SameSite=Lax`.
 - Interface Minha conta na loja, cadastro e login.
 - Sincronização do carrinho da conta com D1 e recuperação em outro dispositivo.

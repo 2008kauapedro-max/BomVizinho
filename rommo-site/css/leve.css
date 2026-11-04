@@ -12,3 +12,18 @@
 @media (prefers-reduced-motion:reduce){
  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
+
+/* Ícone de reserva atrás da foto (tomada, caixa...) some quando a foto carrega */
+.pi.img-ok>.ic,.c.img-ok>.ic{display:none!important}
+
+/* Cabeçalho no celular: marca inteira à esquerda, botões redondos iguais à direita */
+@media (max-width:560px){
+ header .hd{display:flex!important;flex-wrap:nowrap!important;align-items:center!important;gap:8px!important}
+ header .lk.header-brand{flex:1 1 auto!important;min-width:0!important;overflow:hidden}
+ header .header-brand-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ header .act{flex:0 0 auto!important;margin-left:auto!important;gap:6px!important;grid-column:auto!important}
+ header .act>.hide{display:none!important}
+ header .account-trigger,header .search-toggle,header .cb{width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;padding:0!important;border-radius:12px!important;display:inline-grid!important;place-items:center!important}
+ /* "Minha conta" vira ícone de pessoa (o texto continua para leitores de tela) */
+ header .account-trigger{font-size:0!important;color:transparent!important;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23073765' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21c1-4 4-6 8-6s7 2 8 6'/%3E%3C/svg%3E") center/21px no-repeat!important}
+}

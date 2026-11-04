@@ -365,3 +365,9 @@ test('login de cliente bloqueia após 8 senhas erradas, inclusive para e-mail in
   const ghost = await call(env, '/api/customer/login', { method: 'POST', body: { email: 'ninguem@example.test', password: 'qualquer' } });
   assert.equal(ghost.response.status, 429, 'e-mail inexistente também é limitado, sem revelar se existe conta');
 });
+
+test('hash de senha respeita o limite de 100.000 iterações do PBKDF2 na Cloudflare', () => {
+  const found = [...workerSource.matchAll(/iterations:\s*(\d+)/g)].map(m => Number(m[1]));
+  assert.ok(found.length > 0, 'o Worker deve declarar as iterações do PBKDF2');
+  for (const n of found) assert.ok(n <= 100000, `Cloudflare Workers recusa PBKDF2 acima de 100.000 iterações (encontrado ${n})`);
+});
