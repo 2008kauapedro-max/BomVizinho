@@ -137,7 +137,7 @@ catalogReady=(async function syncCatalogFromServer(){
   if(!response.ok) return false;
   const payload=await response.json();
   if(!Array.isArray(payload.products)) return false;
-  const categoryMap={'elétricas':'eletricas','eletricas':'eletricas','manuais':'manuais','kits':'kits','irrigação':'irrigacao','irrigacao':'irrigacao','agropecuária':'agro','agro':'agro','jardim':'jardim','construção':'construcao','construcao':'construcao','limpeza':'limpeza','segurança':'manuais'};
+  const categoryMap={'elétricas':'eletricas','eletricas':'eletricas','manuais':'manuais','kits':'kits','irrigação':'irrigacao','irrigacao':'irrigacao','agropecuária':'agro','agropecuaria':'agro','agro':'agro','jardim':'jardim','construção':'construcao','construcao':'construcao','limpeza':'limpeza','segurança':'manuais'};
   const slugify=s=>String(s||'').trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   const serverProducts=payload.products.map(p=>{
    const raw=slugify(p.category),cat=categoryMap[raw]||raw.replace(/[^a-z0-9]+/g,'-');
