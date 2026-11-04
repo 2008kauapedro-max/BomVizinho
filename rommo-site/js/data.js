@@ -14,7 +14,7 @@ const ENTREGAS=[{v:"Entrega",t:"Receber em casa",s:"Informe o endereço"},{v:"Re
 const CATS=[{id:"todos",n:"Todos",i:"grid"},{id:"eletricas",n:"Elétricas",i:"plug"},{id:"manuais",n:"Manuais",i:"wrench"},{id:"kits",n:"Kits",i:"box"},{id:"irrigacao",n:"Irrigação",i:"drop"},{id:"agro",n:"Agropecuária",i:"tractor"},{id:"jardim",n:"Jardim",i:"leaf"},{id:"construcao",n:"Construção",i:"hat"},{id:"limpeza",n:"Limpeza",i:"spray"}];
 // Banners principais: imagens em assets/banner-1.jpg ... Se a arte já tiver texto, use soImagem:true
 const HERO=[
- {img:"assets/bomvizinho-drill-hero.webp",c:"#f5b51b",t:"Ferramentas certas. Trabalho bem feito.",p:"Encontre ferramentas elétricas e equipamentos para tirar seu próximo projeto do papel.",b:"Explorar ferramentas",cat:"eletricas"}
+ {img:"assets/bomvizinho-drill-hero.webp",c:"#70c7f2",t:"Ferramentas certas. Trabalho bem feito.",p:"Encontre ferramentas elétricas e equipamentos para tirar seu próximo projeto do papel.",b:"Explorar ferramentas",cat:"eletricas"}
 ];
 // Produtos: a foto é lida de assets/produtos/ID.png (ex.: 1.png). Para outro nome, adicione img:"assets/produtos/arquivo.png"
 let P=[
