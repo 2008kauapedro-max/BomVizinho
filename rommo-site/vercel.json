@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://rommo-store.rommo-kauapedro.workers.dev/api/:path*"
+      "destination": "https://bomvizinho.2008kauapedro.workers.dev/api/:path*"
     }
   ]
 }
