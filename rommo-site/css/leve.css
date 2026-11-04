@@ -4,10 +4,8 @@
  header,.customer-modal,.bvc-burger{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
  header{background:rgba(244,249,252,.985)!important}
  .customer-modal{background:rgba(4,22,41,.74)!important}
- /* bolhas desfocadas animadas da tela de carregamento */
- .ld-b{display:none!important}
  /* animações decorativas que ficam rodando sem parar */
- .experience-product,.fab::before,.cta::before,.ld-ring::after{animation:none!important}
+ .experience-product,.fab::before,.cta::before{animation:none!important}
  /* partes do fim da página só são desenhadas quando chegam perto da tela */
  #loja,footer{content-visibility:auto;contain-intrinsic-size:auto 900px}
 }
