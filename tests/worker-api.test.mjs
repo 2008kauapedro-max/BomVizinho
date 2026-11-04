@@ -336,3 +336,32 @@ test('retirar consentimento remove o carrinho da lista e impede registrar lembre
   const marked = await call(env, `/api/admin/abandoned-carts/${account.customer.id}/reminded`, { method: 'POST', cookie: admin, body: {} });
   assert.equal(marked.response.status, 404);
 });
+
+test('login do painel bloqueia após 8 senhas erradas e libera a senha certa só depois', async () => {
+  const env = createEnv();
+  for (let i = 0; i < 8; i++) {
+    const { response } = await call(env, '/api/admin/login', { method: 'POST', body: { email: env.ADMIN_EMAIL, password: 'errada-' + i } });
+    assert.equal(response.status, 401);
+  }
+  const blocked = await call(env, '/api/admin/login', { method: 'POST', body: { email: env.ADMIN_EMAIL, password: env.ADMIN_PASSWORD } });
+  assert.equal(blocked.response.status, 429);
+  assert.equal(blocked.data.error, 'muitas_tentativas');
+  env.db.prepare('UPDATE login_attempts SET locked_until=0').run();
+  const ok = await call(env, '/api/admin/login', { method: 'POST', body: { email: env.ADMIN_EMAIL, password: env.ADMIN_PASSWORD } });
+  assert.equal(ok.response.status, 200);
+  assert.equal(Number(env.db.prepare("SELECT COUNT(*) AS n FROM login_attempts WHERE attempt_key LIKE 'admin:email:%'").get().n), 0, 'login certo limpa as tentativas');
+});
+
+test('login de cliente bloqueia após 8 senhas erradas, inclusive para e-mail inexistente', async () => {
+  const env = createEnv();
+  await register(env);
+  for (let i = 0; i < 8; i++) {
+    const { response } = await call(env, '/api/customer/login', { method: 'POST', body: { email: sampleCustomer.email, password: 'errada-' + i } });
+    assert.equal(response.status, 401);
+  }
+  const blocked = await call(env, '/api/customer/login', { method: 'POST', body: { email: sampleCustomer.email, password: sampleCustomer.password } });
+  assert.equal(blocked.response.status, 429);
+  for (let i = 0; i < 8; i++) await call(env, '/api/customer/login', { method: 'POST', body: { email: 'ninguem@example.test', password: 'x-' + i } });
+  const ghost = await call(env, '/api/customer/login', { method: 'POST', body: { email: 'ninguem@example.test', password: 'qualquer' } });
+  assert.equal(ghost.response.status, 429, 'e-mail inexistente também é limitado, sem revelar se existe conta');
+});

@@ -13,6 +13,15 @@ async function requireCustomer(req,env){const raw=cookieVal(req,'bv_customer');i
 async function passwordHash(password,salt){const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveBits']);const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:new TextEncoder().encode(salt),iterations:210000,hash:'SHA-256'},key,256);return [...new Uint8Array(bits)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 const customerCookie=(value,maxAge)=>`bv_customer=${encodeURIComponent(value)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
 async function requireAdmin(req,env){const raw=cookieVal(req,'rommo_session');if(!raw)return null;const hash=await sha256(raw);const row=await env.DB.prepare('SELECT email, expires_at FROM admin_sessions WHERE token_hash=?').bind(hash).first();if(!row||row.expires_at<Math.floor(Date.now()/1000)){if(row)await env.DB.prepare('DELETE FROM admin_sessions WHERE token_hash=?').bind(hash).run();return null}return {email:row.email,hash}}
+
+/* ===== Bloqueio de tentativas de login ===== */
+const LOGIN_RULES={email:{max:8,window:900,lock:900},ip:{max:20,window:900,lock:900}};
+function clientIp(req){const xr=req.headers.get('x-real-ip')||'',xf=(req.headers.get('x-forwarded-for')||'').split(',')[0].trim();return (xr||xf||req.headers.get('CF-Connecting-IP')||'desconhecido').slice(0,64)}
+function loginKeys(scope,email,req){return [[`${scope}:email:${email}`,LOGIN_RULES.email],[`${scope}:ip:${clientIp(req)}`,LOGIN_RULES.ip]]}
+async function loginLockedFor(env,keys){const t=Math.floor(Date.now()/1000);let wait=0;for(const [k] of keys){try{const r=await env.DB.prepare('SELECT locked_until FROM login_attempts WHERE attempt_key=?').bind(k).first();if(r&&Number(r.locked_until)>t)wait=Math.max(wait,Number(r.locked_until)-t)}catch(e){}}return wait}
+async function loginFailed(env,keys){const t=Math.floor(Date.now()/1000);for(const [k,rule] of keys){try{const r=await env.DB.prepare('SELECT failures,first_failure_at FROM login_attempts WHERE attempt_key=?').bind(k).first();let failures=1,first=t;if(r&&t-Number(r.first_failure_at)<rule.window){failures=Number(r.failures)+1;first=Number(r.first_failure_at)}const locked=failures>=rule.max?t+rule.lock:0;await env.DB.prepare('INSERT INTO login_attempts(attempt_key,failures,first_failure_at,locked_until) VALUES(?,?,?,?) ON CONFLICT(attempt_key) DO UPDATE SET failures=excluded.failures,first_failure_at=excluded.first_failure_at,locked_until=excluded.locked_until').bind(k,locked?0:failures,locked?t:first,locked).run()}catch(e){}}}
+async function loginSucceeded(env,keys){for(const [k] of keys){try{await env.DB.prepare('DELETE FROM login_attempts WHERE attempt_key=?').bind(k).run()}catch(e){}}}
+const lockedResponse=wait=>json({error:'muitas_tentativas',retry_after_seconds:wait},429,{'Retry-After':String(wait)});
 async function route(req,env){const url=new URL(req.url),path=url.pathname,method=req.method;
  if(method==='OPTIONS')return new Response(null,{status:204,headers:{...corsHeaders,'Access-Control-Allow-Methods':'GET,POST,PATCH,OPTIONS','Access-Control-Allow-Headers':'Content-Type'}});
  if(path==='/api/health'&&method==='GET')return json({ok:true,service:'rommo-api'});
@@ -50,9 +59,10 @@ async function route(req,env){const url=new URL(req.url),path=url.pathname,metho
   return json({ok:true,customer:{id,name,email,phone,marketingConsent:p.marketingConsent===true}},201,{'Set-Cookie':customerCookie(token,60*60*24*30)});
  }
  if(path==='/api/customer/login'&&method==='POST'){
-  const p=await body(req),email=String(p?.email||'').trim().toLowerCase(),password=String(p?.password||'');if(email.length>160||password.length>128)return fail('credenciais_invalidas',401);const c=await env.DB.prepare('SELECT id,name,email,phone,password_hash,password_salt,marketing_consent FROM customers WHERE email=?').bind(email).first();
-  if(!c){if(password)await passwordHash(password,'bomvizinho-login-dummy-salt-v1');return fail('credenciais_invalidas',401)}
-  if(!password||!safeEqual(await passwordHash(password,c.password_salt),c.password_hash))return fail('credenciais_invalidas',401);
+  const p=await body(req),email=String(p?.email||'').trim().toLowerCase(),password=String(p?.password||'');if(email.length>160||password.length>128)return fail('credenciais_invalidas',401);const keys=loginKeys('cliente',email,req),wait=await loginLockedFor(env,keys);if(wait)return lockedResponse(wait);const c=await env.DB.prepare('SELECT id,name,email,phone,password_hash,password_salt,marketing_consent FROM customers WHERE email=?').bind(email).first();
+  if(!c){if(password)await passwordHash(password,'bomvizinho-login-dummy-salt-v1');await loginFailed(env,keys);return fail('credenciais_invalidas',401)}
+  if(!password||!safeEqual(await passwordHash(password,c.password_salt),c.password_hash)){await loginFailed(env,keys);return fail('credenciais_invalidas',401)}
+  await loginSucceeded(env,keys);
   const token=Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join(''),expires=Math.floor(Date.now()/1000)+60*60*24*30;await env.DB.prepare('INSERT INTO customer_sessions(token_hash,customer_id,expires_at) VALUES(?,?,?)').bind(await sha256(token),c.id,expires).run();
   return json({ok:true,customer:{id:c.id,name:c.name,email:c.email,phone:c.phone,marketingConsent:!!c.marketing_consent}},200,{'Set-Cookie':customerCookie(token,60*60*24*30)});
  }
@@ -75,7 +85,9 @@ async function route(req,env){const url=new URL(req.url),path=url.pathname,metho
   if(path==='/api/admin/login'&&method==='POST'){
    const p=await body(req);const email=String(p?.email||'').trim().toLowerCase(),password=String(p?.password||'');
    if(!env.ADMIN_EMAIL||!env.ADMIN_PASSWORD)return fail('admin_nao_configurado',503);
-   if(email!==String(env.ADMIN_EMAIL).trim().toLowerCase()||password!==env.ADMIN_PASSWORD){await new Promise(r=>setTimeout(r,350));return fail('credenciais_invalidas',401)}
+   const keys=loginKeys('admin',email,req),wait=await loginLockedFor(env,keys);if(wait)return lockedResponse(wait);
+   if(!safeEqual(email,String(env.ADMIN_EMAIL).trim().toLowerCase())||!safeEqual(password,String(env.ADMIN_PASSWORD))){await loginFailed(env,keys);await new Promise(r=>setTimeout(r,350));return fail('credenciais_invalidas',401)}
+   await loginSucceeded(env,keys);try{await env.DB.prepare('DELETE FROM admin_sessions WHERE expires_at<?').bind(Math.floor(Date.now()/1000)).run()}catch(e){}
    const maxAge=p?.remember===false?60*60*12:60*60*24*7;const token=Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join(''),hash=await sha256(token),expires=Math.floor(Date.now()/1000)+maxAge;
    await env.DB.prepare('INSERT INTO admin_sessions(token_hash,email,expires_at) VALUES(?,?,?)').bind(hash,email,expires).run();
    return json({ok:true,email},200,{'Set-Cookie':setCookie(token,maxAge)});
