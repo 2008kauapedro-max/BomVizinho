@@ -36,8 +36,12 @@ const pct=p=>p.o?Math.round((1-p.p/p.o)*100):0;
 /* imagens: aceita .jpg .jpeg .png .webp (testa uma por uma) */
 const EXTS=[".jpg",".jpeg",".png",".webp"];
 function achaImg(src,cb){const base=src.replace(/\.(jpe?g|png|webp)$/i,""),l=[src,...EXTS.map(e=>base+e)];(function t(i){if(i>=l.length)return;const im=new Image();im.onload=()=>cb(l[i]);im.onerror=()=>t(i+1);im.src=l[i]})(0)}
-function aplicaImgs(){document.querySelectorAll("[data-img]").forEach(el=>{achaImg(el.dataset.img,u=>{el.style.backgroundImage=`url("${u}")`;el.classList.add("carregou")})})}
-function imgErr(el){const b=el.dataset.b;if(!b){el.remove();return}const L=[".png",".jpg",".jpeg",".webp"],n=(+el.dataset.n||0)+1;if(n>=L.length){el.remove();return}el.dataset.n=n;el.src=b+L[n]}
+function aplicaImgs(){const go=el=>{if(el.dataset.ok)return;el.dataset.ok=1;achaImg(el.dataset.img,u=>{el.style.backgroundImage=`url("${u}")`;el.classList.add("carregou")})};const els=[...document.querySelectorAll("[data-img]")];
+ /* fotos de fundo só carregam quando estão perto de aparecer na tela (abertura mais leve) */
+ if(!("IntersectionObserver" in window)){els.forEach(go);return}
+ const io=window.__bvImgIO||(window.__bvImgIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);go(e.target)}}),{rootMargin:"500px 0px"}));
+ els.forEach(el=>{if(!el.dataset.ok)io.observe(el)})}
+function imgErr(el){const b=el.dataset.b;if(!b){el.remove();return}const L=[".webp",".png",".jpg",".jpeg"],n=(+el.dataset.n||0)+1;if(n>=L.length){el.remove();return}el.dataset.n=n;el.src=b+L[n]}
 const productImageFor=p=>{
  const s=String(p.n||"").toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g,"");
  const rules=[
@@ -51,9 +55,9 @@ const productImageFor=p=>{
   [/oculos de protecao|oculos|protecao ocular/ ,"oculos-de-protecao.jpg"]
  ];
  const match=rules.find(([re])=>re.test(s));
- return match?`assets/produtos/${match[1]}`:(p.img||`assets/produtos/${p.id}.png`);
+ return match?`assets/produtos/${match[1]}`:(p.img||`assets/produtos/${p.id}.webp`);
 };
-const img=p=>{const src=productImageFor(p);return `<div class="pi" onclick="openProduct(${p.id})" role="button" tabindex="0" aria-label="Ver detalhes de ${p.n}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openProduct(${p.id})}">${ic(cc(p.cat).i)}<img src="${src}" alt="${p.n}" loading="lazy" onerror="imgErr(this)"></div>`};
+const img=p=>{const src=productImageFor(p);return `<div class="pi" onclick="openProduct(${p.id})" role="button" tabindex="0" aria-label="Ver detalhes de ${p.n}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openProduct(${p.id})}">${ic(cc(p.cat).i)}<img src="${src}" alt="${p.n}" loading="lazy" decoding="async" onerror="imgErr(this)"></div>`};
 const stars=r=>Array.from({length:5},(_,i)=>`<svg class="ic ${i<Math.round(r)?"f":""}" style="${i<Math.round(r)?"":"opacity:.3"}"><use href="#i-star"/></svg>`).join("");
 const card=p=>{const d=pct(p),b=d?`-${d}% OFF`:p.t,bc=d?"":p.tc||"";
  return`<article class="card"><div class="product-visual-wrap">${b?`<span class="bd ${bc}">${b}</span>`:""}${img(p)}</div>
@@ -62,7 +66,7 @@ const card=p=>{const d=pct(p),b=d?`-${d}% OFF`:p.t,bc=d?"":p.tc||"";
  <div class="bt"><button class="btn" onclick="comprar(${p.id})">Comprar agora</button><button class="btn ol" onclick="add(${p.id})" aria-label="Adicionar ao carrinho">${ic("cart")}Adicionar ao carrinho</button></div></div></article>`};
 function drawStatic(){
  $("#nav").innerHTML=CATS.slice(1).map(c=>`<a href="#" onclick="setCat('${c.id}');return false">${c.n}</a>`).join("");
- $("#cg").innerHTML=CATS.slice(1).map(c=>`<button class="cat" onclick="setCat('${c.id}')"><div class="c">${ic(c.i)}<img src="assets/categorias/${c.id}.png" data-b="assets/categorias/${c.id}" alt="" onerror="imgErr(this)"></div>${c.n}</button>`).join("");
+ $("#cg").innerHTML=CATS.slice(1).map(c=>`<button class="cat" onclick="setCat('${c.id}')"><div class="c">${ic(c.i)}<img src="assets/categorias/${c.id}.webp" loading="lazy" decoding="async" data-b="assets/categorias/${c.id}" alt="" onerror="imgErr(this)"></div>${c.n}</button>`).join("");
  drawOffers();
 }
 let offersOpen=false,offersCap=0;
@@ -91,8 +95,8 @@ function setCat(id,stay){cat=id;term="";const q=$("#q");if(q)q.value="";drawProd
 /* banner */
 let hi=0,ht;
 function drawHero(){
-  const s=HERO[0]||{img:"assets/bomvizinho-drill-hero.png",t:"Ferramentas certas. Trabalho bem feito.",p:"Encontre ferramentas e equipamentos para o seu próximo projeto.",b:"Explorar ferramentas",cat:"eletricas"};
-  $("#hero").innerHTML=`<div class="experience-track" role="progressbar" aria-label="Abertura da loja" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="experience-stage"><div class="experience-image" data-img="${s.img}" role="img" aria-label="Ferramenta em destaque da BomVizinho"></div><div class="experience-shade"></div><div class="experience-copy"><span class="experience-eyebrow"><i></i> BOMVIZINHO <b>•</b> FERRAMENTAS & EQUIPAMENTOS</span><h1>${s.t}</h1><p>${s.p}</p><button class="btn experience-cta" onclick="setCat('${s.cat}')">${s.b}<span aria-hidden="true">↗</span></button><div class="experience-proof"><span>●</span> Produtos para casa, obra e agro</div></div><button class="experience-product" type="button" onclick="openProduct(1)" aria-label="Ver produto em destaque: parafusadeira furadeira de impacto"><span class="experience-product-image"><img src="assets/produtos/1.png" alt="" onerror="imgErr(this)"></span><span class="experience-product-copy"><small>DESTAQUE DA LOJA</small><strong>Parafusadeira Furadeira 20V</strong><em>Ver produto <b aria-hidden="true">↗</b></em></span></button><div class="experience-scroll"><span>ROLE PARA EXPLORAR</span><i aria-hidden="true"></i></div><span class="experience-index" aria-hidden="true">01 <b>/</b> 04</span></div></div>`;
+  const s=HERO[0]||{img:"assets/bomvizinho-drill-hero.webp",t:"Ferramentas certas. Trabalho bem feito.",p:"Encontre ferramentas e equipamentos para o seu próximo projeto.",b:"Explorar ferramentas",cat:"eletricas"};
+  $("#hero").innerHTML=`<div class="experience-track" role="progressbar" aria-label="Abertura da loja" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="experience-stage"><div class="experience-image" data-img="${s.img}" role="img" aria-label="Ferramenta em destaque da BomVizinho"></div><div class="experience-shade"></div><div class="experience-copy"><span class="experience-eyebrow"><i></i> BOMVIZINHO <b>•</b> FERRAMENTAS & EQUIPAMENTOS</span><h1>${s.t}</h1><p>${s.p}</p><button class="btn experience-cta" onclick="setCat('${s.cat}')">${s.b}<span aria-hidden="true">↗</span></button><div class="experience-proof"><span>●</span> Produtos para casa, obra e agro</div></div><button class="experience-product" type="button" onclick="openProduct(1)" aria-label="Ver produto em destaque: parafusadeira furadeira de impacto"><span class="experience-product-image"><img src="assets/produtos/1.webp" alt="" decoding="async" onerror="imgErr(this)"></span><span class="experience-product-copy"><small>DESTAQUE DA LOJA</small><strong>Parafusadeira Furadeira 20V</strong><em>Ver produto <b aria-hidden="true">↗</b></em></span></button><div class="experience-scroll"><span>ROLE PARA EXPLORAR</span><i aria-hidden="true"></i></div><span class="experience-index" aria-hidden="true">01 <b>/</b> 04</span></div></div>`;
   aplicaImgs();updateExperience();
 }
 function hg(n){hi=(n+HERO.length)%HERO.length;document.querySelectorAll(".sl").forEach((e,i)=>e.classList.toggle("on",i===hi));document.querySelectorAll(".dots button").forEach((e,i)=>e.classList.toggle("on",i===hi));clearInterval(ht);ht=setInterval(()=>hg(hi+1),6500)}
@@ -104,7 +108,7 @@ function openProduct(id){
  const p=P.find(x=>x.id===id);if(!p)return;
  const related=P.filter(x=>x.id!==id&&(x.cat===p.cat||x.cat!==p.cat)).slice(0,4);
  const d=pct(p),old=p.o?`<div class="detail-old">De <s>${brl(p.o)}</s>${d?` · ${d}% de desconto`:''}</div>`:'';
- const image=p.img||`assets/produtos/${p.id}.png`;
+ const image=p.img||`assets/produtos/${p.id}.webp`;
  const desc=p.desc||`Produto da categoria ${cc(p.cat)?.n||'geral'}. Confira as especificações, compatibilidade, medidas, conteúdo da embalagem e garantia com a equipe BomVizinho antes de finalizar a compra. As informações técnicas detalhadas devem ser confirmadas conforme o modelo exato do produto.`;
  $('#detailContent').innerHTML=`<div class="detail-layout"><div><div class="detail-image">${ic(cc(p.cat)?.i||'box')}<img src="${image}" alt="${p.n}" onerror="imgErr(this)"></div></div><div class="detail-info"><div class="detail-category">${cc(p.cat)?.n||'Produto'}</div><h1 id="detailTitle">${p.n}</h1><div class="detail-price">${brl(p.p)}</div>${old}<div class="detail-stock">✓ Disponibilidade e prazo confirmados pela equipe antes do envio.<br>🚚 Envio para todo o Brasil sujeito à cotação de frete por CEP.</div><div class="detail-actions"><button class="btn" onclick="comprar(${p.id})">Comprar agora</button><button class="btn ol" onclick="add(${p.id});closeProduct()">Adicionar ao carrinho</button></div><div class="detail-description"><h3>Sobre este produto</h3><p>${desc}</p><p><strong>Entrega:</strong> informe seu CEP durante a finalização para consultar as opções disponíveis. O valor final do frete será confirmado antes do pagamento até a integração com a transportadora estar configurada.</p><p><strong>Precisa de ajuda?</strong> Nossa equipe pode confirmar detalhes técnicos e compatibilidade.</p></div><button class="btn ol" style="margin-top:14px;width:100%" onclick="wa('Olá! Tenho uma dúvida sobre: ${String(p.n).replace(/'/g,"\'")}')">Consultar produto pelo WhatsApp</button></div></div><section class="detail-related"><h2>Você também pode gostar</h2><div class="grid">${related.map(card).join('')}</div></section>`;
  const view=$('#productDetail');view.classList.add('on');view.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';history.replaceState(null,'',`#produto-${id}`);view.scrollTop=0;

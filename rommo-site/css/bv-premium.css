@@ -224,7 +224,7 @@ html{scroll-behavior:auto!important}
  .bvc-img{background-color:#050c18;background-size:cover!important;background-position:92% 70%!important;background-repeat:no-repeat}
  .bvc-img::after{background:linear-gradient(180deg,#04152acc 0,#04152a55 38%,transparent 60%)}
  .bvc-mid{top:calc(86px + env(safe-area-inset-top,0px));bottom:auto}
- .experience-image{background-image:url(../assets/herocelular.png)!important;background-size:cover!important;background-position:92% 72%!important}
+ .experience-image{background-image:url(../assets/herocelular.webp)!important;background-size:cover!important;background-position:92% 72%!important}
  .experience-shade{background:linear-gradient(180deg,#04152ae6 0,#04152a66 45%,transparent 70%)!important}
  .experience-stage{min-height:min(620px,calc(100svh - 190px));justify-content:flex-start!important;padding:26px 0 18px!important;align-items:stretch!important}
  .experience-product{order:2;margin-top:auto!important;margin-bottom:0!important;align-self:stretch}

@@ -4,18 +4,21 @@
 <meta name="description" content="Na BomVizinho você encontra produtos, ferramentas e equipamentos. Qualidade e confiança sempre com você.">
 <meta name="theme-color" content="#06356b">
 <link rel="icon" type="image/png" href="assets/bomvizinho-icon-256.png"><link rel="apple-touch-icon" href="assets/bomvizinho-icon-256.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="image" href="assets/herocelular.webp" media="(max-width:760px)" fetchpriority="high"><link rel="preload" as="image" href="assets/bomvizinho-drill-hero.webp" media="(min-width:761px)" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=bv2">
+<link rel="stylesheet" href="css/style.css?v=bv3">
 <link rel="stylesheet" href="css/animacoes.css?v=5">
 <link rel="stylesheet" href="css/loader.css?v=bv7">
 <link rel="stylesheet" href="css/paginas.css?v=5">
 <link rel="stylesheet" href="css/checkout.css?v=mobile-polish-2">
 <link rel="stylesheet" href="css/experience.css?v=bv2">
-<link rel="stylesheet" href="css/bv-premium.css?v=bv15">
+<link rel="stylesheet" href="css/bv-premium.css?v=bv16">
+<link rel="stylesheet" href="css/leve.css?v=1">
 <noscript><style>#ld{display:none}body.ldg{overflow:auto}</style></noscript>
 </head><body class="ldg">
 <div id="ld" role="status" aria-label="Carregando"><div class="ld-grid"></div><div class="ld-c"><div class="ld-mark"><i class="k k1"></i><i class="k k2"></i><i class="k k3"></i><i class="k k4"></i><span class="ld-badge"><img src="assets/bomvizinho-icon-256.png" alt="BomVizinho"></span></div><h2 class="ld-name">BOMVIZINHO</h2><div class="ld-words"><span id="ldw">FERRAMENTAS</span></div><p class="ld-tag">Tudo que você precisa, o vizinho tem!</p></div><div class="pg"><div class="inf"><b id="ldp">0%</b><em>PLANALTINA · GO</em></div><div class="bar2"><i id="ldb"></i></div></div></div>
-<script src="js/loader.js?v=bv10"></script>
+<script src="js/loader.js?v=bv11"></script>
 <svg width="0" height="0" style="position:absolute"><defs>
 <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
 <symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 4h2l2.4 11h10.2L20 8H6.2"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></symbol>
@@ -57,11 +60,11 @@
 <section id="cats"><div class="w"><div class="sh"><h2>Compre por categoria</h2></div><div class="cg" id="cg"></div></div></section>
 <div class="band" id="ofertas"><div class="w"><div class="sh"><h2>Ofertas da semana</h2><a href="#ofertas" onclick="showOffers();return false">Ver todas as ofertas</a></div><div class="og" id="og"></div><div class="ogm" id="ogMore"></div></div></div>
 <section><div class="w pm">
- <a class="pb2" data-img="assets/cardverde.png" data-fb="linear-gradient(120deg,#0b0b0b,#1d8a33)" style="--bgf:linear-gradient(120deg,#0b0b0b,#1d8a33)" href="#" onclick="setCat('eletricas');return false"><h3>Linha elétrica profissional</h3><span class="btn y" style="align-self:flex-start">Ver linha elétrica</span></a>
- <a class="pb2" data-img="assets/irrigacao.png" data-fb="linear-gradient(120deg,#0b0b0b,#2b7fe0)" style="--bgf:linear-gradient(120deg,#0b0b0b,#2b7fe0)" href="#" onclick="setCat('irrigacao');return false"><h3>Irrigação e agropecuária</h3><span class="btn y" style="align-self:flex-start">Ver linha</span></a>
+ <a class="pb2" data-img="assets/cardverde.webp" data-fb="linear-gradient(120deg,#0b0b0b,#1d8a33)" style="--bgf:linear-gradient(120deg,#0b0b0b,#1d8a33)" href="#" onclick="setCat('eletricas');return false"><h3>Linha elétrica profissional</h3><span class="btn y" style="align-self:flex-start">Ver linha elétrica</span></a>
+ <a class="pb2" data-img="assets/irrigacao.webp" data-fb="linear-gradient(120deg,#0b0b0b,#2b7fe0)" style="--bgf:linear-gradient(120deg,#0b0b0b,#2b7fe0)" href="#" onclick="setCat('irrigacao');return false"><h3>Irrigação e agropecuária</h3><span class="btn y" style="align-self:flex-start">Ver linha</span></a>
 </div></section>
 <section id="produtos" style="padding-top:8px"><div class="w"><div class="sh"><h2 id="pt">Principais ofertas para você</h2></div><div class="tabs" id="tabs"></div><div class="grid" id="grid"></div></div></section>
-<section id="loja" style="padding-top:8px"><div class="w"><div class="lj"><div class="ft" data-img="assets/fachada" data-fb="linear-gradient(135deg,#222,#0b0b0b)"></div><div class="tx"><h2>Conheça a BomVizinho</h2><p>Conte com a equipe BomVizinho para encontrar os produtos e equipamentos certos para você.</p>
+<section id="loja" style="padding-top:8px"><div class="w"><div class="lj"><div class="ft" data-img="assets/fachada.webp" data-fb="linear-gradient(135deg,#222,#0b0b0b)"></div><div class="tx"><h2>Conheça a BomVizinho</h2><p>Conte com a equipe BomVizinho para encontrar os produtos e equipamentos certos para você.</p>
  <div class="ct"><p><svg class="ic"><use href="#i-pin"/></svg>Atendimento para todo o Brasil</p><p><svg class="ic"><use href="#i-headset"/></svg>(61) 9594-4857</p><p><svg class="ic"><use href="#i-insta"/></svg><a href="https://www.instagram.com/bomvizinho.bve/" target="_blank" rel="noopener noreferrer">@bomvizinho.bve</a></p></div>
  <a href="#" class="btn wa" onclick="wa('Olá! Gostaria de falar com a equipe da BomVizinho.');return false"><svg class="ic"><use href="#i-wa"/></svg>Falar com a BomVizinho</a></div></div>
  <div class="bn"><div><svg class="ic"><use href="#i-medal"/></svg><p><b>Qualidade garantida</b><span>Marcas selecionadas</span></p></div><div><svg class="ic"><use href="#i-headset"/></svg><p><b>Atendimento ágil</b><span>Suporte via WhatsApp</span></p></div><div><svg class="ic"><use href="#i-truck"/></svg><p><b>Entrega rápida</b><span>Para Planaltina e região</span></p></div></div></div></section>
@@ -87,11 +90,11 @@
 <div id="ck" class="ck" aria-hidden="true"><div class="pgt"><div class="w pgb"><a href="#" class="lk checkout-brand" onclick="closeCheckout();return false" aria-label="BomVizinho"><img class="checkout-brand-icon" src="assets/bomvizinho-icon-256.png" alt=""><span>BomVizinho</span></a><button class="btn o sm" onclick="backToCart()"><svg class="ic"><use href="#i-l"/></svg>Voltar ao carrinho</button></div></div><div id="ckc"></div></div>
 <section class="product-detail" id="productDetail" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="detailTitle"><div class="detail-top"><button class="detail-back" onclick="closeProduct()" aria-label="Voltar ao catálogo">← <span>Voltar à loja</span></button><span class="detail-breadcrumb">BomVizinho / Produto</span></div><div class="detail-content" id="detailContent"></div></section>
 <script src="js/data.js?v=bv11"></script>
-<script src="js/app.js?v=bv16"></script>
+<script src="js/app.js?v=bv17"></script>
 <script src="js/paginas.js?v=6"></script>
 <script src="js/checkout.js?v=9"></script>
 <script src="js/bv-premium.js?v=bv15" defer></script>
 <script src="js/bv-smooth.js?v=bv15" defer></script>
 <script src="js/bv-store.js?v=bv15" defer></script>
-<script src="js/bv-cover.js?v=bv15" defer></script>
+<script src="js/bv-cover.js?v=bv16" defer></script>
 </body></html>

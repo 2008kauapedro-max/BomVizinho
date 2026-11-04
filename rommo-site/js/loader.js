@@ -1,8 +1,8 @@
 /* BomVizinho – tela de carregamento: dura no mínimo DUR ms e só sai quando a página terminar de carregar */
-(()=>{const DUR=4400/* duração mínima curta para não prender a tela */,t0=Date.now(),L=document.getElementById("ld"),B=document.getElementById("ldb"),T=document.getElementById("ldp");if(!L)return;let ok=0,end=0;
+(()=>{const DUR=700/* abertura rápida: sai assim que a primeira tela está pronta */,t0=Date.now(),L=document.getElementById("ld"),B=document.getElementById("ldb"),T=document.getElementById("ldp");if(!L)return;let ok=0,end=0;
 const tick=setInterval(()=>{const e=Date.now()-t0,pr=Math.min(e/DUR,1),v=ok&&pr>=1?100:Math.min(pr*100,96);B.style.width=v+"%";T.textContent=Math.round(v)+"%";
  if(v>=100&&!end){end=1;clearInterval(tick);setTimeout(()=>{L.classList.add("out");document.body.classList.remove("ldg");dispatchEvent(new Event("loaderdone"));setTimeout(()=>L.remove(),700)},120)}},40);
-const done=()=>{ok=1};if(document.readyState==="complete")done();else addEventListener("load",done);setTimeout(done,2500)})();
+const done=()=>{ok=1};if(document.readyState==="complete")done();else addEventListener("load",done);setTimeout(done,1800)})();
 /* Loader autoral: marcas de registro, palavras do segmento e trena que se estica (Web Animations, sem travar) */
 (()=>{const L=document.getElementById("ld");if(!L||!L.animate)return;const q=s=>L.querySelector(s),o={fill:"backwards",easing:"cubic-bezier(.2,.8,.2,1)"};
 q(".ld-grid").animate([{transform:"translate3d(0,0,0)"},{transform:"translate3d(-64px,-64px,0)"}],{duration:6000,iterations:Infinity});

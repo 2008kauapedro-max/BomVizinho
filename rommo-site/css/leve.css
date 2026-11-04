@@ -1,0 +1,16 @@
+/* BomVizinho — modo leve: menos trabalho para a placa de vídeo em celulares (aparência praticamente igual) */
+@media (max-width:760px),(hover:none){
+ /* desfoque de fundo é o efeito mais pesado durante a rolagem: troca por fundo sólido */
+ header,.customer-modal,.bvc-burger{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+ header{background:rgba(244,249,252,.985)!important}
+ .customer-modal{background:rgba(4,22,41,.74)!important}
+ /* bolhas desfocadas animadas da tela de carregamento */
+ .ld-b{display:none!important}
+ /* animações decorativas que ficam rodando sem parar */
+ .experience-product,.fab::before,.cta::before,.ld-ring::after{animation:none!important}
+ /* partes do fim da página só são desenhadas quando chegam perto da tela */
+ #loja,footer{content-visibility:auto;contain-intrinsic-size:auto 900px}
+}
+@media (prefers-reduced-motion:reduce){
+ *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}

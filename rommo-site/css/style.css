@@ -335,7 +335,7 @@ footer{
 
 /* BOMVIZINHO â€” CORRECAO FINAL DO BANNER */
 .hero .sl .bg {
-  background-image: url("/assets/bomvizinho-drill-hero.png") !important;
+  background-image: url("/assets/bomvizinho-drill-hero.webp") !important;
   background-size: cover !important;
   background-position: center 38% !important;
   background-repeat: no-repeat !important;
@@ -473,7 +473,7 @@ footer{
   inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
-  background-image: url("/assets/bomvizinho-drill-hero.png") !important;
+  background-image: url("/assets/bomvizinho-drill-hero.webp") !important;
   background-position: center center !important;
   background-size: cover !important;
   background-repeat: no-repeat !important;
