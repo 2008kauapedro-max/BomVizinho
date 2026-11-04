@@ -156,7 +156,15 @@ async function route(req,env){const url=new URL(req.url),path=url.pathname,metho
    const id=path.split('/')[4];const r=await env.DB.prepare('UPDATE customer_carts SET reminder_sent_at=? WHERE customer_id=? AND recovered_at IS NULL AND completed_order_id IS NULL AND EXISTS (SELECT 1 FROM customers WHERE customers.id=customer_carts.customer_id AND marketing_consent=1)').bind(now(),id).run();if(!r.meta?.changes)return fail('nao_encontrado',404);return json({ok:true});
   }
   if(path==='/api/admin/summary'&&method==='GET'){
-   const c=await env.DB.prepare("SELECT COUNT(*) AS total, SUM(CASE WHEN status='recebido' THEN 1 ELSE 0 END) AS novos, SUM(CASE WHEN status NOT IN ('concluido','cancelado') THEN 1 ELSE 0 END) AS abertos FROM orders").first();return json(c||{total:0,novos:0,abertos:0});
+   const c=await env.DB.prepare("SELECT COUNT(*) AS total, SUM(CASE WHEN status='recebido' THEN 1 ELSE 0 END) AS novos, SUM(CASE WHEN status NOT IN ('concluido','cancelado') THEN 1 ELSE 0 END) AS abertos FROM orders").first();
+   const out={total:0,novos:0,abertos:0,...(c||{})};
+   /* Indicadores extras do painel. Cada bloco é isolado: se uma tabela/coluna não existir ainda, o resumo básico continua funcionando. */
+   const br=new Date(Date.now()-3*3600*1000),dayStart=new Date(Date.UTC(br.getUTCFullYear(),br.getUTCMonth(),br.getUTCDate(),3)).toISOString(),monthStart=new Date(Date.UTC(br.getUTCFullYear(),br.getUTCMonth(),1,3)).toISOString();
+   try{const v="SELECT COUNT(*) AS n, COALESCE(SUM(COALESCE(total_cents,subtotal_cents)),0) AS v FROM orders WHERE status!='cancelado' AND created_at>=?";const [h,m]=await Promise.all([env.DB.prepare(v).bind(dayStart).first(),env.DB.prepare(v).bind(monthStart).first()]);out.hoje_pedidos=Number(h?.n||0);out.hoje_cents=Number(h?.v||0);out.mes_pedidos=Number(m?.n||0);out.mes_cents=Number(m?.v||0)}catch(e){}
+   try{const o=await env.DB.prepare("SELECT COUNT(*) AS n FROM orders WHERE status NOT IN ('concluido','cancelado') AND created_at<=?").bind(new Date(Date.now()-30*60*1000).toISOString()).first();out.atrasados=Number(o?.n||0)}catch(e){}
+   try{const st=await env.DB.prepare("SELECT SUM(CASE WHEN stock<=0 THEN 1 ELSE 0 END) AS zero, SUM(CASE WHEN stock>0 AND stock<=5 THEN 1 ELSE 0 END) AS baixo FROM products WHERE active=1").first();out.sem_estoque=Number(st?.zero||0);out.estoque_baixo=Number(st?.baixo||0)}catch(e){}
+   try{const ab=await env.DB.prepare("SELECT COUNT(*) AS n FROM customer_carts cc WHERE cc.updated_at<=? AND cc.recovered_at IS NULL AND cc.completed_order_id IS NULL AND EXISTS (SELECT 1 FROM customer_cart_items ci WHERE ci.customer_id=cc.customer_id)").bind(new Date(Date.now()-60*60*1000).toISOString()).first();out.carrinhos_abandonados=Number(ab?.n||0)}catch(e){}
+   return json(out);
   }
   return fail('rota_nao_encontrada',404);
  }
