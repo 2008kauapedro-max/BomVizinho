@@ -1,4 +1,4 @@
-name = "rommo-store"
+name = "bomvizinho"
 main = "worker/index.js"
 compatibility_date = "2026-10-25"
 
@@ -9,8 +9,8 @@ run_worker_first = ["/api/*"]
 
 [[d1_databases]]
 binding = "DB"
-database_name = "rommo-db"
-database_id = "ed21d947-64de-4a0b-aeb8-b73979fca919"
+database_name = "bomvizinho-db"
+database_id = "64ec1aff-4931-400b-a3be-f6f177fbe802"
 migrations_dir = "migrations"
 
 [vars]
