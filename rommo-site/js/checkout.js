@@ -102,7 +102,10 @@ async function ckEnviar(){
  }catch(e){if(waTab)waTab.close();const msg={dados_invalidos:'Confira os dados e tente novamente.',produto_invalido:'Um produto não está mais disponível. Atualize a página.',preco_desatualizado:'O preço mudou. Atualize a página e tente novamente.',quantidade_invalida:'Confira as quantidades do carrinho.',preco_desatualizado:'O preço mudou. Atualize a página.'}[e.message]||'Não foi possível registrar o pedido agora. Seus dados continuam nesta tela. Tente novamente ou fale com a equipe pelo WhatsApp.';let err=document.getElementById('ck-api-err');if(!err){err=document.createElement('p');err.id='ck-api-err';err.style.cssText='color:#b42318;font-weight:600;margin-top:12px';(document.getElementById('ck-finish')||document.getElementById('ck-next'))?.insertAdjacentElement('afterend',err)}err.textContent=msg;
  }finally{ckBusy=false;if(btn){btn.disabled=false;btn.innerHTML='<svg class="ic"><use href="#i-wa"/></svg>Registrar pedido e abrir WhatsApp'}}
 }
-function openCheckout(){if(!cart.length)return;closeAll();ckSent=false;ckDraw();ck.classList.add("on");ck.setAttribute("aria-hidden","false");ck.scrollTop=0;trava()}
+function openCheckout(){if(!cart.length)return;closeAll();ckSent=false;ckDraw();ckPrefill();ck.classList.add("on");ck.setAttribute("aria-hidden","false");ck.scrollTop=0;trava()}
 function closeCheckout(){if(ckSent){cart=[];save({guestEdit:true});drawCart();ckSent=false}ck.classList.remove("on");ck.setAttribute("aria-hidden","true");trava()}
 function backToCart(){if(ckSent){closeCheckout();return}ck.classList.remove("on");ck.setAttribute("aria-hidden","true");trava();openCart()}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&ck.classList.contains("on")&&!document.getElementById("pgv").classList.contains("on"))backToCart()});
+
+/* Cliente logado: preenche nome, telefone e e-mail da conta (só campos vazios; o cliente pode editar). */
+function ckPrefill(){try{const a=typeof customerAccount!=="undefined"?customerAccount:null;if(!a)return;[["f-nome",a.name],["f-tel",a.phone],["f-email",a.email]].forEach(([id,v])=>{const el=document.getElementById(id);if(el&&!el.value&&v){el.value=String(v);el.dispatchEvent(new Event("input",{bubbles:true}))}})}catch(e){}}
