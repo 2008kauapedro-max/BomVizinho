@@ -22,24 +22,42 @@ const LINHAS = [
 ];
 
 /* Produtos de exemplo — troque pelos reais.
-   p = preço, de = preço antigo (se tiver, o produto entra nas Ofertas), destaque = aparece em "Mais procurados" */
+   p        = preço · de = preço antigo (se tiver, entra nas Ofertas)
+   destaque = aparece em Destaques · novo = etiqueta "Novo"
+   tags     = outros nomes que o povo usa pra procurar esse produto (opcional)
+   grupo    = produtos que são o mesmo item em tamanhos/modelos diferentes
+              (ex.: coquete 12, 13 e 14 com grupo: "coquete") — aparecem juntos em "Outros modelos" */
 const PRODUTOS = [
-  { id: 1, cat: "eletricas", nome: "Furadeira de impacto 650W", p: 329.9, de: 389.9 },
-  { id: 2, cat: "eletricas", nome: "Parafusadeira de impacto 21V com bateria", p: 249.9, destaque: true },
-  { id: 3, cat: "manuais", nome: "Jogo de chaves e bits 46 peças", p: 89.9, de: 119.9 },
-  { id: 4, cat: "kits", nome: "Maleta de ferramentas 25 peças", p: 179.9, destaque: true },
-  { id: 5, cat: "kits", nome: "Kit de ferramentas 129 peças com maleta", p: 349.9, de: 459.9 },
-  { id: 6, cat: "manuais", nome: "Jogo de chaves combinadas 12 peças", p: 139.9 },
-  { id: 7, cat: "manuais", nome: "Trena profissional 8 m", p: 39.9, novo: true },
-  { id: 8, cat: "construcao", nome: "Kit EPI com capacete e luvas", p: 119.9 },
-  { id: 9, cat: "construcao", nome: "Óculos de proteção incolor", p: 14.9 },
-  { id: 10, cat: "irrigacao", nome: "Mangueira para jardim 30 m com engates", p: 129.9, de: 159.9, destaque: true },
-  { id: 11, cat: "irrigacao", nome: "Kit irrigação por gotejamento", p: 189.9, novo: true, destaque: true },
-  { id: 12, cat: "agro", nome: "Pulverizador costal 20 L", p: 219.9, de: 269.9, destaque: true },
-  { id: 13, cat: "jardim", nome: "Tesoura de poda profissional", p: 49.9 },
-  { id: 14, cat: "jardim", nome: "Kit jardinagem 3 peças", p: 39.9, novo: true },
-  { id: 15, cat: "jardim", nome: "Kit jardinagem com maleta 9 peças", p: 99.9, de: 129.9 },
-  { id: 16, cat: "limpeza", nome: "Kit de limpeza automotiva", p: 159.9 },
+  { id: 1, cat: "eletricas", nome: "Furadeira de impacto 650W", p: 329.9, de: 389.9, tags: "furar broca perfuradora parede concreto" },
+  { id: 2, cat: "eletricas", nome: "Parafusadeira de impacto 21V com bateria", p: 249.9, destaque: true, tags: "parafuso apertadeira sem fio bateria" },
+  { id: 3, cat: "manuais", nome: "Jogo de chaves e bits 46 peças", p: 89.9, de: 119.9, grupo: "jogo-chaves", tags: "ponta bit phillips fenda parafuso catraca" },
+  { id: 4, cat: "kits", nome: "Maleta de ferramentas 25 peças", p: 179.9, destaque: true, grupo: "kit-ferramentas", tags: "caixa de ferramentas jogo" },
+  { id: 5, cat: "kits", nome: "Kit de ferramentas 129 peças com maleta", p: 349.9, de: 459.9, grupo: "kit-ferramentas", tags: "caixa de ferramentas jogo completo" },
+  { id: 6, cat: "manuais", nome: "Jogo de chaves combinadas 12 peças", p: 139.9, grupo: "jogo-chaves", tags: "chave de boca estria porca" },
+  { id: 7, cat: "manuais", nome: "Trena profissional 8 m", p: 39.9, novo: true, tags: "fita metrica medir metro" },
+  { id: 8, cat: "construcao", nome: "Kit EPI com capacete e luvas", p: 119.9, tags: "seguranca protecao obra" },
+  { id: 9, cat: "construcao", nome: "Óculos de proteção incolor", p: 14.9, tags: "seguranca epi protecao" },
+  { id: 10, cat: "irrigacao", nome: "Mangueira para jardim 30 m com engates", p: 129.9, de: 159.9, destaque: true, tags: "mangote regar molhar esguicho" },
+  { id: 11, cat: "irrigacao", nome: "Kit irrigação por gotejamento", p: 189.9, novo: true, destaque: true, tags: "gotejador horta microaspersor" },
+  { id: 12, cat: "agro", nome: "Pulverizador costal 20 L", p: 219.9, de: 269.9, destaque: true, tags: "bomba costal veneno borrifador aplicador" },
+  { id: 13, cat: "jardim", nome: "Tesoura de poda profissional", p: 49.9, tags: "podador galho" },
+  { id: 14, cat: "jardim", nome: "Kit jardinagem 3 peças", p: 39.9, novo: true, grupo: "kit-jardinagem", tags: "pazinha rastelo horta" },
+  { id: 15, cat: "jardim", nome: "Kit jardinagem com maleta 9 peças", p: 99.9, de: 129.9, grupo: "kit-jardinagem", tags: "pazinha rastelo horta" },
+  { id: 16, cat: "limpeza", nome: "Kit de limpeza automotiva", p: 159.9, tags: "carro lavar polir" },
+];
+
+/* Palavras que querem dizer a mesma coisa. Vale para TODOS os produtos de uma vez:
+   quem procurar qualquer palavra do grupo encontra produtos com as outras.
+   Para incluir um apelido novo, é só acrescentar aqui. */
+const SINONIMOS = [
+  ["cachimbo", "coquete"],
+  ["mangueira", "mangote"],
+  ["pulverizador", "bomba costal", "borrifador"],
+  ["trena", "fita metrica"],
+  ["chave", "ferramenta manual"],
+  ["parafusadeira", "apertadeira"],
+  ["epi", "seguranca", "protecao"],
+  ["gotejamento", "gotejador"],
 ];
 
 /* (Opcional) Últimas postagens do Instagram — se ficar vazio, a seção não aparece.

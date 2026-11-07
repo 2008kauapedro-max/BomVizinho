@@ -71,12 +71,12 @@ function aba(id) {
     itens = PRODUTOS.filter(p => p.destaque || p.novo);
     PRODUTOS.forEach(p => { if (itens.length < 6 && !itens.includes(p)) itens.push(p); });
   } else itens = PRODUTOS.filter(p => linhaDe(p.cat).id === id);
-  const l = LINHAS.find(x => x.id === id), total = id ? itens.length : PRODUTOS.length;
+  const l = LINHAS.find(x => x.id === id);
   const g = $("#vitrine");
   g.innerHTML = itens.slice(0, 6).map(cartao).join("");
   if (!reduz) g.animate?.([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "ease-out" });
   const v = $("#ver-tudo"); v.dataset.loja = id;
-  v.textContent = l ? `Ver todos de ${l.nome} (${total})` : `Ver todos os ${total} produtos`;
+  v.textContent = l ? `Ver todos de ${l.nome}` : "Ver todos os produtos";
   $$(".aba").forEach(b => { const on = b.dataset.aba === id; b.classList.toggle("on", on); b.setAttribute("aria-selected", on); });
 }
 $("#abas").addEventListener("click", e => { const b = e.target.closest(".aba"); if (!b) return; aba(b.dataset.aba); b.scrollIntoView({ inline: "center", block: "nearest", behavior: reduz ? "auto" : "smooth" }); });
@@ -135,17 +135,79 @@ function carrossel() {
 /* ---------- Loja: todos os produtos, com busca, linhas e ordem ---------- */
 let filtro = "", lojaAberta = false, rolagemCasa = 0;
 const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+/* ---------- Busca inteligente ----------
+   Procura no nome, nos apelidos (tags) e nos sinônimos. Primeiro vem o que a pessoa
+   procurou; quando acaba, aparecem os produtos relacionados. */
+const PARADAS = new Set(["de", "da", "do", "das", "dos", "com", "para", "por", "e", "a", "o", "em", "kit", "jogo", "pecas", "peca"]);
+const raiz = w => w.length > 4 ? w.replace(/oes$|aes$/, "ao").replace(/es$|s$/, "") : w;
+const palavras = t => norm(t).split(/[^a-z0-9]+/).filter(w => w && !PARADAS.has(w));
+const SIN = (typeof SINONIMOS !== "undefined" ? SINONIMOS : []).map(g => g.map(norm));
+const INDICE = new Map(PRODUTOS.map(p => {
+  const nome = palavras(p.nome), extra = palavras(p.tags || "");
+  const texto = " " + [...nome, ...extra].join(" ") + " ";
+  SIN.forEach(g => { if (g.some(t => texto.includes(" " + t))) g.forEach(t => extra.push(...palavras(t))); });
+  const l = linhaDe(p.cat);
+  return [p.id, { nome, extra, linha: palavras(l.nome + " " + p.cat), todas: new Set([...nome, ...extra].map(raiz)) }];
+}));
+const bate = (lista, t) => lista.some(w => w.startsWith(t) || raiz(w) === t);
+function buscar(q, base) {
+  const toks = palavras(q).map(raiz);
+  if (!toks.length) return { achados: [], rel: [] };
+  const pontos = new Map(), parcial = new Map();
+  base.forEach(p => {
+    const ix = INDICE.get(p.id); let soma = 0, todos = true, algum = 0;
+    toks.forEach(t => {
+      const v = bate(ix.nome, t) ? (ix.nome[0].startsWith(t) ? 14 : 10) : bate(ix.extra, t) ? 7 : 0;
+      if (v) { soma += v; algum++; } else { todos = false; if (bate(ix.linha, t)) algum += .5; }
+    });
+    if (todos) pontos.set(p, soma); else if (algum) parcial.set(p, algum * 3);
+  });
+  const achados = [...pontos.keys()].sort((a, b) => pontos.get(b) - pontos.get(a));
+  /* relacionados: mesmo grupo, mesma categoria, palavras em comum, mesma linha */
+  const rel = new Map(parcial);
+  achados.forEach(a => {
+    const ia = INDICE.get(a.id);
+    base.forEach(p => {
+      if (pontos.has(p)) return;
+      const ip = INDICE.get(p.id);
+      let r = (a.grupo && p.grupo === a.grupo ? 8 : 0) + (p.cat === a.cat ? 5 : 0) + (linhaDe(p.cat) === linhaDe(a.cat) ? 1 : 0);
+      ip.todas.forEach(w => { if (w.length > 3 && ia.todas.has(w)) r += 2; });
+      if (r) rel.set(p, Math.max(rel.get(p) || 0, r));
+    });
+  });
+  return { achados, rel: [...rel.keys()].sort((a, b) => rel.get(b) - rel.get(a)).slice(0, 24) };
+}
+function parecidos(p) {
+  const mesmos = p.grupo ? PRODUTOS.filter(x => x !== p && x.grupo === p.grupo) : [];
+  const ip = INDICE.get(p.id), nota = new Map();
+  PRODUTOS.forEach(x => {
+    if (x === p || mesmos.includes(x)) return;
+    let r = (x.cat === p.cat ? 6 : 0) + (linhaDe(x.cat) === linhaDe(p.cat) ? 2 : 0);
+    INDICE.get(x.id).todas.forEach(w => { if (w.length > 3 && ip.todas.has(w)) r += 3; });
+    if (r) nota.set(x, r);
+  });
+  return { mesmos, outros: [...nota.keys()].sort((a, b) => nota.get(b) - nota.get(a)).slice(0, 12) };
+}
+
 function grade() {
-  const q = norm($("#busca").value.trim()), ordem = $("#ordem").value;
-  let itens = PRODUTOS.filter(p => (!filtro || (filtro === "ofertas" ? desc(p) > 0 : linhaDe(p.cat).id === filtro)) && (!q || norm(p.nome).includes(q)));
-  if (ordem === "menor") itens = itens.slice().sort((a, b) => a.p - b.p);
-  if (ordem === "maior") itens = itens.slice().sort((a, b) => b.p - a.p);
-  if (ordem === "ofertas") itens = itens.slice().sort((a, b) => desc(b) - desc(a));
-  if (ordem === "az") itens = itens.slice().sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
-  $("#grade").innerHTML = itens.map(cartao).join("");
+  const bruto = $("#busca").value.trim(), q = norm(bruto), ordem = $("#ordem").value;
+  const base = PRODUTOS.filter(p => !filtro || (filtro === "ofertas" ? desc(p) > 0 : linhaDe(p.cat).id === filtro));
+  let itens = base, rel = [];
+  if (q) ({ achados: itens, rel } = buscar(q, base));
+  const ordenar = l => {
+    if (ordem === "menor") return l.slice().sort((a, b) => a.p - b.p);
+    if (ordem === "maior") return l.slice().sort((a, b) => b.p - a.p);
+    if (ordem === "ofertas") return l.slice().sort((a, b) => desc(b) - desc(a));
+    if (ordem === "az") return l.slice().sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+    return l;
+  };
+  itens = ordenar(itens);
+  let html = itens.map(cartao).join("");
+  if (rel.length) html += `<p class="sep">${itens.length ? "Relacionados" : `Não achamos “${esc(bruto)}”. Veja parecidos:`}</p>` + rel.map(cartao).join("");
+  $("#grade").innerHTML = html;
   $("#vazio").hidden = itens.length > 0;
   $("#busca-limpa").hidden = !q;
-  $("#conta").textContent = `${itens.length} ${itens.length === 1 ? "produto" : "produtos"}`;
+  $("#conta").textContent = q ? `${itens.length} ${itens.length === 1 ? "resultado" : "resultados"}` : `${itens.length} ${itens.length === 1 ? "produto" : "produtos"}`;
   $$(".chip").forEach(c => { const on = c.dataset.filtro === filtro; c.classList.toggle("on", on); c.setAttribute("aria-selected", on); });
 }
 function abrirLoja(linha, focar, ordem) {
@@ -213,7 +275,9 @@ function verProduto(id) {
       <button class="btn btn-zap btn-largo" type="button" id="f-zap"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg>Pedir no WhatsApp</button>
       <button class="btn btn-claro btn-largo" type="button" id="f-lista">Adicionar à lista</button>
     </div>
-    <p class="f-nota">Você confirma estoque e entrega com a gente pelo WhatsApp.</p>`, "Produto");
+    <p class="f-nota">Você confirma estoque e entrega com a gente pelo WhatsApp.</p>
+    ${(() => { const { mesmos, outros } = parecidos(p); return (mesmos.length ? `<h3 class="f-sub">Outros modelos</h3><div class="trilho">${mesmos.map(cartao).join("")}</div>` : "") +
+      (outros.length ? `<h3 class="f-sub">Você também pode gostar</h3><div class="grade">${outros.map(cartao).join("")}</div>` : ""); })()}`, "Produto");
   folha.querySelectorAll("[data-q]").forEach(b => b.onclick = () => { q = Math.max(1, Math.min(99, q + Number(b.dataset.q))); $("#f-q").textContent = q; });
   $("#f-zap").onclick = () => abrirZap(MSG.produto(p, q));
   $("#f-lista").onclick = () => {

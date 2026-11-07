@@ -415,3 +415,9 @@ main,#loja{background:radial-gradient(ellipse 120% 40% at 0 0,#e4f0c9 0,transpar
 .linha-contato .insta-anel img{width:36px;height:36px;border-width:2px}
 .linha-contato .insta-seguir{font-style:normal;padding:6px 12px;font-size:12.5px}
 .insta-posts{padding:0 var(--g) 12px}
+
+/* busca: separador dos relacionados · produto: sugestões embaixo */
+.grade .sep{grid-column:1/-1;margin:14px 0 2px;color:#55554f;font:600 13.5px var(--txt)}
+.f-sub{margin:26px 0 10px;font-size:16px}
+.folha .grade{padding:0;margin-bottom:6px}
+.folha .trilho{--vis:2.6}
