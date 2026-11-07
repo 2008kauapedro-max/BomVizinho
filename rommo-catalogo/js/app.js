@@ -38,8 +38,8 @@ const etiqueta = p => desc(p) ? `<span class="etiqueta">-${desc(p)}%</span>` : p
 const selosDe = p => [desc(p) ? `<span class="selo-f desc">-${desc(p)}% de desconto</span>` : "", SELOS[p.selo] ? `<span class="selo-f ${SELOS[p.selo][1]}">${SELOS[p.selo][0]}</span>` : "", p.novo ? `<span class="selo-f novo">Novo</span>` : ""].join("");
 const cartao = p => `<button class="cartao" type="button" data-prod="${p.id}">
   <span class="foto"><img src="${foto(p)}" alt="" loading="lazy" decoding="async" width="560" height="560">${etiqueta(p)}<span class="mais" data-add="${p.id}" role="button" aria-label="Adicionar à lista">+</span></span>
-  <span class="info">${SELOS[p.selo] ? `<span class="selo-c ${SELOS[p.selo][1]}" title="${SELOS[p.selo][0]}">${SELOS[p.selo][2]}</span>` : ""}<span class="nome">${esc(p.nome)}</span>
-  <span class="preco">${p.de ? `<span class="de">${brl(p.de)}</span>` : ""}${brl(p.p)}</span></span>
+  <span class="info">${SELOS[p.selo] ? `<span class="selo-c ${SELOS[p.selo][1]}" title="${SELOS[p.selo][0]}">${SELOS[p.selo][2]}</span>` : `<span class="selo-c" aria-hidden="true"></span>`}<span class="nome">${esc(p.nome)}</span>
+  <span class="de${p.de ? "" : " sem"}">${p.de ? brl(p.de) : ""}</span><span class="preco">${brl(p.p)}</span></span>
 </button>`;
 
 /* ---------- Página inicial (vitrine) ---------- */

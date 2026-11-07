@@ -544,3 +544,13 @@ main,#loja{background:radial-gradient(ellipse 120% 40% at 0 0,#e4f0c9 0,transpar
 .selo-c.vendido::before{content:"★ ";color:var(--amarelo)}
 .selo-c.ultimas{color:#c5221f}
 .selo-c.ultimas::before{content:"● "}
+
+/* v13: todo cartão com as mesmas linhas — aviso, nome (2 linhas), preço antigo, preço — sempre na mesma altura */
+.cartao{height:100%}
+.cartao .info{display:flex;flex-direction:column;flex:1}
+.cartao .selo-c{flex:none;height:1.5em;margin-bottom:3px;font-size:10.5px;line-height:1.5}
+.cartao .nome{flex:none;height:2.56em;min-height:0;line-height:1.28}
+.cartao .de{flex:none;display:block;height:1.4em;margin:4px 0 0;line-height:1.4}
+.cartao .de.sem{visibility:hidden}
+.cartao .preco{margin-top:0}
+.trilho,.grade{align-items:stretch}
