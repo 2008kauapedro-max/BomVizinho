@@ -554,3 +554,6 @@ main,#loja{background:radial-gradient(ellipse 120% 40% at 0 0,#e4f0c9 0,transpar
 .cartao .de.sem{visibility:hidden}
 .cartao .preco{margin-top:0}
 .trilho,.grade{align-items:stretch}
+/* mapa limpo: sem selo nosso e com a caixinha do Google (canto de cima) escondida — a rota fica no botão "Como chegar" */
+.mapa{height:190px;overflow:hidden}
+.mapa iframe{top:-64px;height:calc(100% + 64px)}
