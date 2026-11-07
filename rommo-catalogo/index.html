@@ -15,7 +15,7 @@
 <link rel="preload" as="font" type="font/woff" href="fonts/ChakraPetch-Bold.woff" crossorigin>
 <link rel="preload" as="font" type="font/woff" href="fonts/Barlow-Regular.woff" crossorigin>
 <link rel="preload" as="image" href="assets/fotos/capa-celular.webp" fetchpriority="high">
-<link rel="stylesheet" href="css/app.css?v=6">
+<link rel="stylesheet" href="css/app.css?v=7">
 </head>
 <body class="ldg">
 
@@ -72,9 +72,7 @@
     <span>Buscar produto</span>
   </button>
 
-  <nav class="atalhos" id="atalhos" aria-label="Linhas de produtos"></nav>
-
-  <!-- Ofertas: o único bloco colorido da página -->
+  <!-- Ofertas: o único bloco colorido (e o lugar das campanhas) -->
   <section class="ofertas" id="ofertas">
     <div class="secao-topo">
       <div><h2>Ofertas da semana</h2><p class="relogio" id="relogio"></p></div>
@@ -84,37 +82,21 @@
     <div class="pontos" id="pontos" aria-hidden="true"></div>
   </section>
 
-  <ul class="valores" aria-label="Por que comprar na ROMMO">
-    <li><svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Qualidade</li>
-    <li><svg viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg>Atendimento</li>
-    <li><svg viewBox="0 0 24 24"><path d="M13 3 5 13h6l-1 8 8-10h-6z"/></svg>Agilidade</li>
-  </ul>
-
-  <div id="secoes"></div>
-
-  <section class="secao" aria-label="Como comprar">
-    <div class="secao-topo"><h2>Como comprar</h2></div>
-    <ol class="passos">
-      <li><b>1</b><span>Escolha os produtos</span></li>
-      <li><b>2</b><span>Adicione à sua lista</span></li>
-      <li><b>3</b><span>Envie no WhatsApp</span></li>
-    </ol>
-  </section>
-
-  <section class="secao" id="insta">
-    <a class="insta-card" id="insta-link" href="#" target="_blank" rel="noopener">
-      <span class="insta-anel"><img src="assets/rommo-icon-192.png" alt="" width="56" height="56"></span>
-      <span class="insta-txt"><b>ROMMO</b><small>@<span id="insta-user"></span></small><em>Novidades e ofertas toda semana</em></span>
-      <span class="insta-seguir">Seguir</span>
-    </a>
-    <div class="insta-posts" id="insta-posts" hidden></div>
+  <!-- Produtos: uma vitrine só, trocando por abas -->
+  <section class="secao" id="produtos">
+    <div class="secao-topo"><h2>Nossos produtos</h2></div>
+    <div class="abas" id="abas" role="tablist" aria-label="Linhas de produtos"></div>
+    <div class="grade" id="vitrine"></div>
+    <button class="ver-tudo" type="button" id="ver-tudo" data-loja=""></button>
+    <p class="como"><span><b>1</b>Escolha</span><i></i><span><b>2</b>Adicione à lista</span><i></i><span><b>3</b>Envie no WhatsApp</span></p>
   </section>
 
   <section class="secao" id="contato">
     <div class="secao-topo"><h2>Fale com a gente</h2></div>
+    <div class="insta-posts" id="insta-posts" hidden></div>
     <div class="contato">
       <button type="button" data-zap="geral" class="linha-contato"><span class="ic zap"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg></span><span><b>WhatsApp</b><small id="c-zap"></small></span><i></i></button>
-      <a id="c-insta" class="linha-contato" href="#" target="_blank" rel="noopener"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg></span><span><b>Instagram</b><small id="c-insta-txt"></small></span><i></i></a>
+      <a id="c-insta" class="linha-contato" href="#" target="_blank" rel="noopener"><span class="insta-anel"><img src="assets/rommo-icon-192.png" alt="" width="36" height="36"></span><span><b>Instagram</b><small id="c-insta-txt"></small></span><em class="insta-seguir">Seguir</em></a>
       <a id="c-mapa" class="linha-contato" href="#" target="_blank" rel="noopener"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span><b id="c-cidade"></b><small id="c-ref"></small></span><i></i></a>
     </div>
   </section>
@@ -170,6 +152,6 @@
 </svg>
 
 <script src="js/data.js?v=3"></script>
-<script src="js/app.js?v=6"></script>
+<script src="js/app.js?v=7"></script>
 </body>
 </html>

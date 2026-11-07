@@ -46,22 +46,15 @@ const oferta = p => `<button class="oferta" type="button" data-prod="${p.id}">
 </button>`;
 
 function montar() {
-  $("#atalhos").innerHTML = LINHAS.map(l => `<button class="atalho" type="button" data-loja="${l.id}" style="--c:${l.cor}"><img src="${l.icone}" alt="" width="64" height="64">${l.nome}</button>`).join("");
   const ofertas = PRODUTOS.filter(desc).sort((a, b) => desc(b) - desc(a));
   $("#trilho-ofertas").innerHTML = ofertas.map(oferta).join("");
   $("#pontos").innerHTML = ofertas.map(() => "<i></i>").join("");
   $("#ofertas").hidden = !ofertas.length;
-  /* uma prateleira por linha, todas no mesmo modelo */
-  const procurados = PRODUTOS.filter(p => (p.destaque || p.novo) && !p.de);
-  const prateleira = (titulo, cor, itens, loja, n) => `<section class="secao">
-    <div class="secao-topo"><h2>${cor ? `<i style="background:${cor}"></i>` : ""}${esc(titulo)}</h2><button class="ver" type="button" data-loja="${loja}">Ver ${n ? `todos (${n})` : "todos"}<i></i></button></div>
-    <div class="trilho">${itens.map(cartao).join("")}</div>
-  </section>`;
-  $("#secoes").innerHTML = (procurados.length ? prateleira("Mais procurados", "", procurados, "") : "") +
-    LINHAS.map(l => { const it = PRODUTOS.filter(p => linhaDe(p.cat).id === l.id); return it.length ? prateleira(l.nome, l.cor, it.slice(0, 10), l.id, it.length) : ""; }).join("");
+  $("#abas").innerHTML = `<button class="aba" type="button" role="tab" data-aba="">Destaques</button>` +
+    LINHAS.map(l => `<button class="aba" type="button" role="tab" data-aba="${l.id}" style="--c:${l.cor}"><i></i>${esc(l.nome)}</button>`).join("");
+  aba("");
 
   const ig = `https://www.instagram.com/${LOJA.instagram}/`;
-  $("#insta-user").textContent = LOJA.instagram; $("#insta-link").href = ig;
   if (INSTAGRAM_POSTS.length) montarInsta();
   $("#c-insta").href = ig; $("#c-insta-txt").textContent = "@" + LOJA.instagram;
   $("#c-zap").textContent = LOJA.whatsappVisivel;
@@ -70,6 +63,23 @@ function montar() {
   $("#chips").innerHTML = `<button class="chip" type="button" role="tab" data-filtro="">Tudo</button><button class="chip oferta-chip" type="button" role="tab" data-filtro="ofertas"><i></i>Ofertas</button>` +
     LINHAS.map(l => `<button class="chip" type="button" role="tab" data-filtro="${l.id}" style="--c:${l.cor}"><i></i>${l.nome}</button>`).join("");
 }
+
+/* ---------- Vitrine por abas: 6 produtos de cada vez ---------- */
+function aba(id) {
+  let itens;
+  if (!id) {
+    itens = PRODUTOS.filter(p => p.destaque || p.novo);
+    PRODUTOS.forEach(p => { if (itens.length < 6 && !itens.includes(p)) itens.push(p); });
+  } else itens = PRODUTOS.filter(p => linhaDe(p.cat).id === id);
+  const l = LINHAS.find(x => x.id === id), total = id ? itens.length : PRODUTOS.length;
+  const g = $("#vitrine");
+  g.innerHTML = itens.slice(0, 6).map(cartao).join("");
+  if (!reduz) g.animate?.([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "ease-out" });
+  const v = $("#ver-tudo"); v.dataset.loja = id;
+  v.textContent = l ? `Ver todos de ${l.nome} (${total})` : `Ver todos os ${total} produtos`;
+  $$(".aba").forEach(b => { const on = b.dataset.aba === id; b.classList.toggle("on", on); b.setAttribute("aria-selected", on); });
+}
+$("#abas").addEventListener("click", e => { const b = e.target.closest(".aba"); if (!b) return; aba(b.dataset.aba); b.scrollIntoView({ inline: "center", block: "nearest", behavior: reduz ? "auto" : "smooth" }); });
 
 /* ---------- Instagram: posts oficiais (só carrega quando chega perto) ---------- */
 function montarInsta() {
