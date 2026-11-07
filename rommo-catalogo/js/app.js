@@ -46,7 +46,7 @@ const oferta = p => `<button class="oferta" type="button" data-prod="${p.id}">
 </button>`;
 
 function montar() {
-  $("#atalhos").innerHTML = LINHAS.map(l => `<button class="atalho" type="button" data-loja="${l.id}"><img src="${l.icone}" alt="" width="64" height="64">${l.nome}</button>`).join("");
+  $("#atalhos").innerHTML = LINHAS.map(l => `<button class="atalho" type="button" data-loja="${l.id}" style="--c:${l.cor}"><img src="${l.icone}" alt="" width="64" height="64">${l.nome}</button>`).join("");
   const ofertas = PRODUTOS.filter(desc).sort((a, b) => desc(b) - desc(a));
   $("#trilho-ofertas").innerHTML = ofertas.map(oferta).join("");
   $("#pontos").innerHTML = ofertas.map(() => "<i></i>").join("");
@@ -67,7 +67,7 @@ function montar() {
   $("#c-zap").textContent = LOJA.whatsappVisivel;
   $("#c-mapa").href = LOJA.mapa; $("#c-cidade").textContent = LOJA.cidade; $("#c-ref").textContent = LOJA.referencia || "Ver no mapa";
   $("#ano").textContent = new Date().getFullYear();
-  $("#chips").innerHTML = `<button class="chip" type="button" role="tab" data-filtro="">Tudo</button>` +
+  $("#chips").innerHTML = `<button class="chip" type="button" role="tab" data-filtro="">Tudo</button><button class="chip oferta-chip" type="button" role="tab" data-filtro="ofertas"><i></i>Ofertas</button>` +
     LINHAS.map(l => `<button class="chip" type="button" role="tab" data-filtro="${l.id}" style="--c:${l.cor}"><i></i>${l.nome}</button>`).join("");
 }
 
@@ -127,7 +127,7 @@ let filtro = "", lojaAberta = false, rolagemCasa = 0;
 const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 function grade() {
   const q = norm($("#busca").value.trim()), ordem = $("#ordem").value;
-  let itens = PRODUTOS.filter(p => (!filtro || linhaDe(p.cat).id === filtro) && (!q || norm(p.nome).includes(q)));
+  let itens = PRODUTOS.filter(p => (!filtro || (filtro === "ofertas" ? desc(p) > 0 : linhaDe(p.cat).id === filtro)) && (!q || norm(p.nome).includes(q)));
   if (ordem === "menor") itens = itens.slice().sort((a, b) => a.p - b.p);
   if (ordem === "maior") itens = itens.slice().sort((a, b) => b.p - a.p);
   if (ordem === "ofertas") itens = itens.slice().sort((a, b) => desc(b) - desc(a));

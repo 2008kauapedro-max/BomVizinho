@@ -289,3 +289,82 @@ body.na-loja .flutua-zap{transform:none}
 .insta-posts{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:12px var(--g) 0;scrollbar-width:none}
 .insta-posts::-webkit-scrollbar{display:none}
 .insta-posts .instagram-media,.insta-posts iframe{flex:0 0 86%!important;min-width:0!important;max-width:none!important;width:86%!important;margin:0!important;scroll-snap-align:center;border-radius:14px!important}
+
+/* ============ Tema claro (inspirado no BomVizinho): fundo claro, cartões brancos, topo preto ============ */
+:root{--fundo:#f1f2ee;--sup:#fff;--sup2:#eeefea;--borda:#e2e3dc;--texto:#15150f;--fosco:#6b6b64;--verde-esc:#4a6e00;--sombra:0 1px 2px #0000000a,0 6px 18px -6px #00000014}
+body{background:var(--fundo);color:var(--texto)}
+main,#loja{background:radial-gradient(ellipse 120% 40% at 0 0,#e4f0c9 0,transparent 60%),radial-gradient(ellipse 90% 30% at 100% 30%,#dcebf6 0,transparent 60%)}
+#ld,#capa,.palco,.topo{color:#fff}
+.capa-texto h1,.palco-ui h2{color:#fff}
+
+/* busca */
+.busca{background:#fff;border-color:var(--borda);box-shadow:var(--sombra)}
+.busca input{color:var(--texto)}
+.busca input::placeholder,.busca-falsa{color:#8a8a83}
+.busca svg{color:#8a8a83}
+.busca button{background:var(--sup2)}
+
+/* linhas: cada bloco com o tom da sua cor */
+.atalho{background:color-mix(in srgb,var(--c,#fff) 13%,#fff);border:1px solid color-mix(in srgb,var(--c,#ccc) 30%,#fff);color:var(--texto);box-shadow:var(--sombra)}
+.atalho:last-child{background:#fff;border-color:var(--borda)}
+
+/* seções */
+.secao-topo h2{color:var(--texto)}
+.ver{color:var(--verde-esc)}
+
+/* cartão */
+.cartao{background:#fff;border:1px solid var(--borda);box-shadow:var(--sombra)}
+.cartao .foto{background:#f6f6f2}
+.cartao .nome{color:#3a3a35}
+.cartao .preco{color:var(--texto)}
+.cartao .de{color:#9a9a93}
+.mais.ok{background:var(--texto);color:#fff}
+
+/* ofertas: amarelo com um brilho suave */
+.ofertas{background:radial-gradient(ellipse 80% 70% at 85% 0,#ffe27a 0,transparent 60%),var(--amarelo);box-shadow:0 12px 28px -14px #b38600}
+
+/* valores, passos, instagram, contato */
+.valores,.passos li,.insta-card,.contato{background:#fff;border-color:var(--borda);box-shadow:var(--sombra)}
+.valores li,.passos li{color:#3a3a35}
+.valores li+li{border-color:var(--borda)}
+.valores svg{color:var(--verde-esc)}
+.passos b{background:var(--texto);color:#fff}
+.insta-anel img{border-color:#fff}
+.insta-txt small{color:var(--fosco)}
+.insta-txt em{color:#4a4a44}
+.insta-seguir{background:var(--texto);color:#fff}
+.linha-contato{background:#fff}
+.linha-contato+.linha-contato{border-color:var(--borda)}
+.linha-contato .ic{background:var(--sup2)}
+.linha-contato>i{border-color:#aaa}
+.rodape{color:#8a8a83}
+.rodape img{filter:invert(1) hue-rotate(180deg)}
+
+/* loja */
+.loja-topo,.loja-filtros{background:var(--fundo)}
+.loja-filtros{border-color:var(--borda)}
+.voltar{background:#fff;border-color:var(--borda)}
+.voltar i{border-color:var(--texto)}
+.chip{background:#fff;border-color:var(--borda);color:#3a3a35}
+.chip.on{background:var(--texto);border-color:var(--texto);color:#fff}
+.chip.oferta-chip i{background:var(--amarelo)}
+.ordem select{background-color:#fff;color:var(--texto)}
+.vazio{background:#fff}
+.vazio p{color:#4a4a44}
+
+/* folha e botões */
+.folha{background:#fff;color:var(--texto)}
+.alca{background:#d6d6cf}
+.fechar{background:var(--sup2)}
+.f-foto,.item .ft{background:#f6f6f2}
+.f-qtd>span,.folha .sub{color:#55554f}
+.f-preco em{color:var(--verde-esc)}
+.item{border-color:var(--borda)}
+.btn-claro{background:var(--sup2);color:var(--texto)}
+.sair-outra{color:#77776f}
+.aviso{background:var(--texto);color:#fff}
+.atalho img{box-shadow:0 0 0 1px #0000000f}
+.atalho:last-child img{background:var(--texto)}
+.secao-topo h2 i{box-shadow:inset 0 0 0 1.5px #0000002a}
+.cartao .foto,.oferta .foto,.f-foto,.item .ft{background:#fff}
+.cartao .foto{box-shadow:inset 0 0 0 1px #00000008}
