@@ -36,32 +36,100 @@ const cartao = p => `<button class="cartao" type="button" data-prod="${p.id}">
 </button>`;
 
 /* ---------- Página inicial (vitrine) ---------- */
+/* cartão grande do carrossel de ofertas */
+const oferta = p => `<button class="oferta" type="button" data-prod="${p.id}">
+  <span class="foto"><img src="${foto(p)}" alt="" decoding="async" width="560" height="560"><span class="etiqueta">-${desc(p)}%</span></span>
+  <span class="o-info"><span class="nome">${esc(p.nome)}</span>
+  <span class="preco">${brl(p.p)}<span class="de">${brl(p.de)}</span></span>
+  <span class="o-eco">Economize ${brl(p.de - p.p)}</span></span>
+</button>`;
+
+const mostrar = n => n < 3 ? n : Math.min(6, n - n % 3);
 function montar() {
   $("#atalhos").innerHTML = LINHAS.map(l => `<button class="atalho" type="button" data-loja="${l.id}"><img src="${l.icone}" alt="" width="64" height="64">${l.nome}</button>`).join("");
   const ofertas = PRODUTOS.filter(desc).sort((a, b) => desc(b) - desc(a));
-  $("#trilho-ofertas").innerHTML = ofertas.map(cartao).join("");
+  $("#trilho-ofertas").innerHTML = ofertas.map(oferta).join("");
+  $("#pontos").innerHTML = ofertas.map(() => "<i></i>").join("");
   $("#ofertas").hidden = !ofertas.length;
+  /* sempre fileiras completas de 3 */
   const procurados = PRODUTOS.filter(p => (p.destaque || p.novo) && !p.de);
-  $("#trilho-procurados").innerHTML = procurados.map(cartao).join("");
-  $("#trilho-procurados").closest(".bloco").hidden = !procurados.length;
-  /* destaques: um produto de cada linha que ainda não apareceu nos carrosséis */
-  const usados = new Set([...ofertas, ...procurados].map(p => p.id));
-  const dest = LINHAS.map(l => PRODUTOS.find(p => linhaDe(p.cat).id === l.id && !usados.has(p.id))).filter(Boolean);
-  PRODUTOS.forEach(p => { if (dest.length < 4 && !dest.includes(p) && !usados.has(p.id)) dest.push(p); });
-  $("#destaques").innerHTML = dest.slice(0, 4).map(cartao).join("");
-  $("#total-produtos").textContent = `${PRODUTOS.length} produtos em ${LINHAS.length} linhas`;
+  PRODUTOS.forEach(p => { if (procurados.length < 6 && !p.de && !procurados.includes(p)) procurados.push(p); });
+  procurados.length = Math.min(6, procurados.length - procurados.length % 3) || procurados.length;
+  $("#procurados").innerHTML = procurados.map(cartao).join("");
+  $("#procurados").closest(".faixa").hidden = !procurados.length;
 
-  if (INSTAGRAM_POSTS.length) {
-    $("#insta-grade").innerHTML = INSTAGRAM_POSTS.slice(0, 6).map(p => `<a href="${esc(p.link)}" target="_blank" rel="noopener" aria-label="Ver post no Instagram"><img src="${esc(p.img)}" alt="" loading="lazy"></a>`).join("");
-    $("#insta").hidden = false;
-  }
+  /* uma faixa por linha, com a cor da linha */
+  const tons = { irrigacao: "verde", ferramentas: "escura", eletricas: "azul", agro: "branca" };
+  $("#faixas-linhas").innerHTML = LINHAS.map(l => {
+    const itens = PRODUTOS.filter(p => linhaDe(p.cat).id === l.id);
+    if (!itens.length) return "";
+    return `<section class="faixa faixa-${tons[l.id] || "escura"}">
+      <div class="faixa-topo"><h2><img src="${l.icone}" alt="" width="40" height="40">${esc(l.nome)}</h2><button class="ver" type="button" data-loja="${l.id}">Ver ${itens.length}</button></div>
+      <div class="grade">${itens.slice(0, mostrar(itens.length)).map(cartao).join("")}${itens.length < 3 ? `<button class="cartao-ver" type="button" data-loja="${l.id}" style="grid-column:span ${3 - itens.length}"><b>Ver tudo de ${esc(l.nome)}</b><small>Peça pelo WhatsApp o que não estiver aqui</small></button>` : ""}</div>
+      ${itens.length > mostrar(itens.length) ? `<button class="ver-mais" type="button" data-loja="${l.id}">Ver todos de ${esc(l.nome)}</button>` : ""}
+    </section>`;
+  }).join("");
+
   const ig = `https://www.instagram.com/${LOJA.instagram}/`;
+  $("#insta-user").textContent = LOJA.instagram; $("#insta-seguir").href = ig;
+  if (INSTAGRAM_POSTS.length) montarInsta();
   $("#c-insta").href = ig; $("#c-insta-txt").textContent = "@" + LOJA.instagram;
   $("#c-zap").textContent = LOJA.whatsappVisivel;
   $("#c-mapa").href = LOJA.mapa; $("#c-cidade").textContent = LOJA.cidade; $("#c-ref").textContent = LOJA.referencia || "Ver no mapa";
   $("#ano").textContent = new Date().getFullYear();
   $("#chips").innerHTML = `<button class="chip" type="button" role="tab" data-filtro="">Tudo</button>` +
     LINHAS.map(l => `<button class="chip" type="button" role="tab" data-filtro="${l.id}" style="--c:${l.cor}"><i></i>${l.nome}</button>`).join("");
+}
+
+/* ---------- Instagram: posts oficiais (só carrega quando chega perto) ---------- */
+function montarInsta() {
+  const box = $("#insta-posts");
+  box.innerHTML = INSTAGRAM_POSTS.slice(0, 3).map(u => {
+    const link = String(u).split("?")[0].replace(/\/?$/, "/");
+    return /^https:\/\/www\.instagram\.com\/(p|reel)\/[\w-]+\/$/.test(link)
+      ? `<blockquote class="instagram-media" data-instgrm-permalink="${esc(link)}" data-instgrm-version="14"><a href="${esc(link)}" target="_blank" rel="noopener">Ver no Instagram</a></blockquote>` : "";
+  }).join("");
+  if (!box.innerHTML.trim()) return;
+  box.hidden = false;
+  const carregar = () => { const s = document.createElement("script"); s.async = true; s.src = "https://www.instagram.com/embed.js"; document.body.appendChild(s); };
+  if (!("IntersectionObserver" in window)) return carregar();
+  const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); carregar(); } }, { rootMargin: "600px" });
+  io.observe(box);
+}
+
+/* ---------- Carrossel de ofertas: o do meio cresce, os lados recuam ---------- */
+function carrossel() {
+  const t = $("#trilho-ofertas"), pts = $$("#pontos i");
+  const cards = $$(".oferta", t); if (!cards.length) return;
+  let pedido = 0, atual = -1;
+  function pintar() {
+    pedido = 0;
+    const meio = t.scrollLeft + t.clientWidth / 2;
+    let melhor = 0, md = 1e9;
+    cards.forEach((c, i) => {
+      const centro = c.offsetLeft + c.offsetWidth / 2, d = (centro - meio) / c.offsetWidth;
+      const a = Math.min(Math.abs(d), 1.4);
+      if (!reduz) c.style.transform = `scale(${1 - a * .12}) translateY(${a * 10}px)`;
+      c.style.opacity = 1 - Math.min(a, 1) * .45;
+      if (Math.abs(d) < md) { md = Math.abs(d); melhor = i; }
+    });
+    if (melhor !== atual) { atual = melhor; pts.forEach((p, i) => p.classList.toggle("on", i === melhor)); cards.forEach((c, i) => c.classList.toggle("ativo", i === melhor)); }
+  }
+  t.addEventListener("scroll", () => { if (!pedido) pedido = requestAnimationFrame(pintar); }, { passive: true });
+  addEventListener("resize", pintar);
+  pintar();
+  if (reduz || cards.length < 2) return;
+  /* passa sozinho a cada 4s, para quando a pessoa toca */
+  let parado = false, tPausa;
+  const pausar = () => { parado = true; clearTimeout(tPausa); tPausa = setTimeout(() => parado = false, 8000); };
+  ["pointerdown", "touchstart", "wheel"].forEach(ev => t.addEventListener(ev, pausar, { passive: true }));
+  let visivel = false;
+  if ("IntersectionObserver" in window) new IntersectionObserver(es => visivel = es[0].isIntersecting, { threshold: .5 }).observe(t);
+  setInterval(() => {
+    if (parado || !visivel || document.hidden || lojaAberta || aberta) return;
+    const prox = cards[(atual + 1) % cards.length];
+    t.scrollTo({ left: prox.offsetLeft - (t.clientWidth - prox.offsetWidth) / 2, behavior: "smooth" });
+  }, 4000);
 }
 
 /* ---------- Loja: todos os produtos, com busca, linhas e ordem ---------- */
@@ -80,8 +148,9 @@ function grade() {
   $("#conta").textContent = `${itens.length} ${itens.length === 1 ? "produto" : "produtos"}`;
   $$(".chip").forEach(c => { const on = c.dataset.filtro === filtro; c.classList.toggle("on", on); c.setAttribute("aria-selected", on); });
 }
-function abrirLoja(linha, focar) {
+function abrirLoja(linha, focar, ordem) {
   filtro = linha || "";
+  $("#ordem").value = ordem || "";
   if (!lojaAberta) {
     rolagemCasa = scrollY; lojaAberta = true;
     try { history.pushState({ rommo: "loja" }, ""); } catch {}
@@ -219,7 +288,7 @@ document.addEventListener("click", e => {
   const t = e.target;
   const z = t.closest("[data-zap]"); if (z) { abrirZap((MSG[z.dataset.zap] || MSG.geral)()); return; }
   const pr = t.closest("[data-prod]"); if (pr) { verProduto(pr.dataset.prod); return; }
-  const lj = t.closest("[data-loja]"); if (lj) { abrirLoja(lj.dataset.loja, lj.dataset.focar); return; }
+  const lj = t.closest("[data-loja]"); if (lj) { abrirLoja(lj.dataset.loja, lj.dataset.focar, lj.dataset.ordem); return; }
   if (t.closest("[data-fechar]") || t === fundo) { fecharFolha(); return; }
   const a = t.closest('a[href="#inicio"]'); if (a) { e.preventDefault(); scrollTo({ top: D, behavior: reduz ? "auto" : "smooth" }); }
 });
@@ -281,7 +350,7 @@ function carregamento() {
 }
 
 /* ---------- Início ---------- */
-montar(); grade(); salvarLista(); relogio(); setInterval(relogio, 30000);
+montar(); carrossel(); grade(); salvarLista(); relogio(); setInterval(relogio, 30000);
 if (!reduz) { scrollTo(0, 0); medir(true); addEventListener("load", () => medir(true)); document.fonts?.ready.then(() => medir(true)); }
 carregamento();
 })();

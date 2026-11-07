@@ -244,3 +244,88 @@ body.na-loja .flutua-zap{transform:none}
 .ordem{display:flex;align-items:center;gap:6px}
 .ordem select{height:34px;padding:0 28px 0 10px;border-radius:9px;border:1px solid var(--borda);background:var(--sup) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23aaa' stroke-width='1.8'/%3E%3C/svg%3E") right 9px center/10px no-repeat;color:#fff;font:600 13.5px var(--txt);-webkit-appearance:none;appearance:none}
 #loja .vazio{margin-top:10px}
+
+/* ============ Faixas coloridas (camadas da vitrine) ============ */
+.faixa{--fx-txt:#fff;--fx-sub:#b9b9b4;--fx-nome:#e4e4df;--fx-ver:var(--amarelo);margin-top:28px;padding:24px 0 26px;color:var(--fx-txt)}
+.faixa-topo{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;padding:0 var(--g) 14px}
+.faixa-topo h2{display:flex;align-items:center;gap:10px;font-size:21px;line-height:1.1;color:var(--fx-txt)}
+.faixa-topo h2 img{width:34px;height:34px;border-radius:9px}
+.ver{flex:none;min-height:36px;padding:0 14px;border-radius:99px;background:rgba(255,255,255,.1);color:var(--fx-txt);font:600 13.5px var(--txt)}
+.ver:active{transform:scale(.96)}
+.ver-mais{display:block;width:calc(100% - var(--g)*2);margin:18px var(--g) 0;min-height:46px;border-radius:12px;background:rgba(255,255,255,.1);color:var(--fx-txt);font:600 14.5px var(--txt)}
+.faixa .cartao .nome{color:var(--fx-nome)}
+.faixa .cartao .preco{color:var(--fx-txt)}
+.faixa .cartao .de{color:var(--fx-sub)}
+
+/* cartões menores, 3 por fileira (vitrine e loja) */
+.grade{grid-template-columns:repeat(3,1fr);gap:16px 8px}
+.grade .cartao .foto{border-radius:11px}
+.grade .cartao .nome{margin-top:7px;font-size:11.5px;line-height:1.28;min-height:29px}
+.grade .cartao .preco{font-size:13.5px}
+.grade .cartao .de{display:block;margin:1px 0 0;font-size:10.5px}
+.grade .etiqueta{left:4px;top:4px;font-size:10px;padding:3px 5px}
+@media (min-width:761px){.grade{grid-template-columns:repeat(4,1fr);gap:20px 12px}}
+
+/* tons de cada faixa */
+.faixa-amarela{--fx-txt:#141000;--fx-sub:#5b4b00;background:var(--amarelo);border-radius:26px 26px 0 0;padding-bottom:20px}
+.faixa-amarela .ver{background:#141000;color:var(--amarelo)}
+.faixa-clara{--fx-txt:#111;--fx-sub:#76766f;--fx-nome:#33332f;background:#ecebe5}
+.faixa-clara .ver,.faixa-branca .ver,.faixa-clara .ver-mais,.faixa-branca .ver-mais{background:#111;color:#fff}
+.faixa-clara .cartao .foto{box-shadow:0 1px 0 rgba(0,0,0,.06)}
+.faixa-verde{--fx-txt:#fff;--fx-sub:#dbeab0;--fx-nome:#f3f8e3;background:linear-gradient(180deg,#5f8204,#4a6703)}
+.faixa-verde h2 img,.faixa-azul h2 img{box-shadow:0 0 0 2px #fff}
+.faixa-escura{background:var(--preto)}
+.faixa-escura .ver{background:var(--amarelo);color:#141000}
+.faixa-azul{--fx-sub:#bfe0f5;--fx-nome:#eaf5fc;background:linear-gradient(180deg,#006bb0,#005590)}
+.faixa-branca{--fx-txt:#111;--fx-sub:#76766f;--fx-nome:#33332f;background:#fff}
+.faixa-branca .cartao .foto{background:#f3f3ef}
+.faixa-branca h2 img{box-shadow:0 0 0 1px #ddd}
+#faixas-linhas .faixa{margin-top:0}
+.faixa-clara{margin-top:0}
+
+/* letreiro que corre entre as faixas */
+.letreiro{overflow:hidden;background:#000;border-block:1px solid #222;padding:11px 0}
+.letreiro div{display:flex;width:max-content;align-items:center;gap:18px;animation:letreiro 22s linear infinite}
+.letreiro span{font:700 14px var(--disp);color:#fff;white-space:nowrap}
+.letreiro i{width:9px;height:9px;border-radius:2px;background:var(--lima);flex:none}
+.letreiro i:nth-of-type(4n+2){background:var(--amarelo)}
+.letreiro i:nth-of-type(4n+3){background:var(--azul)}
+.letreiro i:nth-of-type(4n){background:#fff}
+@keyframes letreiro{to{transform:translateX(-50%)}}
+
+/* carrossel de ofertas */
+.relogio{margin:5px 0 0;font:600 13px var(--txt);color:#4a3d00}
+.destaque-trilho{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 19% 14px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.destaque-trilho::-webkit-scrollbar{display:none}
+.oferta{flex:0 0 62%;scroll-snap-align:center;display:flex;flex-direction:column;text-align:left;background:#fff;border-radius:20px;padding:10px;box-shadow:0 14px 28px -14px rgba(60,40,0,.55);transform-origin:50% 60%;will-change:transform,opacity;transition:box-shadow .3s}
+.oferta .foto{position:relative;display:block;aspect-ratio:1;border-radius:14px;background:#f5f5f1;overflow:hidden}
+.oferta .foto img{width:100%;height:100%;object-fit:contain;padding:9%;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.oferta.ativo .foto img{transform:scale(1.06)}
+.oferta .etiqueta{left:8px;top:8px;font-size:13px;padding:5px 8px;background:#000;color:var(--amarelo)}
+.o-info{display:block;padding:10px 4px 4px}
+.oferta .nome{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font:600 13.5px/1.3 var(--txt);color:#222;min-height:35px}
+.oferta .preco{display:block;margin-top:5px;font:700 20px var(--disp);color:#000;font-variant-numeric:tabular-nums}
+.oferta .de{margin-left:7px;font:400 12.5px var(--txt);color:#888;text-decoration:line-through}
+.o-eco{display:inline-block;margin-top:6px;padding:3px 8px;border-radius:99px;background:#eaf5d2;color:#3d5600;font:700 11.5px var(--txt)}
+.pontos{display:flex;justify-content:center;gap:6px}
+.pontos i{width:6px;height:6px;border-radius:99px;background:rgba(0,0,0,.25);transition:width .3s,background .3s}
+.pontos i.on{width:20px;background:#000}
+@media (min-width:761px){.oferta{flex-basis:300px}.destaque-trilho{padding-inline:calc(50% - 150px)}}
+
+/* instagram */
+.faixa-insta{background:linear-gradient(160deg,#16161a,#000 70%);margin-top:0}
+.insta-perfil{display:flex;align-items:center;gap:14px;padding:0 var(--g) 16px}
+.insta-perfil img{width:60px;height:60px;border-radius:50%;background:#fff;padding:3px;box-shadow:0 0 0 2px #000,0 0 0 4px var(--amarelo)}
+.insta-perfil b{display:block;font:700 18px var(--disp)}
+.insta-perfil div>span{display:block;color:#aaa;font-size:13.5px}
+.insta-posts{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 var(--g) 16px;scrollbar-width:none}
+.insta-posts::-webkit-scrollbar{display:none}
+.insta-posts .instagram-media,.insta-posts iframe{flex:0 0 86%!important;min-width:0!important;max-width:none!important;width:86%!important;margin:0!important;scroll-snap-align:center;border-radius:14px!important}
+.btn-insta{width:calc(100% - var(--g)*2);margin:0 var(--g);background:#fff;color:#000}
+.btn-insta svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2}
+#contato{margin-top:0;background:var(--preto)}
+.cartao-ver{display:flex;flex-direction:column;justify-content:center;gap:6px;aspect-ratio:auto;padding:14px;border-radius:11px;border:1.5px dashed rgba(255,255,255,.45);color:var(--fx-txt);text-align:left;align-self:start;min-height:calc((100vw - 48px)/3)}
+.cartao-ver b{font:700 15px/1.2 var(--disp)}
+.cartao-ver small{font-size:12px;color:var(--fx-sub)}
+.faixa-branca .cartao-ver,.faixa-clara .cartao-ver{border-color:#bbb}
+@media (min-width:561px){.cartao-ver{min-height:160px}}

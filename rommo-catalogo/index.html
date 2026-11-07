@@ -15,7 +15,7 @@
 <link rel="preload" as="font" type="font/woff" href="fonts/ChakraPetch-Bold.woff" crossorigin>
 <link rel="preload" as="font" type="font/woff" href="fonts/Barlow-Regular.woff" crossorigin>
 <link rel="preload" as="image" href="assets/fotos/capa-celular.webp" fetchpriority="high">
-<link rel="stylesheet" href="css/app.css?v=3">
+<link rel="stylesheet" href="css/app.css?v=4">
 </head>
 <body class="ldg">
 
@@ -71,29 +71,39 @@
 
   <nav class="atalhos" id="atalhos" aria-label="Linhas de produtos"></nav>
 
-  <section class="bloco" id="ofertas">
-    <div class="titulo"><h2>Ofertas da semana</h2><span class="relogio" id="relogio"></span></div>
-    <div class="trilho" id="trilho-ofertas"></div>
+  <!-- Faixa amarela: ofertas em carrossel animado -->
+  <section class="faixa faixa-amarela" id="ofertas">
+    <div class="faixa-topo">
+      <div><h2>Ofertas da semana</h2><p class="relogio" id="relogio"></p></div>
+      <button class="ver" type="button" data-loja="" data-ordem="ofertas">Ver todas</button>
+    </div>
+    <div class="destaque-trilho" id="trilho-ofertas" aria-label="Ofertas, arraste para o lado"></div>
+    <div class="pontos" id="pontos" aria-hidden="true"></div>
   </section>
 
-  <section class="bloco">
-    <div class="titulo"><h2>Mais procurados</h2></div>
-    <div class="trilho" id="trilho-procurados"></div>
+  <div class="letreiro" aria-hidden="true"><div><span>Ferramentas</span><i></i><span>Irrigação</span><i></i><span>Agropecuária</span><i></i><span>Peça pelo WhatsApp</span><i></i><span>Ferramentas</span><i></i><span>Irrigação</span><i></i><span>Agropecuária</span><i></i><span>Peça pelo WhatsApp</span><i></i></div></div>
+
+  <!-- Faixa clara: mais procurados -->
+  <section class="faixa faixa-clara">
+    <div class="faixa-topo"><h2>Mais procurados</h2><button class="ver" type="button" data-loja="">Ver tudo</button></div>
+    <div class="grade" id="procurados"></div>
   </section>
 
-  <section class="bloco">
-    <div class="titulo"><h2>Destaques</h2><button class="link" type="button" data-loja="">Ver todos</button></div>
-    <div class="grade" id="destaques"></div>
-    <button class="ver-loja" type="button" data-loja=""><span><b>Ver todos os produtos</b><small id="total-produtos"></small></span><i></i></button>
+  <!-- Uma faixa por linha, cada uma com a cor do quadradinho -->
+  <div id="faixas-linhas"></div>
+
+  <!-- Instagram -->
+  <section class="faixa faixa-insta" id="insta">
+    <div class="insta-perfil">
+      <img src="assets/rommo-icon-192.png" alt="" width="64" height="64">
+      <div><b>@<span id="insta-user"></span></b><span>Novidades, chegadas e ofertas toda semana</span></div>
+    </div>
+    <div class="insta-posts" id="insta-posts" hidden></div>
+    <a class="btn btn-insta btn-largo" id="insta-seguir" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg>Seguir no Instagram</a>
   </section>
 
-  <section class="bloco" id="insta" hidden>
-    <div class="titulo"><h2>No Instagram</h2></div>
-    <div class="insta-grade" id="insta-grade"></div>
-  </section>
-
-  <section class="bloco" id="contato">
-    <div class="titulo"><h2>Fale com a gente</h2></div>
+  <section class="faixa" id="contato">
+    <div class="faixa-topo"><h2>Fale com a gente</h2></div>
     <div class="contato">
       <button type="button" data-zap="geral" class="linha-contato"><span class="ic zap"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg></span><span><b>WhatsApp</b><small id="c-zap"></small></span><i></i></button>
       <a id="c-insta" class="linha-contato" href="#" target="_blank" rel="noopener"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg></span><span><b>Instagram</b><small id="c-insta-txt"></small></span><i></i></a>
@@ -152,7 +162,7 @@
   <symbol id="i-zap" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></symbol>
 </svg>
 
-<script src="js/data.js?v=2"></script>
-<script src="js/app.js?v=3"></script>
+<script src="js/data.js?v=3"></script>
+<script src="js/app.js?v=4"></script>
 </body>
 </html>
