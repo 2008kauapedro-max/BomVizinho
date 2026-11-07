@@ -62,6 +62,9 @@ function montar() {
   $("#c-mapa").href = LOJA.mapa || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lugar)}`;
   $("#c-rota").href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(lugar)}`;
   $("#mapa-frame").src = `https://maps.google.com/maps?q=${encodeURIComponent(lugar)}&z=16&hl=pt-BR&output=embed`;
+  $("#m-rota").href = $("#c-rota").href; $("#m-end").textContent = LOJA.cidade;
+  $("#m-insta").href = ig; $("#m-insta-txt").textContent = "@" + LOJA.instagram; $("#m-zap").textContent = LOJA.whatsappVisivel;
+  $("#menu-linhas").innerHTML = LINHAS.map(l => `<button class="menu-sub" type="button" data-loja="${l.id}"><i style="background:${l.cor}"></i>${esc(l.nome)}</button>`).join("");
   $("#c-cidade").textContent = LOJA.cidade; $("#c-end").textContent = LOJA.endereco || ""; $("#c-ref").textContent = LOJA.referencia || "";
   $("#ano").textContent = new Date().getFullYear();
   $("#chips").innerHTML = `<button class="chip" type="button" role="tab" data-filtro="">Tudo</button><button class="chip oferta-chip" type="button" role="tab" data-filtro="ofertas"><i></i>Ofertas</button>` +
@@ -247,6 +250,7 @@ function salvarLista() {
   guardar.set("rommo_lista", lista);
   const n = lista.reduce((s, i) => s + i.q, 0);
   const s = $("#lista-qtd"); s.textContent = n > 99 ? "99+" : n; s.hidden = !n;
+  $("#menu-qtd").textContent = n ? n : "";
 }
 let tAviso;
 function avisar(t) { const a = $("#aviso"); a.textContent = t; a.classList.add("on"); clearTimeout(tAviso); tAviso = setTimeout(() => a.classList.remove("on"), 1700); }
@@ -315,6 +319,41 @@ function adicionar(id, q = 1) {
   const b = $("#lista-qtd"); b.classList.remove("pulo"); void b.offsetWidth; b.classList.add("pulo");
 }
 
+/* ---------- Menu lateral ---------- */
+const menu = $("#menu"), menuFundo = $("#menu-fundo");
+let menuAberto = false;
+function abrirMenu() {
+  menuAberto = true; menu.hidden = false; document.body.classList.add("travado");
+  $("#btn-menu").setAttribute("aria-expanded", "true");
+  requestAnimationFrame(() => { menu.classList.add("on"); menuFundo.classList.add("on"); });
+}
+function fecharMenu() {
+  if (!menuAberto) return; menuAberto = false;
+  menu.classList.remove("on"); menuFundo.classList.remove("on");
+  if (!aberta) document.body.classList.remove("travado");
+  $("#btn-menu").setAttribute("aria-expanded", "false");
+  setTimeout(() => { if (!menuAberto) menu.hidden = true; }, 300);
+}
+$("#btn-menu").addEventListener("click", abrirMenu);
+$("#menu-fechar").addEventListener("click", fecharMenu);
+menuFundo.addEventListener("click", fecharMenu);
+$("#menu-lista").addEventListener("click", () => { fecharMenu(); $("#btn-lista").click(); });
+
+/* página "Como comprar" (abre como folha) */
+const INFO = {
+  como: () => `<h2>Como comprar pelo site</h2>
+    <p class="sub">É um catálogo: você escolhe aqui e fecha o pedido com a gente pelo WhatsApp.</p>
+    <ol class="info-passos">
+      <li><b>1</b><div><strong>Escolha os produtos</strong><span>Use a busca, as abas ou as ofertas. Toque no produto para ver foto, preço e modelos parecidos.</span></div></li>
+      <li><b>2</b><div><strong>Monte sua lista</strong><span>Toque no <em>+</em> ou em “Adicionar à lista”. A lista fica no carrinho, no topo da tela.</span></div></li>
+      <li><b>3</b><div><strong>Envie no WhatsApp</strong><span>Abra a lista e toque em “Enviar lista no WhatsApp”. A mensagem já vai pronta com os produtos e o total.</span></div></li>
+      <li><b>4</b><div><strong>Combine com a gente</strong><span>Confirmamos estoque, preço, pagamento e como você vai receber ou retirar.</span></div></li>
+    </ol>
+    <div class="info-perg"><strong>Preciso pagar pelo site?</strong><span>Não. O pagamento é combinado direto com a loja pelo WhatsApp.</span></div>
+    <div class="info-perg"><strong>Não achei o que procuro.</strong><span>Fale com a gente: a loja tem mais produtos do que os que aparecem aqui.</span></div>
+    <button class="btn btn-zap btn-largo" type="button" data-zap="geral"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg>Falar no WhatsApp</button>`,
+};
+
 /* ---------- Aviso antes de sair (uma vez por visita) ---------- */
 function antesDeSair() {
   if (sessao.get("rommo_sair")) return false;
@@ -337,6 +376,7 @@ function antesDeSair() {
 let guarda = false;
 function armarGuarda() { if (guarda || sessao.get("rommo_sair")) return; try { history.pushState({ rommo: 1 }, ""); guarda = true; } catch {} }
 addEventListener("popstate", () => {
+  if (menuAberto) { fecharMenu(); try { history.pushState(lojaAberta ? { rommo: "loja" } : { rommo: 1 }, ""); } catch {} return; }
   if (aberta) { fecharFolha(); try { history.pushState(lojaAberta ? { rommo: "loja" } : { rommo: 1 }, ""); } catch {} return; }
   if (lojaAberta) { fecharLoja(); return; }
   guarda = false;
@@ -358,14 +398,16 @@ const relogio = () => { $("#relogio").textContent = relogioTexto(); };
 function rolarPara(el) { const y = el.getBoundingClientRect().top + scrollY - 66; scrollTo({ top: Math.max(0, y), behavior: reduz ? "auto" : "smooth" }); }
 document.addEventListener("click", e => {
   const t = e.target;
+  if (menuAberto && t.closest("#menu a, #menu button")) fecharMenu();
+  const inf = t.closest("[data-info]"); if (inf && INFO[inf.dataset.info]) { abrirFolha(INFO[inf.dataset.info](), "Como comprar"); return; }
   const z = t.closest("[data-zap]"); if (z) { abrirZap((MSG[z.dataset.zap] || MSG.geral)()); return; }
   const ad = t.closest("[data-add]"); if (ad) { adicionar(Number(ad.dataset.add)); ad.classList.add("ok"); setTimeout(() => ad.classList.remove("ok"), 900); return; }
   const pr = t.closest("[data-prod]"); if (pr) { verProduto(pr.dataset.prod); return; }
   const lj = t.closest("[data-loja]"); if (lj) { abrirLoja(lj.dataset.loja, lj.dataset.focar, lj.dataset.ordem); return; }
   if (t.closest("[data-fechar]") || t === fundo) { fecharFolha(); return; }
-  const a = t.closest('a[href="#inicio"]'); if (a) { e.preventDefault(); scrollTo({ top: D, behavior: reduz ? "auto" : "smooth" }); }
+  const a = t.closest('a[href="#inicio"]'); if (a) { e.preventDefault(); if (lojaAberta) { history.back(); return; } scrollTo({ top: D, behavior: reduz ? "auto" : "smooth" }); }
 });
-addEventListener("keydown", e => { if (e.key === "Escape") fecharFolha(); });
+addEventListener("keydown", e => { if (e.key === "Escape") { fecharFolha(); fecharMenu(); } });
 
 /* ---------- Capa em tela cheia que encolhe até o palco ----------
    Mede só quando a largura muda (a barra do navegador do celular não bagunça a animação). */
