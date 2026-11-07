@@ -7,7 +7,10 @@ const brl = v => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const reduz = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const linhaDe = cat => LINHAS.find(l => l.cats.includes(cat)) || LINHAS[1];
-const foto = p => p.img || `assets/produtos/${p.id}.webp`;
+const foto = p => p.img || `assets/cat/${p.cat}.svg`;
+/* ordem da vitrine: destaques, depois quem tem estoque, depois os mais caros (máquinas e kits na frente de parafuso) */
+const peso = p => (p.destaque ? 1e6 : 0) + (p.est > 0 ? 1e5 : 0) + Math.min(p.p, 9e4);
+const seloDe = p => p.selo || (p.est <= 0 ? "consultar" : "");
 const porId = id => PRODUTOS.find(p => p.id === Number(id));
 const desc = p => (p.de && p.de > p.p ? Math.round((1 - p.p / p.de) * 100) : 0);
 const guardar = { get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
@@ -27,32 +30,38 @@ const MSG = {
   geral: () => "Olá, ROMMO! Vim pelo catálogo e quero atendimento." + assin(),
   busca: () => `Olá, ROMMO! Procurei "${$("#busca").value.trim()}" no catálogo e não encontrei. Vocês têm?` + assin(),
   oferta: () => "Olá, ROMMO! Vi as ofertas no catálogo e quero saber mais." + assin(),
-  produto: (p, q) => `Olá, ROMMO! Quero este produto do catálogo:\n\n*${p.nome}*\nQuantidade: ${q}\nPreço: ${brl(p.p)} cada\n\nTem disponível?` + assin(),
-  lista: itens => `Olá, ROMMO! Montei esta lista no catálogo:\n\n${itens.map(({ p, q }) => `• ${q}x ${p.nome} — ${brl(p.p * q)}`).join("\n")}\n\n*Total: ${brl(somaLista(itens))}*\n\nTem tudo disponível?` + assin(),
+  produto: (p, q) => `Olá, ROMMO! Quero este produto do catálogo:\n\n*${p.nome}*${p.cod ? ` (cód. ${p.cod})` : ""}\nQuantidade: ${q}\nPreço: ${brl(p.p)} cada\n\nTem disponível?` + assin(),
+  lista: itens => `Olá, ROMMO! Montei esta lista no catálogo:\n\n${itens.map(({ p, q }) => `• ${q}x ${p.nome}${p.cod ? ` (cód. ${p.cod})` : ""} — ${brl(p.p * q)}`).join("\n")}\n\n*Total: ${brl(somaLista(itens))}*\n\nTem tudo disponível?` + assin(),
   kit: k => `Olá, ROMMO! Quero o kit *${k.nome}* do catálogo:\n\n${k.itens.map(porId).filter(Boolean).map(p => `• 1x ${p.nome} — ${brl(p.p)}`).join("\n")}\n\n*Total: ${brl(k.itens.map(porId).filter(Boolean).reduce((s, p) => s + p.p, 0))}*\n\nTem tudo disponível?` + assin(),
 };
 
 /* ---------- Cartão (um modelo só) ---------- */
-const SELOS = { "mais-vendido": ["Mais vendido", "vendido", "Top vendas"], ultimas: ["Últimas unidades", "ultimas", "Acabando"] };
+const SELOS = { "mais-vendido": ["Mais vendido", "vendido", "Top vendas"], ultimas: ["Últimas unidades", "ultimas", "Acabando"], consultar: ["Sob consulta: pergunte no WhatsApp", "consultar", "Sob consulta"] };
 const etiqueta = p => desc(p) ? `<span class="etiqueta">-${desc(p)}%</span>` : p.novo ? `<span class="etiqueta novo">Novo</span>` : "";
-const selosDe = p => [desc(p) ? `<span class="selo-f desc">-${desc(p)}% de desconto</span>` : "", SELOS[p.selo] ? `<span class="selo-f ${SELOS[p.selo][1]}">${SELOS[p.selo][0]}</span>` : "", p.novo ? `<span class="selo-f novo">Novo</span>` : ""].join("");
+const selosDe = p => [desc(p) ? `<span class="selo-f desc">-${desc(p)}% de desconto</span>` : "", SELOS[seloDe(p)] ? `<span class="selo-f ${SELOS[seloDe(p)][1]}">${SELOS[seloDe(p)][0]}</span>` : "", p.novo ? `<span class="selo-f novo">Novo</span>` : ""].join("");
 const cartao = p => `<button class="cartao" type="button" data-prod="${p.id}">
   <span class="foto"><img src="${foto(p)}" alt="" loading="lazy" decoding="async" width="560" height="560">${etiqueta(p)}<span class="mais" data-add="${p.id}" role="button" aria-label="Adicionar à lista">+</span></span>
-  <span class="info">${SELOS[p.selo] ? `<span class="selo-c ${SELOS[p.selo][1]}" title="${SELOS[p.selo][0]}">${SELOS[p.selo][2]}</span>` : `<span class="selo-c" aria-hidden="true"></span>`}<span class="nome">${esc(p.nome)}</span>
+  <span class="info">${SELOS[seloDe(p)] ? `<span class="selo-c ${SELOS[seloDe(p)][1]}" title="${SELOS[seloDe(p)][0]}">${SELOS[seloDe(p)][2]}</span>` : `<span class="selo-c" aria-hidden="true"></span>`}<span class="nome">${esc(p.nome)}</span>
   <span class="de${p.de ? "" : " sem"}">${p.de ? brl(p.de) : ""}</span><span class="preco">${brl(p.p)}</span></span>
 </button>`;
 
 /* ---------- Página inicial (vitrine) ---------- */
 /* cartão grande do carrossel de ofertas */
 const oferta = p => `<button class="oferta" type="button" data-prod="${p.id}">
-  <span class="foto"><img src="${foto(p)}" alt="" decoding="async" width="560" height="560"><span class="etiqueta">-${desc(p)}%</span></span>
+  <span class="foto"><img src="${foto(p)}" alt="" decoding="async" width="560" height="560">${desc(p) ? `<span class="etiqueta">-${desc(p)}%</span>` : ""}</span>
   <span class="o-info"><span class="nome">${esc(p.nome)}</span>
-  <span class="preco">${brl(p.p)}<span class="de">${brl(p.de)}</span></span>
-  <span class="o-eco">Economize ${brl(p.de - p.p)}</span></span>
+  <span class="preco">${brl(p.p)}${p.de ? `<span class="de">${brl(p.de)}</span>` : ""}</span>
+  ${p.de ? `<span class="o-eco">Economize ${brl(p.de - p.p)}</span>` : `<span class="o-eco o-cat">${esc((typeof CATEGORIAS !== "undefined" && CATEGORIAS[p.cat]) || linhaDe(p.cat).nome)}</span>`}</span>
 </button>`;
 
 function montar() {
-  const ofertas = PRODUTOS.filter(desc).sort((a, b) => desc(b) - desc(a));
+  let ofertas = PRODUTOS.filter(desc).sort((a, b) => desc(b) - desc(a));
+  const temOferta = ofertas.length > 0;
+  if (!temOferta) {  /* sem ofertas cadastradas: o bloco amarelo mostra os destaques */
+    ofertas = PRODUTOS.filter(p => p.destaque && p.est > 0).slice(0, 8);
+    $("#of-titulo").textContent = "Destaques da semana"; $("#relogio").hidden = true;
+    const v = $("#ofertas .ver"); v.dataset.loja = ""; v.dataset.ordem = "";
+  }
   $("#trilho-ofertas").innerHTML = ofertas.map(oferta).join("");
   $("#pontos").innerHTML = ofertas.map(() => "<i></i>").join("");
   $("#ofertas").hidden = !ofertas.length;
@@ -63,7 +72,7 @@ function montar() {
   /* cupom */
   if (cupomOk()) { $("#cupom-cod").textContent = CUPOM.codigo; $("#cupom-txt").textContent = CUPOM.texto; $("#cupom").hidden = false; }
   /* campanha */
-  if (campanhaAtiva()) $("#of-titulo").textContent = CAMPANHA.titulo;
+  if (temOferta && campanhaAtiva()) $("#of-titulo").textContent = CAMPANHA.titulo;
   /* kits prontos */
   const kits = (typeof KITS !== "undefined" ? KITS : []).filter(k => k.itens.some(porId));
   if (kits.length) {
@@ -94,17 +103,17 @@ function montar() {
   $("#menu-linhas").innerHTML = LINHAS.map(l => `<button class="menu-sub" type="button" data-loja="${l.id}"><i style="background:${l.cor}"></i>${esc(l.nome)}</button>`).join("");
   $("#c-cidade").textContent = LOJA.cidade; $("#c-end").textContent = LOJA.endereco || ""; $("#c-ref").textContent = LOJA.referencia || "";
   $("#ano").textContent = new Date().getFullYear();
-  $("#chips").innerHTML = `<button class="chip" type="button" role="tab" data-filtro="">Tudo</button><button class="chip oferta-chip" type="button" role="tab" data-filtro="ofertas"><i></i>Ofertas</button>` +
+  $("#chips").innerHTML = `<button class="chip" type="button" role="tab" data-filtro="">Tudo</button>` + (PRODUTOS.some(desc) ? `<button class="chip oferta-chip" type="button" role="tab" data-filtro="ofertas"><i></i>Ofertas</button>` : "") +
     LINHAS.map(l => `<button class="chip" type="button" role="tab" data-filtro="${l.id}" style="--c:${l.cor}"><i></i>${l.nome}</button>`).join("");
 }
 
 /* ---------- Vitrine por abas: 6 produtos de cada vez ---------- */
 function aba(id) {
   let itens;
-  if (!id) {
-    itens = PRODUTOS.filter(p => p.destaque || p.novo);
-    PRODUTOS.forEach(p => { if (itens.length < 6 && !itens.includes(p)) itens.push(p); });
-  } else itens = PRODUTOS.filter(p => linhaDe(p.cat).id === id);
+  /* não repete o mesmo produto em vários tamanhos na vitrine */
+  const unicos = l => { const vistos = new Set(); return l.filter(p => !p.grupo || (!vistos.has(p.grupo) && vistos.add(p.grupo))); };
+  if (!id) itens = unicos(PRODUTOS.filter(p => p.destaque || p.novo).sort((a, b) => peso(b) - peso(a)));
+  else itens = unicos(PRODUTOS.filter(p => linhaDe(p.cat).id === id).sort((a, b) => peso(b) - peso(a)));
   const l = LINHAS.find(x => x.id === id);
   const g = $("#vitrine");
   g.innerHTML = itens.slice(0, 6).map(cartao).join("");
@@ -229,11 +238,11 @@ const raiz = w => w.length > 4 ? w.replace(/oes$|aes$/, "ao").replace(/es$|s$/, 
 const palavras = t => norm(t).split(/[^a-z0-9]+/).filter(w => w && !PARADAS.has(w));
 const SIN = (typeof SINONIMOS !== "undefined" ? SINONIMOS : []).map(g => g.map(norm));
 const INDICE = new Map(PRODUTOS.map(p => {
-  const nome = palavras(p.nome), extra = palavras(p.tags || "");
+  const nome = palavras(p.nome), extra = palavras((p.tags || "") + " " + ((typeof CATEGORIAS !== "undefined" && CATEGORIAS[p.cat]) || ""));
   const texto = " " + [...nome, ...extra].join(" ") + " ";
   SIN.forEach(g => { if (g.some(t => texto.includes(" " + t))) g.forEach(t => extra.push(...palavras(t))); });
   const l = linhaDe(p.cat);
-  return [p.id, { nome, extra, linha: palavras(l.nome + " " + p.cat), todas: new Set([...nome, ...extra].map(raiz)) }];
+  return [p.id, { nome, extra, linha: palavras(l.nome + " " + p.cat + " " + ((typeof CATEGORIAS !== "undefined" && CATEGORIAS[p.cat]) || "")), todas: new Set([...nome, ...extra].map(raiz)) }];
 }));
 const bate = (lista, t) => lista.some(w => w.startsWith(t) || raiz(w) === t);
 function buscar(q, base) {
@@ -285,7 +294,7 @@ function grade() {
     if (ordem === "maior") return l.slice().sort((a, b) => b.p - a.p);
     if (ordem === "ofertas") return l.slice().sort((a, b) => desc(b) - desc(a));
     if (ordem === "az") return l.slice().sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
-    return l;
+    return q ? l : l.slice().sort((a, b) => peso(b) - peso(a));
   };
   itens = ordenar(itens);
   let html = itens.map(cartao).join("");
@@ -355,6 +364,7 @@ function verProduto(id) {
   const p = porId(id); if (!p) return;
   let q = 1;
   abrirFolha(`<div class="f-foto"><img src="${foto(p)}" alt="${esc(p.nome)}"></div>
+    <p class="f-cat">${esc((typeof CATEGORIAS !== "undefined" && CATEGORIAS[p.cat]) || linhaDe(p.cat).nome)}${p.cod ? ` · cód. ${esc(p.cod)}` : ""}</p>
     <h2 class="f-nome">${esc(p.nome)}</h2>
     ${selosDe(p) ? `<div class="f-selos">${selosDe(p)}</div>` : ""}
     <div class="f-preco"><b>${brl(p.p)}</b>${p.de ? `<s>${brl(p.de)}</s><em>Economize ${brl(p.de - p.p)}</em>` : ""}</div>

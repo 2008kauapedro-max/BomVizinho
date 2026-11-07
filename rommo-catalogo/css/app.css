@@ -557,3 +557,10 @@ main,#loja{background:radial-gradient(ellipse 120% 40% at 0 0,#e4f0c9 0,transpar
 /* mapa limpo: sem selo nosso e com a caixinha do Google (canto de cima) escondida — a rota fica no botão "Como chegar" */
 .mapa{height:190px;overflow:hidden}
 .mapa iframe{top:-64px;height:calc(100% + 64px)}
+
+/* produtos reais */
+.f-cat{margin:14px 0 -8px;color:var(--fosco);font:500 12.5px var(--txt)}
+.selo-c.consultar{color:#8a6d00}
+.selo-c.consultar::before{content:"◷ "}
+.selo-f.consultar{background:#fff4cc;color:#6b5400}
+.o-cat{background:var(--sup2);color:#55554f}
