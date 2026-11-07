@@ -15,7 +15,7 @@
 <link rel="preload" as="font" type="font/woff" href="fonts/ChakraPetch-Bold.woff" crossorigin>
 <link rel="preload" as="font" type="font/woff" href="fonts/Barlow-Regular.woff" crossorigin>
 <link rel="preload" as="image" href="assets/fotos/capa-celular.webp" fetchpriority="high">
-<link rel="stylesheet" href="css/app.css?v=10">
+<link rel="stylesheet" href="css/app.css?v=11">
 </head>
 <body class="ldg">
 
@@ -72,15 +72,28 @@
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
     <span>Buscar produto</span>
   </button>
+  <button class="cupom" type="button" id="cupom" hidden><b id="cupom-cod"></b><span id="cupom-txt"></span></button>
 
   <!-- Ofertas: o único bloco colorido (e o lugar das campanhas) -->
   <section class="ofertas" id="ofertas">
     <div class="secao-topo">
-      <div><h2>Ofertas da semana</h2><p class="relogio" id="relogio"></p></div>
+      <div><h2 id="of-titulo">Ofertas da semana</h2><p class="relogio" id="relogio"></p></div>
       <button class="ver" type="button" data-loja="ofertas" data-ordem="ofertas">Ver todas<i></i></button>
     </div>
     <div class="destaque-trilho" id="trilho-ofertas" aria-label="Ofertas, arraste para o lado"></div>
     <div class="pontos" id="pontos" aria-hidden="true"></div>
+  </section>
+
+  <!-- Oferta do dia: um produto por dia, troca sozinho à meia-noite -->
+  <section class="secao" id="dia" hidden>
+    <div class="secao-topo"><h2>Oferta do dia</h2><span class="dia-relogio" id="dia-relogio"></span></div>
+    <div id="dia-card"></div>
+  </section>
+
+  <!-- Kits prontos -->
+  <section class="secao" id="kits" hidden>
+    <div class="secao-topo"><h2>Kits prontos</h2></div>
+    <div class="kits" id="kits-trilho"></div>
   </section>
 
   <!-- Produtos: uma vitrine só, trocando por abas -->
@@ -186,7 +199,7 @@
   <symbol id="i-zap" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></symbol>
 </svg>
 
-<script src="js/data.js?v=5"></script>
-<script src="js/app.js?v=10"></script>
+<script src="js/data.js?v=6"></script>
+<script src="js/app.js?v=11"></script>
 </body>
 </html>

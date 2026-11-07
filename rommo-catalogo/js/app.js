@@ -16,19 +16,26 @@ const sessao = { get(k) { try { return sessionStorage.getItem(k); } catch { retu
 /* ---------- WhatsApp ---------- */
 function abrirZap(txt) {
   const url = `https://wa.me/${LOJA.whatsapp}?text=${encodeURIComponent(txt)}`;
-  const w = window.open(url, "_blank", "noopener");
-  if (!w) location.href = url;
+  /* "noopener" faz o window.open devolver null e a página ia embora junto: abre normal e corta o vínculo */
+  const w = window.open(url, "_blank");
+  if (w) { try { w.opener = null; } catch {} } else location.href = url;
 }
+const cupomOk = () => (typeof CUPOM !== "undefined" ? CUPOM : {}).codigo;
+const assin = () => cupomOk() ? `\n\nVim pelo site — cupom *${CUPOM.codigo}*` : "";
+const somaLista = itens => itens.reduce((s, { p, q }) => s + p.p * q, 0);
 const MSG = {
-  geral: () => "Olá, ROMMO! Vim pelo catálogo e quero atendimento.",
-  busca: () => `Olá, ROMMO! Procurei "${$("#busca").value.trim()}" no catálogo e não encontrei. Vocês têm?`,
-  oferta: () => "Olá, ROMMO! Vi as ofertas da semana no catálogo e quero saber mais.",
-  produto: (p, q) => `Olá, ROMMO! Quero este produto do catálogo:\n\n*${p.nome}*\nQuantidade: ${q}\nPreço: ${brl(p.p)} cada\n\nTem disponível?`,
-  lista: itens => `Olá, ROMMO! Montei esta lista no catálogo:\n\n${itens.map(({ p, q }) => `• ${q}x ${p.nome} — ${brl(p.p * q)}`).join("\n")}\n\n*Total: ${brl(itens.reduce((s, { p, q }) => s + p.p * q, 0))}*\n\nTem tudo disponível?`,
+  geral: () => "Olá, ROMMO! Vim pelo catálogo e quero atendimento." + assin(),
+  busca: () => `Olá, ROMMO! Procurei "${$("#busca").value.trim()}" no catálogo e não encontrei. Vocês têm?` + assin(),
+  oferta: () => "Olá, ROMMO! Vi as ofertas no catálogo e quero saber mais." + assin(),
+  produto: (p, q) => `Olá, ROMMO! Quero este produto do catálogo:\n\n*${p.nome}*\nQuantidade: ${q}\nPreço: ${brl(p.p)} cada\n\nTem disponível?` + assin(),
+  lista: itens => `Olá, ROMMO! Montei esta lista no catálogo:\n\n${itens.map(({ p, q }) => `• ${q}x ${p.nome} — ${brl(p.p * q)}`).join("\n")}\n\n*Total: ${brl(somaLista(itens))}*\n\nTem tudo disponível?` + assin(),
+  kit: k => `Olá, ROMMO! Quero o kit *${k.nome}* do catálogo:\n\n${k.itens.map(porId).filter(Boolean).map(p => `• 1x ${p.nome} — ${brl(p.p)}`).join("\n")}\n\n*Total: ${brl(k.itens.map(porId).filter(Boolean).reduce((s, p) => s + p.p, 0))}*\n\nTem tudo disponível?` + assin(),
 };
 
 /* ---------- Cartão (um modelo só) ---------- */
-const etiqueta = p => desc(p) ? `<span class="etiqueta">-${desc(p)}%</span>` : p.novo ? `<span class="etiqueta novo">Novo</span>` : "";
+const SELOS = { "mais-vendido": ["Mais vendido", "vendido"], ultimas: ["Últimas unidades", "ultimas"] };
+const etiqueta = p => desc(p) ? `<span class="etiqueta">-${desc(p)}%</span>` : SELOS[p.selo] ? `<span class="etiqueta ${SELOS[p.selo][1]}">${SELOS[p.selo][0]}</span>` : p.novo ? `<span class="etiqueta novo">Novo</span>` : "";
+const selosDe = p => [desc(p) ? `<span class="selo-f desc">-${desc(p)}% de desconto</span>` : "", SELOS[p.selo] ? `<span class="selo-f ${SELOS[p.selo][1]}">${SELOS[p.selo][0]}</span>` : "", p.novo ? `<span class="selo-f novo">Novo</span>` : ""].join("");
 const cartao = p => `<button class="cartao" type="button" data-prod="${p.id}">
   <span class="foto"><img src="${foto(p)}" alt="" loading="lazy" decoding="async" width="560" height="560">${etiqueta(p)}</span>
   <span class="info"><span class="nome">${esc(p.nome)}</span>
@@ -53,6 +60,27 @@ function montar() {
   $("#abas").innerHTML = `<button class="aba" type="button" role="tab" data-aba="">Destaques</button>` +
     LINHAS.map(l => `<button class="aba" type="button" role="tab" data-aba="${l.id}" style="--c:${l.cor}"><i></i>${esc(l.nome)}</button>`).join("");
   aba("");
+
+  /* cupom */
+  if (cupomOk()) { $("#cupom-cod").textContent = CUPOM.codigo; $("#cupom-txt").textContent = CUPOM.texto; $("#cupom").hidden = false; }
+  /* campanha */
+  if (campanhaAtiva()) $("#of-titulo").textContent = CAMPANHA.titulo;
+  /* kits prontos */
+  const kits = (typeof KITS !== "undefined" ? KITS : []).filter(k => k.itens.some(porId));
+  if (kits.length) {
+    $("#kits-trilho").innerHTML = kits.map(k => {
+      const ps = k.itens.map(porId).filter(Boolean), tot = ps.reduce((s, p) => s + p.p, 0);
+      return `<div class="kit" style="--c:${k.cor || "#15150f"}">
+        <button class="kit-abrir" type="button" data-kit="${k.id}" aria-label="Ver o kit ${esc(k.nome)}">
+          <span class="kit-fotos">${ps.slice(0, 3).map(p => `<img src="${foto(p)}" alt="" loading="lazy">`).join("")}</span>
+          <b>${esc(k.nome)}</b><small>${ps.length} itens · ${brl(tot)}</small>
+        </button>
+        <button class="kit-add" type="button" data-kit-add="${k.id}">+ Adicionar kit</button>
+      </div>`;
+    }).join("");
+    $("#kits").hidden = false;
+  }
+  diaMontar();
 
   const ig = `https://www.instagram.com/${LOJA.instagram}/`;
   if (INSTAGRAM_POSTS.length) montarInsta();
@@ -87,6 +115,58 @@ function aba(id) {
   $$(".aba").forEach(b => { const on = b.dataset.aba === id; b.classList.toggle("on", on); b.setAttribute("aria-selected", on); });
 }
 $("#abas").addEventListener("click", e => { const b = e.target.closest(".aba"); if (!b) return; aba(b.dataset.aba); b.scrollIntoView({ inline: "center", block: "nearest", behavior: reduz ? "auto" : "smooth" }); });
+
+/* ---------- Campanha e oferta do dia ---------- */
+function campanhaAtiva() { const c = (typeof CAMPANHA !== "undefined" ? CAMPANHA : null); return !!(c && c.ativa && c.titulo && (!c.fim || new Date(c.fim) > new Date())); }
+function produtoDoDia() {
+  const of = PRODUTOS.filter(desc); if (!of.length) return null;
+  const d = new Date(), n = Math.floor(new Date(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
+  return of[n % of.length];
+}
+function diaMontar() {
+  const p = produtoDoDia(); if (!p) return;
+  $("#dia-card").innerHTML = `<button class="dia" type="button" data-prod="${p.id}">
+    <span class="dia-foto"><img src="${foto(p)}" alt="" loading="lazy"><span class="etiqueta">-${desc(p)}%</span></span>
+    <span class="dia-info"><span class="nome">${esc(p.nome)}</span>
+      <span class="dia-preco"><s>${brl(p.de)}</s><b>${brl(p.p)}</b></span>
+      <span class="dia-eco">Você economiza ${brl(p.de - p.p)}</span></span>
+    <span class="mais" data-add="${p.id}" role="button" aria-label="Adicionar à lista">+</span>
+  </button>`;
+  $("#dia").hidden = false;
+}
+const ateMeiaNoite = () => { const d = new Date(), f = new Date(d); f.setHours(24, 0, 0, 0); let s = Math.max(0, Math.floor((f - d) / 1000)); const h = Math.floor(s / 3600); s %= 3600; return `Acaba em ${h}h ${String(Math.floor(s / 60)).padStart(2, "0")}min`; };
+
+/* ---------- Kits ---------- */
+const kitPorId = id => (typeof KITS !== "undefined" ? KITS : []).find(k => k.id === id);
+function adicionarKit(k) {
+  const ps = k.itens.map(porId).filter(Boolean);
+  ps.forEach(p => { const i = lista.find(x => x.id === p.id); if (i) i.q = Math.min(99, i.q + 1); else lista.push({ id: p.id, q: 1 }); });
+  salvarLista(); avisar(`Kit adicionado: ${ps.length} itens`);
+  const b = $("#lista-qtd"); b.classList.remove("pulo"); void b.offsetWidth; b.classList.add("pulo");
+}
+function verKit(k) {
+  const ps = k.itens.map(porId).filter(Boolean), tot = ps.reduce((s, p) => s + p.p, 0);
+  abrirFolha(`<h2>${esc(k.nome)}</h2><p class="sub">${esc(k.desc || "")}</p>
+    <div class="grade">${ps.map(cartao).join("")}</div>
+    <div class="total"><span>Total do kit</span><b>${brl(tot)}</b></div>
+    <div class="f-acoes">
+      <button class="btn btn-zap btn-largo" type="button" id="k-zap"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg>Pedir o kit no WhatsApp</button>
+      <button class="btn btn-claro btn-largo" type="button" id="k-add">Adicionar kit à lista</button>
+    </div>`, "Kit");
+  $("#k-zap").onclick = () => abrirZap(MSG.kit(k));
+  $("#k-add").onclick = () => { fecharFolha(); adicionarKit(k); };
+}
+
+/* ---------- Compartilhar produto ---------- */
+async function compartilhar(p) {
+  const url = `${location.origin}${location.pathname}?p=${p.id}`, texto = `${p.nome} por ${brl(p.p)} na ROMMO`;
+  try { if (navigator.share) { await navigator.share({ title: p.nome, text: texto, url }); return; } } catch (e) { if (e && e.name === "AbortError") return; }
+  window.open(`https://wa.me/?text=${encodeURIComponent(texto + "\n" + url)}`, "_blank", "noopener");
+}
+function abrirLink() {
+  const id = new URLSearchParams(location.search).get("p");
+  if (id && porId(id)) { verProduto(id); try { history.replaceState(history.state, "", location.pathname); } catch {} }
+}
 
 /* ---------- Instagram: posts oficiais (só carrega quando chega perto) ---------- */
 function montarInsta() {
@@ -277,17 +357,23 @@ function verProduto(id) {
   let q = 1;
   abrirFolha(`<div class="f-foto"><img src="${foto(p)}" alt="${esc(p.nome)}"></div>
     <h2 class="f-nome">${esc(p.nome)}</h2>
+    ${selosDe(p) ? `<div class="f-selos">${selosDe(p)}</div>` : ""}
     <div class="f-preco"><b>${brl(p.p)}</b>${p.de ? `<s>${brl(p.de)}</s><em>Economize ${brl(p.de - p.p)}</em>` : ""}</div>
     <div class="f-qtd"><span>Quantidade</span><div class="passo"><button type="button" data-q="-1" aria-label="Diminuir">−</button><b id="f-q">1</b><button type="button" data-q="1" aria-label="Aumentar">+</button></div></div>
     <div class="f-acoes">
       <button class="btn btn-zap btn-largo" type="button" id="f-zap"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg>Pedir no WhatsApp</button>
       <button class="btn btn-claro btn-largo" type="button" id="f-lista">Adicionar à lista</button>
     </div>
-    <p class="f-nota">Você confirma estoque e entrega com a gente pelo WhatsApp.</p>
+    <div class="f-extra">
+      ${cupomOk() ? `<span class="f-cupom">Cupom <b>${esc(CUPOM.codigo)}</b> já vai na mensagem</span>` : "<span></span>"}
+      <button class="f-share" type="button" id="f-share"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.5M8.2 13.2l7.6 4.5"/></svg>Compartilhar</button>
+    </div>
+    ${(() => { const c = (p.combina || []).map(porId).filter(Boolean); return c.length ? `<h3 class="f-sub">Combina com</h3><div class="combina">${c.map(x => `<button class="comb" type="button" data-prod="${x.id}"><span class="ft"><img src="${foto(x)}" alt=""></span><span class="comb-txt"><b>${esc(x.nome)}</b><small>${brl(x.p)}</small></span><span class="mais" data-add="${x.id}" role="button" aria-label="Adicionar à lista">+</span></button>`).join("")}</div>` : ""; })()}
     ${(() => { const { mesmos, outros } = parecidos(p); return (mesmos.length ? `<h3 class="f-sub">Outros modelos</h3><div class="trilho">${mesmos.map(cartao).join("")}</div>` : "") +
       (outros.length ? `<h3 class="f-sub">Você também pode gostar</h3><div class="grade">${outros.map(cartao).join("")}</div>` : ""); })()}`, "Produto");
   folha.querySelectorAll("[data-q]").forEach(b => b.onclick = () => { q = Math.max(1, Math.min(99, q + Number(b.dataset.q))); $("#f-q").textContent = q; });
   $("#f-zap").onclick = () => abrirZap(MSG.produto(p, q));
+  $("#f-share").onclick = () => compartilhar(p);
   $("#f-lista").onclick = () => {
     fecharFolha(); adicionar(p.id, q);
   };
@@ -302,6 +388,9 @@ function verLista() {
       <div><b>${esc(p.nome)}</b><small>${brl(p.p)} cada</small></div>
       <div class="passo"><button type="button" data-li="${p.id}" data-d="-1" aria-label="Diminuir">${q === 1 ? "×" : "−"}</button><b>${q}</b><button type="button" data-li="${p.id}" data-d="1" aria-label="Aumentar">+</button></div></div>`).join("")}
       <div class="total"><span>Total</span><b>${brl(total)}</b></div>
+      ${(() => { const m = (typeof META !== "undefined" ? META : {}); if (!m.valor) return ""; const falta = m.valor - total, pc = Math.min(100, total / m.valor * 100);
+        return `<div class="meta ${falta <= 0 ? "ok" : ""}"><p>${falta > 0 ? `Faltam <b>${brl(falta)}</b> para ganhar ${esc(m.premio)}` : `Você ganhou <b>${esc(m.premio)}</b>!`}</p><div class="meta-barra"><i style="width:${pc}%"></i></div></div>`; })()}
+      ${cupomOk() ? `<p class="l-cupom">Cupom <b>${esc(CUPOM.codigo)}</b> · ${esc(CUPOM.texto)} — já vai na mensagem</p>` : ""}
       <button class="btn btn-zap btn-largo" type="button" id="l-zap"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg>Enviar lista no WhatsApp</button>`, "Sua lista");
     folha.querySelectorAll("[data-li]").forEach(b => b.onclick = () => {
       const i = lista.find(x => x.id === Number(b.dataset.li)); if (!i) return;
@@ -387,12 +476,13 @@ document.addEventListener("mouseout", e => { if (!e.relatedTarget && e.clientY <
 /* ---------- Relógio das ofertas (renova todo domingo 23h59) ---------- */
 function fimSemana() { const d = new Date(); d.setHours(23, 59, 59, 0); d.setDate(d.getDate() + ((7 - d.getDay()) % 7)); return d; }
 function relogioTexto(frase) {
-  let s = Math.max(0, Math.floor((fimSemana() - Date.now()) / 1000));
+  const alvo = campanhaAtiva() && CAMPANHA.fim ? new Date(CAMPANHA.fim) : fimSemana();
+  let s = Math.max(0, Math.floor((alvo - Date.now()) / 1000));
   const d = Math.floor(s / 86400); s %= 86400; const h = Math.floor(s / 3600); s %= 3600; const m = Math.floor(s / 60);
   const t = d ? `${d}d ${h}h` : `${h}h ${String(m).padStart(2, "0")}min`;
   return frase ? `Os preços especiais acabam em ${t}.` : `Acaba em ${t}`;
 }
-const relogio = () => { $("#relogio").textContent = relogioTexto(); };
+const relogio = () => { $("#relogio").textContent = relogioTexto(); $("#dia-relogio").textContent = ateMeiaNoite(); };
 
 /* ---------- Cliques ---------- */
 function rolarPara(el) { const y = el.getBoundingClientRect().top + scrollY - 66; scrollTo({ top: Math.max(0, y), behavior: reduz ? "auto" : "smooth" }); }
@@ -400,6 +490,9 @@ document.addEventListener("click", e => {
   const t = e.target;
   if (menuAberto && t.closest("#menu a, #menu button")) fecharMenu();
   const inf = t.closest("[data-info]"); if (inf && INFO[inf.dataset.info]) { abrirFolha(INFO[inf.dataset.info](), "Como comprar"); return; }
+  const ka = t.closest("[data-kit-add]"); if (ka) { const k = kitPorId(ka.dataset.kitAdd); if (k) adicionarKit(k); return; }
+  const kv = t.closest("[data-kit]"); if (kv) { const k = kitPorId(kv.dataset.kit); if (k) verKit(k); return; }
+  if (t.closest("#cupom")) { avisar(`Cupom ${CUPOM.codigo} já vai na sua mensagem`); return; }
   const z = t.closest("[data-zap]"); if (z) { abrirZap((MSG[z.dataset.zap] || MSG.geral)()); return; }
   const ad = t.closest("[data-add]"); if (ad) { adicionar(Number(ad.dataset.add)); ad.classList.add("ok"); setTimeout(() => ad.classList.remove("ok"), 900); return; }
   const pr = t.closest("[data-prod]"); if (pr) { verProduto(pr.dataset.prod); return; }
@@ -448,7 +541,7 @@ addEventListener("scroll", () => { if (scrollY > 40) armarGuarda(); }, { passive
 /* ---------- Tela de carregamento ---------- */
 function carregamento() {
   const L = $("#ld"), B = $("#ldb"), T = $("#ldp"), W = $("#ldw");
-  const fim = () => { document.body.classList.remove("ldg"); document.body.classList.add("pronto"); };
+  const fim = () => { document.body.classList.remove("ldg"); document.body.classList.add("pronto"); setTimeout(abrirLink, 400); };
   if (!L) return fim();
   const DUR = reduz ? 600 : 4200, t0 = Date.now();
   let ok = false, saiu = false, fi = 0;
