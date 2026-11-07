@@ -463,11 +463,20 @@ function antesDeSair() {
       <button class="btn btn-zap btn-largo" type="button" id="s-zap"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg>Enviar lista no WhatsApp</button>
       <button class="sair-outra" type="button" id="s-sair">Sair mesmo assim</button>`, "Antes de sair");
   } else {
-    abrirFolha(`<h2>Antes de ir, veja as ofertas</h2><p class="sub">${relogioTexto(true)}</p><div class="trilho">${ofertas.map(cartao).join("")}</div>
-      <button class="btn btn-zap btn-largo" type="button" id="s-zap"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg>Falar no WhatsApp</button>
+    const temOferta = ofertas.length > 0;
+    const mostra = temOferta ? ofertas : PRODUTOS.filter(p => p.destaque && p.est > 0).slice(0, 8);
+    abrirFolha(`<h2>Antes de ir, veja ${temOferta ? "as ofertas" : "os destaques"}</h2><p class="sub">${temOferta ? relogioTexto(true) : "Os produtos mais procurados da ROMMO."}</p><div class="trilho">${mostra.map(cartao).join("")}</div>
+      <button class="btn btn-escuro btn-largo" type="button" id="s-ver"><svg viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/></svg>${temOferta ? "Ver todas as ofertas" : "Ver os destaques"}</button>
       <button class="sair-outra" type="button" id="s-sair">Sair mesmo assim</button>`, "Antes de sair");
+    /* fica no site: abre as ofertas (ou os destaques) */
+    $("#s-ver").onclick = () => {
+      fecharFolha(); guarda = true;
+      try { history.pushState({ rommo: 1 }, ""); } catch {}
+      if (temOferta) abrirLoja("ofertas", false, "ofertas");
+      else { const o = $("#ofertas"); if (o) scrollTo({ top: o.getBoundingClientRect().top + scrollY - 70, behavior: reduz ? "auto" : "smooth" }); }
+    };
   }
-  $("#s-zap").onclick = () => abrirZap(itens.length ? MSG.lista(itens) : MSG.oferta());
+  if ($("#s-zap")) $("#s-zap").onclick = () => abrirZap(MSG.lista(itens));
   $("#s-sair").onclick = () => { fecharFolha(); history.back(); };
   return true;
 }

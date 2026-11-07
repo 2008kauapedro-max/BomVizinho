@@ -564,3 +564,5 @@ main,#loja{background:radial-gradient(ellipse 120% 40% at 0 0,#e4f0c9 0,transpar
 .selo-c.consultar::before{content:"◷ "}
 .selo-f.consultar{background:#fff4cc;color:#6b5400}
 .o-cat{background:var(--sup2);color:#55554f}
+.btn-escuro{background:var(--texto);color:#fff}
+.btn-escuro svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2}
