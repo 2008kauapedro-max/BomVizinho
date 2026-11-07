@@ -31,8 +31,9 @@ const MSG = {
 const etiqueta = p => desc(p) ? `<span class="etiqueta">-${desc(p)}%</span>` : p.novo ? `<span class="etiqueta novo">Novo</span>` : "";
 const cartao = p => `<button class="cartao" type="button" data-prod="${p.id}">
   <span class="foto"><img src="${foto(p)}" alt="" loading="lazy" decoding="async" width="560" height="560">${etiqueta(p)}</span>
-  <span class="nome">${esc(p.nome)}</span>
-  <span class="preco">${brl(p.p)}${p.de ? `<span class="de">${brl(p.de)}</span>` : ""}</span>
+  <span class="info"><span class="nome">${esc(p.nome)}</span>
+  <span class="preco">${p.de ? `<span class="de">${brl(p.de)}</span>` : ""}${brl(p.p)}</span></span>
+  <span class="mais" data-add="${p.id}" role="button" aria-label="Adicionar à lista">+</span>
 </button>`;
 
 /* ---------- Página inicial (vitrine) ---------- */
@@ -44,34 +45,23 @@ const oferta = p => `<button class="oferta" type="button" data-prod="${p.id}">
   <span class="o-eco">Economize ${brl(p.de - p.p)}</span></span>
 </button>`;
 
-const mostrar = n => n < 3 ? n : Math.min(6, n - n % 3);
 function montar() {
   $("#atalhos").innerHTML = LINHAS.map(l => `<button class="atalho" type="button" data-loja="${l.id}"><img src="${l.icone}" alt="" width="64" height="64">${l.nome}</button>`).join("");
   const ofertas = PRODUTOS.filter(desc).sort((a, b) => desc(b) - desc(a));
   $("#trilho-ofertas").innerHTML = ofertas.map(oferta).join("");
   $("#pontos").innerHTML = ofertas.map(() => "<i></i>").join("");
   $("#ofertas").hidden = !ofertas.length;
-  /* sempre fileiras completas de 3 */
+  /* uma prateleira por linha, todas no mesmo modelo */
   const procurados = PRODUTOS.filter(p => (p.destaque || p.novo) && !p.de);
-  PRODUTOS.forEach(p => { if (procurados.length < 6 && !p.de && !procurados.includes(p)) procurados.push(p); });
-  procurados.length = Math.min(6, procurados.length - procurados.length % 3) || procurados.length;
-  $("#procurados").innerHTML = procurados.map(cartao).join("");
-  $("#procurados").closest(".faixa").hidden = !procurados.length;
-
-  /* uma faixa por linha, com a cor da linha */
-  const tons = { irrigacao: "verde", ferramentas: "escura", eletricas: "azul", agro: "branca" };
-  $("#faixas-linhas").innerHTML = LINHAS.map(l => {
-    const itens = PRODUTOS.filter(p => linhaDe(p.cat).id === l.id);
-    if (!itens.length) return "";
-    return `<section class="faixa faixa-${tons[l.id] || "escura"}">
-      <div class="faixa-topo"><h2><img src="${l.icone}" alt="" width="40" height="40">${esc(l.nome)}</h2><button class="ver" type="button" data-loja="${l.id}">Ver ${itens.length}</button></div>
-      <div class="grade">${itens.slice(0, mostrar(itens.length)).map(cartao).join("")}${itens.length < 3 ? `<button class="cartao-ver" type="button" data-loja="${l.id}" style="grid-column:span ${3 - itens.length}"><b>Ver tudo de ${esc(l.nome)}</b><small>Peça pelo WhatsApp o que não estiver aqui</small></button>` : ""}</div>
-      ${itens.length > mostrar(itens.length) ? `<button class="ver-mais" type="button" data-loja="${l.id}">Ver todos de ${esc(l.nome)}</button>` : ""}
-    </section>`;
-  }).join("");
+  const prateleira = (titulo, cor, itens, loja, n) => `<section class="secao">
+    <div class="secao-topo"><h2>${cor ? `<i style="background:${cor}"></i>` : ""}${esc(titulo)}</h2><button class="ver" type="button" data-loja="${loja}">Ver ${n ? `todos (${n})` : "todos"}<i></i></button></div>
+    <div class="trilho">${itens.map(cartao).join("")}</div>
+  </section>`;
+  $("#secoes").innerHTML = (procurados.length ? prateleira("Mais procurados", "", procurados, "") : "") +
+    LINHAS.map(l => { const it = PRODUTOS.filter(p => linhaDe(p.cat).id === l.id); return it.length ? prateleira(l.nome, l.cor, it.slice(0, 10), l.id, it.length) : ""; }).join("");
 
   const ig = `https://www.instagram.com/${LOJA.instagram}/`;
-  $("#insta-user").textContent = LOJA.instagram; $("#insta-seguir").href = ig;
+  $("#insta-user").textContent = LOJA.instagram; $("#insta-link").href = ig;
   if (INSTAGRAM_POSTS.length) montarInsta();
   $("#c-insta").href = ig; $("#c-insta-txt").textContent = "@" + LOJA.instagram;
   $("#c-zap").textContent = LOJA.whatsappVisivel;
@@ -180,7 +170,7 @@ const itensLista = () => lista.map(i => ({ p: porId(i.id), q: i.q }));
 function salvarLista() {
   guardar.set("rommo_lista", lista);
   const n = lista.reduce((s, i) => s + i.q, 0);
-  $("#lista-qtd").textContent = n; $("#btn-lista").hidden = !n;
+  const s = $("#lista-qtd"); s.textContent = n > 99 ? "99+" : n; s.hidden = !n;
 }
 let tAviso;
 function avisar(t) { const a = $("#aviso"); a.textContent = t; a.classList.add("on"); clearTimeout(tAviso); tAviso = setTimeout(() => a.classList.remove("on"), 1700); }
@@ -217,8 +207,7 @@ function verProduto(id) {
   folha.querySelectorAll("[data-q]").forEach(b => b.onclick = () => { q = Math.max(1, Math.min(99, q + Number(b.dataset.q))); $("#f-q").textContent = q; });
   $("#f-zap").onclick = () => abrirZap(MSG.produto(p, q));
   $("#f-lista").onclick = () => {
-    const i = lista.find(x => x.id === p.id); if (i) i.q = Math.min(99, i.q + q); else lista.push({ id: p.id, q });
-    salvarLista(); fecharFolha(); avisar("Adicionado à lista");
+    fecharFolha(); adicionar(p.id, q);
   };
 }
 
@@ -241,7 +230,12 @@ function verLista() {
   };
   desenhar();
 }
-$("#btn-lista").addEventListener("click", verLista);
+$("#btn-lista").addEventListener("click", () => { if (lista.length) verLista(); else avisar("Sua lista está vazia"); });
+function adicionar(id, q = 1) {
+  const i = lista.find(x => x.id === id); if (i) i.q = Math.min(99, i.q + q); else lista.push({ id, q });
+  salvarLista(); avisar("Adicionado à lista");
+  const b = $("#lista-qtd"); b.classList.remove("pulo"); void b.offsetWidth; b.classList.add("pulo");
+}
 
 /* ---------- Aviso antes de sair (uma vez por visita) ---------- */
 function antesDeSair() {
@@ -287,6 +281,7 @@ function rolarPara(el) { const y = el.getBoundingClientRect().top + scrollY - 66
 document.addEventListener("click", e => {
   const t = e.target;
   const z = t.closest("[data-zap]"); if (z) { abrirZap((MSG[z.dataset.zap] || MSG.geral)()); return; }
+  const ad = t.closest("[data-add]"); if (ad) { adicionar(Number(ad.dataset.add)); ad.classList.add("ok"); setTimeout(() => ad.classList.remove("ok"), 900); return; }
   const pr = t.closest("[data-prod]"); if (pr) { verProduto(pr.dataset.prod); return; }
   const lj = t.closest("[data-loja]"); if (lj) { abrirLoja(lj.dataset.loja, lj.dataset.focar, lj.dataset.ordem); return; }
   if (t.closest("[data-fechar]") || t === fundo) { fecharFolha(); return; }

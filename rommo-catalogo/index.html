@@ -15,7 +15,7 @@
 <link rel="preload" as="font" type="font/woff" href="fonts/ChakraPetch-Bold.woff" crossorigin>
 <link rel="preload" as="font" type="font/woff" href="fonts/Barlow-Regular.woff" crossorigin>
 <link rel="preload" as="image" href="assets/fotos/capa-celular.webp" fetchpriority="high">
-<link rel="stylesheet" href="css/app.css?v=4">
+<link rel="stylesheet" href="css/app.css?v=5">
 </head>
 <body class="ldg">
 
@@ -52,7 +52,10 @@
 
 <header class="topo">
   <a class="marca" href="#inicio" aria-label="ROMMO, voltar ao início"><span class="mini"><i></i><i></i><i></i><i></i></span><img src="assets/logo/nome.webp" alt="ROMMO"></a>
-  <button class="topo-zap" type="button" data-zap="geral"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg>WhatsApp</button>
+  <div class="topo-acoes">
+    <button class="ic-btn" type="button" data-loja="" data-focar="1" aria-label="Buscar produto"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></button>
+    <button class="ic-btn" type="button" id="btn-lista" aria-label="Minha lista"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.2 10.5a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.1L21 8H6.2"/><circle cx="9.5" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/></svg><span class="selo" id="lista-qtd" hidden>0</span></button>
+  </div>
 </header>
 
 <main id="app">
@@ -71,39 +74,44 @@
 
   <nav class="atalhos" id="atalhos" aria-label="Linhas de produtos"></nav>
 
-  <!-- Faixa amarela: ofertas em carrossel animado -->
-  <section class="faixa faixa-amarela" id="ofertas">
-    <div class="faixa-topo">
+  <!-- Ofertas: o único bloco colorido da página -->
+  <section class="ofertas" id="ofertas">
+    <div class="secao-topo">
       <div><h2>Ofertas da semana</h2><p class="relogio" id="relogio"></p></div>
-      <button class="ver" type="button" data-loja="" data-ordem="ofertas">Ver todas</button>
+      <button class="ver" type="button" data-loja="" data-ordem="ofertas">Ver todas<i></i></button>
     </div>
     <div class="destaque-trilho" id="trilho-ofertas" aria-label="Ofertas, arraste para o lado"></div>
     <div class="pontos" id="pontos" aria-hidden="true"></div>
   </section>
 
-  <div class="letreiro" aria-hidden="true"><div><span>Ferramentas</span><i></i><span>Irrigação</span><i></i><span>Agropecuária</span><i></i><span>Peça pelo WhatsApp</span><i></i><span>Ferramentas</span><i></i><span>Irrigação</span><i></i><span>Agropecuária</span><i></i><span>Peça pelo WhatsApp</span><i></i></div></div>
+  <ul class="valores" aria-label="Por que comprar na ROMMO">
+    <li><svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Qualidade</li>
+    <li><svg viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg>Atendimento</li>
+    <li><svg viewBox="0 0 24 24"><path d="M13 3 5 13h6l-1 8 8-10h-6z"/></svg>Agilidade</li>
+  </ul>
 
-  <!-- Faixa clara: mais procurados -->
-  <section class="faixa faixa-clara">
-    <div class="faixa-topo"><h2>Mais procurados</h2><button class="ver" type="button" data-loja="">Ver tudo</button></div>
-    <div class="grade" id="procurados"></div>
+  <div id="secoes"></div>
+
+  <section class="secao" aria-label="Como comprar">
+    <div class="secao-topo"><h2>Como comprar</h2></div>
+    <ol class="passos">
+      <li><b>1</b><span>Escolha os produtos</span></li>
+      <li><b>2</b><span>Adicione à sua lista</span></li>
+      <li><b>3</b><span>Envie no WhatsApp</span></li>
+    </ol>
   </section>
 
-  <!-- Uma faixa por linha, cada uma com a cor do quadradinho -->
-  <div id="faixas-linhas"></div>
-
-  <!-- Instagram -->
-  <section class="faixa faixa-insta" id="insta">
-    <div class="insta-perfil">
-      <img src="assets/rommo-icon-192.png" alt="" width="64" height="64">
-      <div><b>@<span id="insta-user"></span></b><span>Novidades, chegadas e ofertas toda semana</span></div>
-    </div>
+  <section class="secao" id="insta">
+    <a class="insta-card" id="insta-link" href="#" target="_blank" rel="noopener">
+      <span class="insta-anel"><img src="assets/rommo-icon-192.png" alt="" width="56" height="56"></span>
+      <span class="insta-txt"><b>ROMMO</b><small>@<span id="insta-user"></span></small><em>Novidades e ofertas toda semana</em></span>
+      <span class="insta-seguir">Seguir</span>
+    </a>
     <div class="insta-posts" id="insta-posts" hidden></div>
-    <a class="btn btn-insta btn-largo" id="insta-seguir" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg>Seguir no Instagram</a>
   </section>
 
-  <section class="faixa" id="contato">
-    <div class="faixa-topo"><h2>Fale com a gente</h2></div>
+  <section class="secao" id="contato">
+    <div class="secao-topo"><h2>Fale com a gente</h2></div>
     <div class="contato">
       <button type="button" data-zap="geral" class="linha-contato"><span class="ic zap"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg></span><span><b>WhatsApp</b><small id="c-zap"></small></span><i></i></button>
       <a id="c-insta" class="linha-contato" href="#" target="_blank" rel="noopener"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg></span><span><b>Instagram</b><small id="c-insta-txt"></small></span><i></i></a>
@@ -151,7 +159,6 @@
 </section>
 
 <!-- Botões flutuantes -->
-<button class="flutua-lista" type="button" id="btn-lista" hidden><span id="lista-qtd">0</span> na lista · Ver e enviar</button>
 <button class="flutua-zap" type="button" data-zap="geral" aria-label="Chamar no WhatsApp"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg></button>
 
 <div class="fundo" id="fundo"></div>
@@ -163,6 +170,6 @@
 </svg>
 
 <script src="js/data.js?v=3"></script>
-<script src="js/app.js?v=4"></script>
+<script src="js/app.js?v=5"></script>
 </body>
 </html>
