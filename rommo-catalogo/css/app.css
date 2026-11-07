@@ -216,3 +216,31 @@ body.capa-fora .flutua-zap{transform:none}
   .grade{grid-template-columns:repeat(3,1fr)}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* ============ Vitrine: atalhos para a loja ============ */
+.busca-falsa{width:calc(100% - var(--g) * 2);color:#7c7c77;font:500 16px var(--txt);text-align:left}
+.link{color:var(--amarelo);font:600 14px var(--txt);min-height:32px}
+.ver-loja{display:flex;align-items:center;gap:12px;width:calc(100% - var(--g) * 2);margin:18px var(--g) 0;padding:14px 16px;border-radius:var(--raio);background:#fff;color:#000;text-align:left}
+.ver-loja>span{flex:1}
+.ver-loja b{display:block;font:700 17px var(--disp)}
+.ver-loja small{display:block;color:#555;font-size:13px}
+.ver-loja i{width:10px;height:10px;border-right:2.5px solid #000;border-top:2.5px solid #000;transform:rotate(45deg);margin-right:6px}
+
+/* ============ Loja ============ */
+body.na-loja #capa,body.na-loja .topo{display:none}
+body.na-loja .flutua-zap{transform:none}
+#loja{max-width:var(--col);margin:0 auto;min-height:100svh;padding-bottom:calc(96px + var(--sb))}
+.loja-topo{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:8px;padding:calc(10px + var(--st)) var(--g) 10px;background:#000}
+.loja-topo .busca{flex:1;margin:0}
+.voltar{flex:none;width:44px;height:48px;border-radius:12px;background:var(--sup);border:1px solid var(--borda);display:grid;place-items:center}
+.voltar i{width:11px;height:11px;border-left:2.5px solid #fff;border-bottom:2.5px solid #fff;transform:translateX(2px) rotate(45deg)}
+.loja-filtros{position:sticky;top:calc(68px + var(--st));z-index:19;background:#000;padding-bottom:8px;border-bottom:1px solid #ffffff10;margin-bottom:14px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px var(--g) 10px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:999px;background:var(--sup);border:1px solid var(--borda);color:#d6d6d1;font:600 13.5px var(--txt)}
+.chip i{width:9px;height:9px;border-radius:2px;background:var(--c)}
+.chip.on{background:#fff;border-color:#fff;color:#000}
+.loja-barra{display:flex;align-items:center;justify-content:space-between;padding:0 var(--g);color:var(--fosco);font-size:13.5px}
+.ordem{display:flex;align-items:center;gap:6px}
+.ordem select{height:34px;padding:0 28px 0 10px;border-radius:9px;border:1px solid var(--borda);background:var(--sup) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23aaa' stroke-width='1.8'/%3E%3C/svg%3E") right 9px center/10px no-repeat;color:#fff;font:600 13.5px var(--txt);-webkit-appearance:none;appearance:none}
+#loja .vazio{margin-top:10px}

@@ -35,16 +35,21 @@ const cartao = p => `<button class="cartao" type="button" data-prod="${p.id}">
   <span class="preco">${brl(p.p)}${p.de ? `<span class="de">${brl(p.de)}</span>` : ""}</span>
 </button>`;
 
-/* ---------- Montagem ---------- */
-let filtro = "";
+/* ---------- Página inicial (vitrine) ---------- */
 function montar() {
-  $("#atalhos").innerHTML = LINHAS.map(l => `<button class="atalho" type="button" data-linha="${l.id}" aria-pressed="false"><img src="${l.icone}" alt="" width="64" height="64">${l.nome}</button>`).join("");
+  $("#atalhos").innerHTML = LINHAS.map(l => `<button class="atalho" type="button" data-loja="${l.id}"><img src="${l.icone}" alt="" width="64" height="64">${l.nome}</button>`).join("");
   const ofertas = PRODUTOS.filter(desc).sort((a, b) => desc(b) - desc(a));
   $("#trilho-ofertas").innerHTML = ofertas.map(cartao).join("");
   $("#ofertas").hidden = !ofertas.length;
   const procurados = PRODUTOS.filter(p => (p.destaque || p.novo) && !p.de);
   $("#trilho-procurados").innerHTML = procurados.map(cartao).join("");
   $("#trilho-procurados").closest(".bloco").hidden = !procurados.length;
+  /* destaques: um produto de cada linha que ainda não apareceu nos carrosséis */
+  const usados = new Set([...ofertas, ...procurados].map(p => p.id));
+  const dest = LINHAS.map(l => PRODUTOS.find(p => linhaDe(p.cat).id === l.id && !usados.has(p.id))).filter(Boolean);
+  PRODUTOS.forEach(p => { if (dest.length < 4 && !dest.includes(p) && !usados.has(p.id)) dest.push(p); });
+  $("#destaques").innerHTML = dest.slice(0, 4).map(cartao).join("");
+  $("#total-produtos").textContent = `${PRODUTOS.length} produtos em ${LINHAS.length} linhas`;
 
   if (INSTAGRAM_POSTS.length) {
     $("#insta-grade").innerHTML = INSTAGRAM_POSTS.slice(0, 6).map(p => `<a href="${esc(p.link)}" target="_blank" rel="noopener" aria-label="Ver post no Instagram"><img src="${esc(p.img)}" alt="" loading="lazy"></a>`).join("");
@@ -55,33 +60,50 @@ function montar() {
   $("#c-zap").textContent = LOJA.whatsappVisivel;
   $("#c-mapa").href = LOJA.mapa; $("#c-cidade").textContent = LOJA.cidade; $("#c-ref").textContent = LOJA.referencia || "Ver no mapa";
   $("#ano").textContent = new Date().getFullYear();
-  grade();
+  $("#chips").innerHTML = `<button class="chip" type="button" role="tab" data-filtro="">Tudo</button>` +
+    LINHAS.map(l => `<button class="chip" type="button" role="tab" data-filtro="${l.id}" style="--c:${l.cor}"><i></i>${l.nome}</button>`).join("");
 }
 
-/* ---------- Grade com filtro e busca ---------- */
+/* ---------- Loja: todos os produtos, com busca, linhas e ordem ---------- */
+let filtro = "", lojaAberta = false, rolagemCasa = 0;
 const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 function grade() {
-  const q = norm($("#busca").value.trim());
-  const itens = PRODUTOS.filter(p => (!filtro || linhaDe(p.cat).id === filtro) && (!q || norm(p.nome).includes(q)));
+  const q = norm($("#busca").value.trim()), ordem = $("#ordem").value;
+  let itens = PRODUTOS.filter(p => (!filtro || linhaDe(p.cat).id === filtro) && (!q || norm(p.nome).includes(q)));
+  if (ordem === "menor") itens = itens.slice().sort((a, b) => a.p - b.p);
+  if (ordem === "maior") itens = itens.slice().sort((a, b) => b.p - a.p);
+  if (ordem === "ofertas") itens = itens.slice().sort((a, b) => desc(b) - desc(a));
+  if (ordem === "az") itens = itens.slice().sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
   $("#grade").innerHTML = itens.map(cartao).join("");
   $("#vazio").hidden = itens.length > 0;
   $("#busca-limpa").hidden = !q;
-  const l = LINHAS.find(x => x.id === filtro);
-  $("#catalogo-titulo").textContent = q ? `Resultado para “${$("#busca").value.trim()}”` : l ? l.nome : "Todos os produtos";
-  $("#ver-tudo").hidden = !q && !filtro;
-  $("#vitrine").hidden = !!(q || filtro);
-  $$(".atalho").forEach(b => { const on = b.dataset.linha === filtro; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
+  $("#conta").textContent = `${itens.length} ${itens.length === 1 ? "produto" : "produtos"}`;
+  $$(".chip").forEach(c => { const on = c.dataset.filtro === filtro; c.classList.toggle("on", on); c.setAttribute("aria-selected", on); });
 }
-function escolherLinha(id) {
-  filtro = filtro === id ? "" : id;
-  $("#busca").value = "";
-  grade();
-  rolarPara($("#atalhos"));
+function abrirLoja(linha, focar) {
+  filtro = linha || "";
+  if (!lojaAberta) {
+    rolagemCasa = scrollY; lojaAberta = true;
+    try { history.pushState({ rommo: "loja" }, ""); } catch {}
+  }
+  document.body.classList.add("na-loja");
+  $("#loja").hidden = false; $("#app").hidden = true;
+  grade(); scrollTo(0, 0);
+  $(`.chip[data-filtro="${filtro}"]`)?.scrollIntoView({ inline: "center", block: "nearest" });
+  if (focar) setTimeout(() => $("#busca").focus(), 60);
 }
-$("#busca").addEventListener("input", () => { filtro = ""; grade(); });
-$("#busca").addEventListener("keydown", e => { if (e.key === "Enter") { e.target.blur(); rolarPara($("#catalogo")); } });
+function fecharLoja() {
+  if (!lojaAberta) return; lojaAberta = false;
+  document.body.classList.remove("na-loja");
+  $("#loja").hidden = true; $("#app").hidden = false;
+  scrollTo(0, rolagemCasa); medir(true);
+}
+$("#busca").addEventListener("input", () => { if ($("#busca").value.trim()) filtro = ""; grade(); });
+$("#busca").addEventListener("keydown", e => { if (e.key === "Enter") e.target.blur(); });
 $("#busca-limpa").addEventListener("click", () => { $("#busca").value = ""; grade(); $("#busca").focus(); });
-$("#ver-tudo").addEventListener("click", () => { filtro = ""; $("#busca").value = ""; grade(); rolarPara($("#atalhos")); });
+$("#ordem").addEventListener("change", grade);
+$("#loja-voltar").addEventListener("click", () => history.back());
+$("#chips").addEventListener("click", e => { const c = e.target.closest(".chip"); if (!c) return; filtro = c.dataset.filtro; grade(); scrollTo(0, 0); });
 
 /* ---------- Lista ---------- */
 let lista = guardar.get("rommo_lista", []).filter(i => porId(i.id));
@@ -174,8 +196,9 @@ function antesDeSair() {
 let guarda = false;
 function armarGuarda() { if (guarda || sessao.get("rommo_sair")) return; try { history.pushState({ rommo: 1 }, ""); guarda = true; } catch {} }
 addEventListener("popstate", () => {
+  if (aberta) { fecharFolha(); try { history.pushState(lojaAberta ? { rommo: "loja" } : { rommo: 1 }, ""); } catch {} return; }
+  if (lojaAberta) { fecharLoja(); return; }
   guarda = false;
-  if (aberta) { fecharFolha(); armarGuarda(); return; }
   if (!antesDeSair()) history.back();
 });
 document.addEventListener("mouseout", e => { if (!e.relatedTarget && e.clientY <= 0 && document.body.classList.contains("capa-fora") && !aberta) antesDeSair(); });
@@ -196,7 +219,7 @@ document.addEventListener("click", e => {
   const t = e.target;
   const z = t.closest("[data-zap]"); if (z) { abrirZap((MSG[z.dataset.zap] || MSG.geral)()); return; }
   const pr = t.closest("[data-prod]"); if (pr) { verProduto(pr.dataset.prod); return; }
-  const li = t.closest("[data-linha]"); if (li) { escolherLinha(li.dataset.linha); return; }
+  const lj = t.closest("[data-loja]"); if (lj) { abrirLoja(lj.dataset.loja, lj.dataset.focar); return; }
   if (t.closest("[data-fechar]") || t === fundo) { fecharFolha(); return; }
   const a = t.closest('a[href="#inicio"]'); if (a) { e.preventDefault(); scrollTo({ top: D, behavior: reduz ? "auto" : "smooth" }); }
 });
@@ -209,7 +232,7 @@ let D = 600, M = null, quadro = 0, larg = 0, alt = 0;
 const suave = p => p * p * (3 - 2 * p);
 function medir(forcar) {
   const w = document.documentElement.clientWidth;
-  if (!forcar && w === larg) return;
+  if (reduz || lojaAberta || (!forcar && w === larg)) return;
   larg = w; alt = innerHeight;
   D = Math.round(Math.min(alt * 0.8, 680));
   main.style.paddingTop = (D + 68) + "px";
@@ -218,7 +241,7 @@ function medir(forcar) {
   atualizar();
 }
 function atualizar() {
-  quadro = 0; if (!M) return;
+  quadro = 0; if (!M || lojaAberta) return;
   const y = scrollY, p = Math.min(1, Math.max(0, y / D));
   document.body.classList.toggle("capa-fora", p > 0.85);
   if (p >= 1) { capa.style.visibility = "hidden"; return; }
@@ -258,7 +281,7 @@ function carregamento() {
 }
 
 /* ---------- Início ---------- */
-montar(); salvarLista(); relogio(); setInterval(relogio, 30000);
+montar(); grade(); salvarLista(); relogio(); setInterval(relogio, 30000);
 if (!reduz) { scrollTo(0, 0); medir(true); addEventListener("load", () => medir(true)); document.fonts?.ready.then(() => medir(true)); }
 carregamento();
 })();

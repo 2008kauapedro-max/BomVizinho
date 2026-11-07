@@ -15,7 +15,7 @@
 <link rel="preload" as="font" type="font/woff" href="fonts/ChakraPetch-Bold.woff" crossorigin>
 <link rel="preload" as="font" type="font/woff" href="fonts/Barlow-Regular.woff" crossorigin>
 <link rel="preload" as="image" href="assets/fotos/capa-celular.webp" fetchpriority="high">
-<link rel="stylesheet" href="css/app.css?v=2">
+<link rel="stylesheet" href="css/app.css?v=3">
 </head>
 <body class="ldg">
 
@@ -64,33 +64,27 @@
     </div>
   </section>
 
-  <label class="busca">
+  <button class="busca busca-falsa" type="button" data-loja="" data-focar="1">
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-    <input id="busca" type="search" placeholder="Buscar produto" autocomplete="off" enterkeyhint="search">
-    <button type="button" id="busca-limpa" aria-label="Limpar busca" hidden>×</button>
-  </label>
+    <span>Buscar produto</span>
+  </button>
 
   <nav class="atalhos" id="atalhos" aria-label="Linhas de produtos"></nav>
 
-  <div id="vitrine">
-    <section class="bloco" id="ofertas">
-      <div class="titulo"><h2>Ofertas da semana</h2><span class="relogio" id="relogio"></span></div>
-      <div class="trilho" id="trilho-ofertas"></div>
-    </section>
+  <section class="bloco" id="ofertas">
+    <div class="titulo"><h2>Ofertas da semana</h2><span class="relogio" id="relogio"></span></div>
+    <div class="trilho" id="trilho-ofertas"></div>
+  </section>
 
-    <section class="bloco">
-      <div class="titulo"><h2>Mais procurados</h2></div>
-      <div class="trilho" id="trilho-procurados"></div>
-    </section>
-  </div>
+  <section class="bloco">
+    <div class="titulo"><h2>Mais procurados</h2></div>
+    <div class="trilho" id="trilho-procurados"></div>
+  </section>
 
-  <section class="bloco" id="catalogo">
-    <div class="titulo"><h2 id="catalogo-titulo">Todos os produtos</h2><button class="limpar" type="button" id="ver-tudo" hidden>Ver tudo</button></div>
-    <div class="grade" id="grade"></div>
-    <div class="vazio" id="vazio" hidden>
-      <p>Não encontramos esse produto aqui.</p>
-      <button class="btn btn-zap" type="button" data-zap="busca"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg>Perguntar no WhatsApp</button>
-    </div>
+  <section class="bloco">
+    <div class="titulo"><h2>Destaques</h2><button class="link" type="button" data-loja="">Ver todos</button></div>
+    <div class="grade" id="destaques"></div>
+    <button class="ver-loja" type="button" data-loja=""><span><b>Ver todos os produtos</b><small id="total-produtos"></small></span><i></i></button>
   </section>
 
   <section class="bloco" id="insta" hidden>
@@ -114,6 +108,38 @@
   </footer>
 </main>
 
+<!-- Loja: todos os produtos -->
+<section id="loja" aria-label="Todos os produtos" hidden>
+  <header class="loja-topo">
+    <button class="voltar" type="button" id="loja-voltar" aria-label="Voltar"><i></i></button>
+    <label class="busca">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+      <input id="busca" type="search" placeholder="Buscar produto" autocomplete="off" enterkeyhint="search">
+      <button type="button" id="busca-limpa" aria-label="Limpar busca" hidden>×</button>
+    </label>
+  </header>
+  <div class="loja-filtros">
+    <div class="chips" id="chips" role="tablist" aria-label="Linhas"></div>
+    <div class="loja-barra">
+      <span id="conta"></span>
+      <label class="ordem"><span>Ordenar</span>
+        <select id="ordem">
+          <option value="">Relevância</option>
+          <option value="menor">Menor preço</option>
+          <option value="maior">Maior preço</option>
+          <option value="ofertas">Ofertas primeiro</option>
+          <option value="az">Nome (A–Z)</option>
+        </select>
+      </label>
+    </div>
+  </div>
+  <div class="grade" id="grade"></div>
+  <div class="vazio" id="vazio" hidden>
+    <p>Não encontramos esse produto aqui.</p>
+    <button class="btn btn-zap" type="button" data-zap="busca"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg>Perguntar no WhatsApp</button>
+  </div>
+</section>
+
 <!-- Botões flutuantes -->
 <button class="flutua-lista" type="button" id="btn-lista" hidden><span id="lista-qtd">0</span> na lista · Ver e enviar</button>
 <button class="flutua-zap" type="button" data-zap="geral" aria-label="Chamar no WhatsApp"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg></button>
@@ -127,6 +153,6 @@
 </svg>
 
 <script src="js/data.js?v=2"></script>
-<script src="js/app.js?v=2"></script>
+<script src="js/app.js?v=3"></script>
 </body>
 </html>
