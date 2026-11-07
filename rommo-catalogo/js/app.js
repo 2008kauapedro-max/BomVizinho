@@ -99,7 +99,13 @@ function montar() {
   const lugar = [LOJA.nomeNoMapa, LOJA.endereco].filter(Boolean).join(", ") || LOJA.cidade;
   $("#c-mapa").href = LOJA.mapa || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lugar)}`;
   $("#c-rota").href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(lugar)}`;
-  $("#mapa-frame").src = `https://maps.google.com/maps?q=${encodeURIComponent(lugar)}&z=16&hl=pt-BR&output=embed`;
+  /* o mapa do Google é pesado: só carrega quando o cartão aparece na tela e o celular está livre */
+  const urlMapa = `https://maps.google.com/maps?q=${encodeURIComponent(lugar)}&z=16&hl=pt-BR&output=embed`;
+  const carregaMapa = () => { if (!$("#mapa-frame").src) $("#mapa-frame").src = urlMapa; };
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(es => { if (es[0].isIntersecting) { io.disconnect(); (window.requestIdleCallback || setTimeout)(carregaMapa, { timeout: 1200 }); } }, { rootMargin: "0px 0px 120px 0px" });
+    io.observe($(".mapa-card"));
+  } else carregaMapa();
   $("#m-rota").href = $("#c-rota").href; $("#m-end").textContent = LOJA.cidade;
   $("#m-insta").href = ig; $("#m-insta-txt").textContent = "@" + LOJA.instagram; $("#m-zap").textContent = LOJA.whatsappVisivel;
   $("#menu-linhas").innerHTML = LINHAS.map(l => `<button class="menu-sub" type="button" data-loja="${l.id}"><i style="background:${l.cor}"></i>${esc(l.nome)}</button>`).join("");
@@ -198,22 +204,24 @@ function montarInsta() {
 function carrossel() {
   const t = $("#trilho-ofertas"), pts = $$("#pontos i");
   const cards = $$(".oferta", t); if (!cards.length) return;
-  let pedido = 0, atual = -1;
+  let pedido = 0, atual = -1, pos = [];
+  const medirCards = () => { pos = cards.map(c => [c.offsetLeft + c.offsetWidth / 2, c.offsetWidth]); };
   function pintar() {
     pedido = 0;
+    if (!pos.length) medirCards();
     const meio = t.scrollLeft + t.clientWidth / 2;
     let melhor = 0, md = 1e9;
     cards.forEach((c, i) => {
-      const centro = c.offsetLeft + c.offsetWidth / 2, d = (centro - meio) / c.offsetWidth;
-      const a = Math.min(Math.abs(d), 1.4);
-      if (!reduz) c.style.transform = `scale(${1 - a * .12}) translateY(${a * 10}px)`;
-      c.style.opacity = 1 - Math.min(a, 1) * .45;
+      const d = (pos[i][0] - meio) / pos[i][1], a = Math.min(Math.abs(d), 1.4);
+      if (!reduz) c.style.transform = `translate3d(0,${(a * 10).toFixed(1)}px,0) scale(${(1 - a * .12).toFixed(3)})`;
+      c.style.opacity = (1 - Math.min(a, 1) * .45).toFixed(3);
       if (Math.abs(d) < md) { md = Math.abs(d); melhor = i; }
     });
     if (melhor !== atual) { atual = melhor; pts.forEach((p, i) => p.classList.toggle("on", i === melhor)); cards.forEach((c, i) => c.classList.toggle("ativo", i === melhor)); }
   }
   t.addEventListener("scroll", () => { if (!pedido) pedido = requestAnimationFrame(pintar); }, { passive: true });
-  addEventListener("resize", pintar);
+  addEventListener("resize", () => { pos = []; pintar(); });
+  addEventListener("load", () => { pos = []; pintar(); });
   pintar();
   if (reduz || cards.length < 2) return;
   /* passa sozinho a cada 4s, para quando a pessoa toca */
@@ -225,7 +233,7 @@ function carrossel() {
   setInterval(() => {
     if (parado || !visivel || document.hidden || lojaAberta || aberta) return;
     const prox = cards[(atual + 1) % cards.length];
-    t.scrollTo({ left: prox.offsetLeft - (t.clientWidth - prox.offsetWidth) / 2, behavior: "smooth" });
+    const k = cards.indexOf(prox); t.scrollTo({ left: (pos[k] ? pos[k][0] : prox.offsetLeft + prox.offsetWidth / 2) - t.clientWidth / 2, behavior: "smooth" });
   }, 4000);
 }
 
@@ -534,17 +542,19 @@ addEventListener("keydown", e => { if (e.key === "Escape") { fecharFolha(); fech
 
 /* ---------- Capa em tela cheia que encolhe até o palco ----------
    Mede só quando a largura muda (a barra do navegador do celular não bagunça a animação). */
-const capa = $("#capa"), cImg = $(".capa-img"), cUi = $(".capa-ui"), palco = $("#inicio"), main = $("#app");
-let D = 600, M = null, quadro = 0, larg = 0, alt = 0;
+const capa = $("#capa"), cImg = $(".capa-img"), cFoto = $(".capa-foto"), cUi = $(".capa-ui"), palco = $("#inicio"), main = $("#app");
+let D = 600, M = null, quadro = 0, larg = 0, alt = 0, altCapa = 0;
 const suave = p => p * p * (3 - 2 * p);
 function medir(forcar) {
   const w = document.documentElement.clientWidth;
   if (reduz || lojaAberta || (!forcar && w === larg)) return;
-  larg = w; alt = innerHeight;
+  larg = w; alt = innerHeight; altCapa = cImg.offsetHeight || alt;
   D = Math.round(Math.min(alt * 0.8, 680));
   main.style.paddingTop = (D + 68) + "px";
   const r = palco.getBoundingClientRect();
   M = { t: r.top + scrollY, l: r.left, w: r.width, h: r.height };
+  const vw = document.documentElement.clientWidth;
+  cImg.style.setProperty("--rx", (16 / r.width * 100).toFixed(2) + "%"); cImg.style.setProperty("--ry", (16 / r.height * 100).toFixed(2) + "%");
   atualizar();
 }
 function atualizar() {
@@ -555,7 +565,11 @@ function atualizar() {
   capa.style.visibility = "";
   const e = suave(p), vw = document.documentElement.clientWidth, vh = alt, topo = M.t - y;
   const T = Math.max(0, topo) * e, L = M.l * e, R = Math.max(0, vw - M.l - M.w) * e, B = Math.max(0, vh - topo - M.h) * e;
-  cImg.style.clipPath = `inset(${T.toFixed(1)}px ${R.toFixed(1)}px ${B.toFixed(1)}px ${L.toFixed(1)}px round ${(18 * e).toFixed(1)}px)`;
+  /* só transform e opacity: a placa de vídeo faz tudo, o celular não precisa redesenhar a foto a cada quadro */
+  const sx = Math.max(.05, (vw - L - R) / vw), sy = Math.max(.05, (vh - T - B) / altCapa);
+  cImg.style.transform = `translate3d(${L.toFixed(1)}px,${T.toFixed(1)}px,0) scale(${sx.toFixed(4)},${sy.toFixed(4)})`;
+  cFoto.style.transform = `scale(${(1 / sx).toFixed(4)},${(1 / sy).toFixed(4)})`;
+  cImg.classList.toggle("redonda", p > 0.55);
   cImg.style.opacity = p > 0.9 ? Math.max(0, 1 - (p - 0.9) / 0.1) : 1;
   cUi.style.opacity = Math.max(0, 1 - p * 3);
 }

@@ -62,9 +62,11 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;margin:0;letter-spacing:-.01em}
 
 /* ============ Capa que encolhe ============ */
 #capa{position:fixed;inset:0;z-index:90;pointer-events:none;height:100lvh}
-.capa-img,.palco-img{background:#03070d url("../assets/fotos/capa-celular.webp") 70% 55%/cover no-repeat}
-.capa-img{position:absolute;inset:0;will-change:clip-path,opacity;transform:translateZ(0)}
-.capa-img::after,.palco-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#000d 0,#0005 34%,transparent 55%,#0009 82%,#000 100%)}
+.capa-foto,.palco-img{background:#03070d url("../assets/fotos/capa-celular.webp") 70% 55%/cover no-repeat}
+.capa-img{position:absolute;inset:0;overflow:hidden;transform-origin:0 0;will-change:transform,opacity;contain:strict}
+.capa-foto{position:absolute;inset:0;transform-origin:50% 50%;will-change:transform;backface-visibility:hidden}
+.capa-img.redonda{border-radius:var(--rx)/var(--ry)}
+.capa-foto::after,.palco-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#000d 0,#0005 34%,transparent 55%,#0009 82%,#000 100%)}
 .capa-ui{position:absolute;inset:0;height:100svh;padding:calc(20px + var(--st)) var(--g) calc(24px + var(--sb));display:flex;flex-direction:column}
 .capa-logo{height:22px;width:auto;align-self:flex-start}
 .capa-texto{margin-top:28px;opacity:0;transform:translateY(12px);transition:opacity .6s .1s,transform .7s .1s cubic-bezier(.2,.8,.2,1)}
@@ -214,7 +216,7 @@ body.capa-fora .flutua-zap{transform:none}
 .aviso.on{opacity:1;transform:translate(-50%,0)}
 
 @media (min-width:761px){
-  .capa-img{background-image:url("../assets/fotos/capa-pc.webp");background-position:80% 50%}
+  .capa-foto{background-image:url("../assets/fotos/capa-pc.webp");background-position:80% 50%}
   .capa-ui{padding-left:max(var(--g),calc(50% - 264px));padding-right:max(var(--g),calc(50% - 264px))}
   .capa-texto h1{font-size:52px}
   .trilho{--vis:3.4}
