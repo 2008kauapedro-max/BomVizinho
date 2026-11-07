@@ -533,3 +533,14 @@ main,#loja{background:radial-gradient(ellipse 120% 40% at 0 0,#e4f0c9 0,transpar
 .meta.ok{background:#eaf5d2}
 .l-cupom{margin:0 0 12px;color:#55554f;font-size:12.5px}
 .l-cupom b{color:var(--verde-esc)}
+
+/* v12: nada em cima do produto nem do preço */
+.etiqueta{white-space:nowrap;max-width:calc(100% - 10px);overflow:hidden;text-overflow:ellipsis}
+.cartao .mais,.grade .cartao .mais{right:5px;bottom:5px;width:26px;height:26px;border-radius:8px;font-size:18px;box-shadow:0 2px 6px #0002}
+.cartao .preco,.grade .cartao .preco{padding-right:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cartao .de{white-space:nowrap}
+.selo-c{display:block;max-width:100%;margin-bottom:4px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:700 10.5px/1.5 var(--txt)}
+.selo-c.vendido{color:var(--texto)}
+.selo-c.vendido::before{content:"★ ";color:var(--amarelo)}
+.selo-c.ultimas{color:#c5221f}
+.selo-c.ultimas::before{content:"● "}

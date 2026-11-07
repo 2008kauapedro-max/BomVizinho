@@ -33,14 +33,13 @@ const MSG = {
 };
 
 /* ---------- Cartão (um modelo só) ---------- */
-const SELOS = { "mais-vendido": ["Mais vendido", "vendido"], ultimas: ["Últimas unidades", "ultimas"] };
-const etiqueta = p => desc(p) ? `<span class="etiqueta">-${desc(p)}%</span>` : SELOS[p.selo] ? `<span class="etiqueta ${SELOS[p.selo][1]}">${SELOS[p.selo][0]}</span>` : p.novo ? `<span class="etiqueta novo">Novo</span>` : "";
+const SELOS = { "mais-vendido": ["Mais vendido", "vendido", "Top vendas"], ultimas: ["Últimas unidades", "ultimas", "Acabando"] };
+const etiqueta = p => desc(p) ? `<span class="etiqueta">-${desc(p)}%</span>` : p.novo ? `<span class="etiqueta novo">Novo</span>` : "";
 const selosDe = p => [desc(p) ? `<span class="selo-f desc">-${desc(p)}% de desconto</span>` : "", SELOS[p.selo] ? `<span class="selo-f ${SELOS[p.selo][1]}">${SELOS[p.selo][0]}</span>` : "", p.novo ? `<span class="selo-f novo">Novo</span>` : ""].join("");
 const cartao = p => `<button class="cartao" type="button" data-prod="${p.id}">
-  <span class="foto"><img src="${foto(p)}" alt="" loading="lazy" decoding="async" width="560" height="560">${etiqueta(p)}</span>
-  <span class="info"><span class="nome">${esc(p.nome)}</span>
+  <span class="foto"><img src="${foto(p)}" alt="" loading="lazy" decoding="async" width="560" height="560">${etiqueta(p)}<span class="mais" data-add="${p.id}" role="button" aria-label="Adicionar à lista">+</span></span>
+  <span class="info">${SELOS[p.selo] ? `<span class="selo-c ${SELOS[p.selo][1]}" title="${SELOS[p.selo][0]}">${SELOS[p.selo][2]}</span>` : ""}<span class="nome">${esc(p.nome)}</span>
   <span class="preco">${p.de ? `<span class="de">${brl(p.de)}</span>` : ""}${brl(p.p)}</span></span>
-  <span class="mais" data-add="${p.id}" role="button" aria-label="Adicionar à lista">+</span>
 </button>`;
 
 /* ---------- Página inicial (vitrine) ---------- */
