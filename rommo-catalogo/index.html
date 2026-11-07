@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ROMMO — Ferramentas, irrigação e agro</title>
-<meta name="description" content="Catálogo ROMMO: ferramentas, irrigação, elétricas e agro em Planaltina - GO. Escolha o produto e peça pelo WhatsApp.">
+<meta name="description" content="Catálogo ROMMO: ferramentas, irrigação e agro em Planaltina - GO. Escolha o produto e peça pelo WhatsApp.">
 <meta name="theme-color" content="#000000">
 <meta property="og:title" content="ROMMO — Ferramentas, irrigação e agro">
 <meta property="og:description" content="Escolha no catálogo e peça pelo WhatsApp.">
@@ -12,14 +12,14 @@
 <link rel="icon" href="assets/rommo-icon-192.png">
 <link rel="apple-touch-icon" href="assets/rommo-icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="preload" as="font" type="font/woff" href="fonts/ChakraPetch-Bold.woff" crossorigin><link rel="preload" as="font" type="font/woff" href="fonts/Barlow-Regular.woff" crossorigin>
-<link rel="preload" as="image" href="assets/fotos/capa-celular.webp" media="(max-width:760px)" fetchpriority="high">
-<link rel="preload" as="image" href="assets/fotos/capa-pc.webp" media="(min-width:761px)" fetchpriority="high">
-<link rel="stylesheet" href="css/app.css?v=1">
+<link rel="preload" as="font" type="font/woff" href="fonts/ChakraPetch-Bold.woff" crossorigin>
+<link rel="preload" as="font" type="font/woff" href="fonts/Barlow-Regular.woff" crossorigin>
+<link rel="preload" as="image" href="assets/fotos/capa-celular.webp" fetchpriority="high">
+<link rel="stylesheet" href="css/app.css?v=2">
 </head>
 <body class="ldg">
 
-<!-- Tela de carregamento: a logo se monta (quadradinhos, nome, slogan) -->
+<!-- Tela de carregamento: a logo se monta -->
 <div id="ld" role="status" aria-label="Carregando o catálogo ROMMO">
   <div class="lm">
     <div class="tl" aria-hidden="true">
@@ -41,121 +41,92 @@
 <div id="capa" aria-hidden="true">
   <div class="capa-img"></div>
   <div class="capa-ui">
-    <div class="capa-marca"><span class="mini-tiles"><i></i><i></i><i></i><i></i></span><img src="assets/logo/nome.webp" alt=""></div>
+    <img class="capa-logo" src="assets/logo/nome.webp" alt="">
     <div class="capa-texto">
-      <h1>Ferramenta boa.<br>Campo produzindo.</h1>
-      <p>Ferramentas, irrigação e agro em Planaltina - GO. Escolha aqui e peça pelo WhatsApp.</p>
+      <h1>Ferramentas, irrigação e agro</h1>
+      <p>Escolha no catálogo e peça pelo WhatsApp.</p>
     </div>
-    <div class="capa-dica"><span>Arraste para ver o catálogo</span><i></i></div>
+    <div class="capa-dica"><span>Arraste para cima</span><i></i></div>
   </div>
 </div>
 
-<header class="topo" id="topo">
-  <a class="marca" href="#inicio" aria-label="ROMMO, voltar ao início"><span class="mini-tiles"><i></i><i></i><i></i><i></i></span><img src="assets/logo/nome.webp" alt="ROMMO"></a>
-  <div class="topo-acoes">
-    <button class="ico-btn" type="button" data-acao="buscar" aria-label="Buscar produto"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></button>
-    <a class="ico-btn" id="topo-insta" href="#" target="_blank" rel="noopener" aria-label="Instagram da ROMMO"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg></a>
-  </div>
+<header class="topo">
+  <a class="marca" href="#inicio" aria-label="ROMMO, voltar ao início"><span class="mini"><i></i><i></i><i></i><i></i></span><img src="assets/logo/nome.webp" alt="ROMMO"></a>
+  <button class="topo-zap" type="button" data-zap="geral"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg>WhatsApp</button>
 </header>
 
 <main id="app">
   <section id="inicio" class="palco">
     <div class="palco-img"></div>
     <div class="palco-ui">
-      <h2>Tudo pra obra, pro campo e pra irrigação.</h2>
-      <div class="palco-cta">
-        <a class="btn btn-amarelo" href="#ofertas">Ver ofertas</a>
-        <button class="btn btn-zap" type="button" data-zap="geral"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg>WhatsApp</button>
-      </div>
+      <h2>Ferramentas, irrigação e agro</h2>
+      <p>Planaltina - GO · peça pelo WhatsApp</p>
     </div>
   </section>
 
-  <ul class="selos" aria-label="Como funciona">
-    <li><b>Escolha</b><span>no catálogo</span></li>
-    <li><b>Chame</b><span>no WhatsApp</span></li>
-    <li><b>Retire ou receba</b><span>na região</span></li>
-  </ul>
+  <label class="busca">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+    <input id="busca" type="search" placeholder="Buscar produto" autocomplete="off" enterkeyhint="search">
+    <button type="button" id="busca-limpa" aria-label="Limpar busca" hidden>×</button>
+  </label>
 
-  <section id="linhas" class="bloco">
-    <div class="bloco-topo"><h2>Nossas linhas</h2></div>
-    <div class="linhas" id="linhas-grid"></div>
-  </section>
+  <nav class="atalhos" id="atalhos" aria-label="Linhas de produtos"></nav>
 
-  <section id="ofertas" class="bloco ofertas">
-    <div class="bloco-topo">
-      <h2>Ofertas da semana</h2>
-      <p class="relogio" id="relogio" aria-live="off"></p>
-    </div>
-    <div class="trilho" id="trilho-ofertas" aria-label="Ofertas, arraste para o lado"></div>
-  </section>
+  <div id="vitrine">
+    <section class="bloco" id="ofertas">
+      <div class="titulo"><h2>Ofertas da semana</h2><span class="relogio" id="relogio"></span></div>
+      <div class="trilho" id="trilho-ofertas"></div>
+    </section>
 
-  <section class="bloco">
-    <div class="bloco-topo"><h2>Mais procurados</h2><button class="link" type="button" data-ir="catalogo">Ver todos</button></div>
-    <div class="trilho" id="trilho-procurados" aria-label="Mais procurados, arraste para o lado"></div>
-  </section>
+    <section class="bloco">
+      <div class="titulo"><h2>Mais procurados</h2></div>
+      <div class="trilho" id="trilho-procurados"></div>
+    </section>
+  </div>
 
-  <section class="bloco">
-    <div class="vitrines" id="vitrines"></div>
-  </section>
-
-  <section id="catalogo" class="bloco">
-    <div class="bloco-topo"><h2>Catálogo</h2><span class="conta" id="conta"></span></div>
-    <label class="busca"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="busca" type="search" placeholder="O que você procura?" autocomplete="off" enterkeyhint="search"><button type="button" id="busca-limpa" aria-label="Limpar busca" hidden>×</button></label>
-    <div class="chips" id="chips" role="tablist" aria-label="Filtrar por linha"></div>
+  <section class="bloco" id="catalogo">
+    <div class="titulo"><h2 id="catalogo-titulo">Todos os produtos</h2><button class="limpar" type="button" id="ver-tudo" hidden>Ver tudo</button></div>
     <div class="grade" id="grade"></div>
     <div class="vazio" id="vazio" hidden>
-      <p>Não achou o que procura?</p>
+      <p>Não encontramos esse produto aqui.</p>
       <button class="btn btn-zap" type="button" data-zap="busca"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg>Perguntar no WhatsApp</button>
     </div>
   </section>
 
-  <section id="insta" class="bloco">
-    <div class="bloco-topo"><h2>No nosso Instagram</h2><a class="link" id="insta-link" href="#" target="_blank" rel="noopener"></a></div>
+  <section class="bloco" id="insta" hidden>
+    <div class="titulo"><h2>No Instagram</h2></div>
     <div class="insta-grade" id="insta-grade"></div>
   </section>
 
-  <section id="atendimento" class="bloco">
-    <div class="atende">
-      <div class="atende-topo"><span class="mini-tiles"><i></i><i></i><i></i><i></i></span><h2>Fale com a ROMMO</h2></div>
-      <p id="at-texto">Tirou dúvida, pediu orçamento, combinou entrega. Tudo pelo WhatsApp, com gente de verdade.</p>
-      <button class="btn btn-zap btn-largo" type="button" data-zap="geral"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg>Chamar no WhatsApp</button>
-      <div class="atende-links">
-        <a id="at-insta" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/></svg><span>Instagram</span></a>
-        <a id="at-mapa" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span id="at-cidade"></span></a>
-        <a id="at-tel" href="#"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg><span id="at-num"></span></a>
-      </div>
-      <p class="horario" id="horario" hidden></p>
+  <section class="bloco" id="contato">
+    <div class="titulo"><h2>Fale com a gente</h2></div>
+    <div class="contato">
+      <button type="button" data-zap="geral" class="linha-contato"><span class="ic zap"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg></span><span><b>WhatsApp</b><small id="c-zap"></small></span><i></i></button>
+      <a id="c-insta" class="linha-contato" href="#" target="_blank" rel="noopener"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg></span><span><b>Instagram</b><small id="c-insta-txt"></small></span><i></i></a>
+      <a id="c-mapa" class="linha-contato" href="#" target="_blank" rel="noopener"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span><b id="c-cidade"></b><small id="c-ref"></small></span><i></i></a>
     </div>
   </section>
 
   <footer class="rodape">
     <img src="assets/logo/tagline.webp" alt="Ferramentas, irrigação e agropecuária" loading="lazy">
-    <p>Preços e estoque podem mudar. Confirme no WhatsApp antes de fechar o pedido.</p>
+    <p>Preços sujeitos a alteração. Confirme pelo WhatsApp.</p>
     <p>© <span id="ano"></span> ROMMO</p>
   </footer>
 </main>
 
-<!-- Barra de navegação do app -->
-<nav class="doca" aria-label="Navegação">
-  <button type="button" data-ir="inicio" class="ativo"><svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Início</span></button>
-  <button type="button" data-ir="linhas"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg><span>Linhas</span></button>
-  <button type="button" class="doca-zap" data-zap="geral" aria-label="Chamar no WhatsApp"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg></button>
-  <button type="button" data-ir="ofertas"><svg viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/></svg><span>Ofertas</span></button>
-  <button type="button" data-acao="lista"><svg viewBox="0 0 24 24"><path d="M6 7h12l-1 13H7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg><span>Lista</span><em id="doca-qtd" hidden>0</em></button>
-</nav>
+<!-- Botões flutuantes -->
+<button class="flutua-lista" type="button" id="btn-lista" hidden><span id="lista-qtd">0</span> na lista · Ver e enviar</button>
+<button class="flutua-zap" type="button" data-zap="geral" aria-label="Chamar no WhatsApp"><svg viewBox="0 0 24 24"><use href="#i-zap"/></svg></button>
 
-<!-- Folha do produto -->
-<div class="folha-fundo" id="fundo"></div>
-<section class="folha" id="folha-produto" role="dialog" aria-modal="true" aria-label="Produto" hidden></section>
-<section class="folha" id="folha-lista" role="dialog" aria-modal="true" aria-label="Sua lista" hidden></section>
-<section class="folha" id="folha-sair" role="dialog" aria-modal="true" aria-label="Antes de sair" hidden></section>
+<div class="fundo" id="fundo"></div>
+<section class="folha" id="folha" role="dialog" aria-modal="true" hidden></section>
 <div class="aviso" id="aviso" role="status" aria-live="polite"></div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-zap" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></symbol>
 </svg>
 
-<script src="js/data.js?v=1"></script>
-<script src="js/app.js?v=1"></script>
+<script src="js/data.js?v=2"></script>
+<script src="js/app.js?v=2"></script>
 </body>
 </html>

@@ -15,10 +15,10 @@ const LOJA = {
 
 /* As 4 linhas da marca (as mesmas dos quadradinhos da logo) */
 const LINHAS = [
-  { id: "irrigacao", nome: "Irrigação", cor: "#8ABA06", tinta: "#0b1400", icone: "assets/logo/icone-1.webp", foto: "assets/fotos/irrigacao-campo.webp", frase: "Gotejamento, aspersores e mangueiras", cats: ["irrigacao"] },
-  { id: "ferramentas", nome: "Ferramentas", cor: "#FCC300", tinta: "#1a1300", icone: "assets/logo/icone-2.webp", foto: "assets/fotos/ferramentas.webp", frase: "Manuais, kits e construção", cats: ["manuais", "kits", "construcao", "limpeza"] },
-  { id: "eletricas", nome: "Elétricas e motores", cor: "#007EC6", tinta: "#ffffff", icone: "assets/logo/icone-3.webp", foto: "assets/fotos/linha-eletrica.webp", frase: "Furadeiras, parafusadeiras e bombas", cats: ["eletricas"] },
-  { id: "agro", nome: "Agro e jardim", cor: "#FFFFFF", tinta: "#000000", icone: "assets/logo/icone-4.webp", foto: "assets/fotos/irrigacao-campo.webp", frase: "Roçadeiras e cuidado com a terra", cats: ["agro", "jardim"] },
+  { id: "irrigacao", nome: "Irrigação", cor: "#8ABA06", icone: "assets/logo/quad-1.webp", cats: ["irrigacao"] },
+  { id: "ferramentas", nome: "Ferramentas", cor: "#FCC300", icone: "assets/logo/quad-2.webp", cats: ["manuais", "kits", "construcao", "limpeza"] },
+  { id: "eletricas", nome: "Elétricas", cor: "#007EC6", icone: "assets/logo/quad-3.webp", cats: ["eletricas"] },
+  { id: "agro", nome: "Agro", cor: "#FFFFFF", icone: "assets/logo/quad-4.webp", cats: ["agro", "jardim"] },
 ];
 
 /* Produtos de exemplo — troque pelos reais.
@@ -42,8 +42,8 @@ const PRODUTOS = [
   { id: 16, cat: "limpeza", nome: "Kit de limpeza automotiva", p: 159.9 },
 ];
 
-/* Últimas postagens do Instagram.
+/* (Opcional) Últimas postagens do Instagram — se ficar vazio, a seção não aparece.
    Para mostrar posts reais, cole aqui a imagem e o link de cada post:
    { img: "assets/insta/post1.webp", link: "https://www.instagram.com/p/XXXX/" }
-   Enquanto estiver vazio, o site mostra uma vitrine com fotos dos produtos chamando para o perfil. */
+*/
 const INSTAGRAM_POSTS = [];
