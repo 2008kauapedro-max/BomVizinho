@@ -12,10 +12,13 @@
 <link rel="icon" href="assets/rommo-icon-192.png">
 <link rel="apple-touch-icon" href="assets/rommo-icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
+<script>/* modo leve: aparelho simples ganha a versão sem enfeites */
+(function(){try{var n=navigator,c=n.connection||{},m=n.deviceMemory||8,k=n.hardwareConcurrency||8;
+if(m<=4||k<=4||c.saveData||/2g/.test(c.effectiveType||"")||matchMedia("(prefers-reduced-motion: reduce)").matches||/[?&]leve\b/.test(location.search))document.documentElement.classList.add("leve")}catch(e){}})()</script>
 <link rel="preload" as="font" type="font/woff" href="fonts/ChakraPetch-Bold.woff" crossorigin>
 <link rel="preload" as="font" type="font/woff" href="fonts/Barlow-Regular.woff" crossorigin>
 <link rel="preload" as="image" href="assets/fotos/capa-celular.webp" fetchpriority="high">
-<link rel="stylesheet" href="css/app.css?v=18">
+<link rel="stylesheet" href="css/app.css?v=19">
 </head>
 <body class="ldg">
 
@@ -199,6 +202,6 @@
 </svg>
 
 <script src="js/data.js?v=9"></script>
-<script src="js/app.js?v=18"></script>
+<script src="js/app.js?v=19"></script>
 </body>
 </html>

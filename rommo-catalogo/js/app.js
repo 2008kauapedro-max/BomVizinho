@@ -5,6 +5,7 @@ const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const brl = v => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const leve = document.documentElement.classList.contains("leve");
 const reduz = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const linhaDe = cat => LINHAS.find(l => l.cats.includes(cat)) || LINHAS[1];
 /* foto pequena (cartões, ~6 KB) e grande (página do produto). Sem foto: desenho da categoria */
@@ -213,8 +214,7 @@ function carrossel() {
     let melhor = 0, md = 1e9;
     cards.forEach((c, i) => {
       const d = (pos[i][0] - meio) / pos[i][1], a = Math.min(Math.abs(d), 1.4);
-      if (!reduz) c.style.transform = `translate3d(0,${(a * 10).toFixed(1)}px,0) scale(${(1 - a * .12).toFixed(3)})`;
-      c.style.opacity = (1 - Math.min(a, 1) * .45).toFixed(3);
+      if (!leve) { c.style.transform = `translate3d(0,${(a * 10).toFixed(1)}px,0) scale(${(1 - a * .12).toFixed(3)})`; c.style.opacity = (1 - Math.min(a, 1) * .45).toFixed(3); }
       if (Math.abs(d) < md) { md = Math.abs(d); melhor = i; }
     });
     if (melhor !== atual) { atual = melhor; pts.forEach((p, i) => p.classList.toggle("on", i === melhor)); cards.forEach((c, i) => c.classList.toggle("ativo", i === melhor)); }
@@ -223,7 +223,7 @@ function carrossel() {
   addEventListener("resize", () => { pos = []; pintar(); });
   addEventListener("load", () => { pos = []; pintar(); });
   pintar();
-  if (reduz || cards.length < 2) return;
+  if (reduz || leve || cards.length < 2) return;
   /* passa sozinho a cada 4s, para quando a pessoa toca */
   let parado = false, tPausa;
   const pausar = () => { parado = true; clearTimeout(tPausa); tPausa = setTimeout(() => parado = false, 8000); };

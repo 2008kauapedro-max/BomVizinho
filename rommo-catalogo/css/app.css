@@ -1,11 +1,6 @@
 /* ROMMO — catálogo mobile
    Base preta da logo, quatro cores das linhas (os quadradinhos), cantos chanfrados como as letras do nome. */
-@font-face{font-family:"Chakra Petch";src:url("../fonts/ChakraPetch-SemiBold.woff") format("woff");font-weight:600;font-style:normal;font-display:swap}
-@font-face{font-family:"Chakra Petch";src:url("../fonts/ChakraPetch-Bold.woff") format("woff");font-weight:700;font-style:normal;font-display:swap}
-@font-face{font-family:"Barlow";src:url("../fonts/Barlow-Regular.woff") format("woff");font-weight:400;font-style:normal;font-display:swap}
-@font-face{font-family:"Barlow";src:url("../fonts/Barlow-Medium.woff") format("woff");font-weight:500;font-style:normal;font-display:swap}
-@font-face{font-family:"Barlow";src:url("../fonts/Barlow-SemiBold.woff") format("woff");font-weight:600;font-style:normal;font-display:swap}
-@font-face{font-family:"Barlow";src:url("../fonts/Barlow-Bold.woff") format("woff");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:"Chakra Petch";src:url("../fonts/ChakraPetch-Bold.woff") format("woff");font-weight:600 700;font-style:normal;font-display:swap}@font-face{font-family:"Barlow";src:url("../fonts/Barlow-Regular.woff") format("woff");font-weight:300 500;font-style:normal;font-display:swap}@font-face{font-family:"Barlow";src:url("../fonts/Barlow-SemiBold.woff") format("woff");font-weight:600 800;font-style:normal;font-display:swap}
 
 /* ROMMO — catálogo limpo. Preto domina; as cores da logo só nos detalhes. */
 :root{
@@ -572,3 +567,16 @@ main,#loja{background:radial-gradient(ellipse 120% 40% at 0 0,#e4f0c9 0,transpar
 /* desempenho: o navegador só desenha os cartões que estão perto da tela */
 .grade .cartao,.trilho .cartao{content-visibility:auto;contain-intrinsic-size:auto 220px}
 .sentinela{height:1px}
+
+/* ============ MODO LEVE: celular simples ou PC fraco ============
+   Liga sozinho (poucos núcleos, pouca memória, economia de dados ou "reduzir movimento").
+   Tira sombras, degradês e animações enfeite — fica só cor sólida. */
+.leve main,.leve #loja{background:var(--fundo)}
+.leve *,.leve *::before,.leve *::after{box-shadow:none!important;text-shadow:none!important}
+.leve .cartao,.leve .kit,.leve .dia,.leve .valores,.leve .passos li,.leve .contato,.leve .mapa-card,.leve .ver-tudo,.leve .busca,.leve .cupom{border-color:#dcddd5}
+.leve .ofertas{background:var(--amarelo)}
+.leve .oferta{will-change:auto;transition:none}
+.leve .oferta .foto img,.leve .cartao .foto img{transition:none}
+.leve .oferta.ativo .foto img{transform:none}
+.leve .capa-dica i,.leve .letreiro div{animation:none}
+.leve .folha,.leve .menu,.leve .fundo,.leve .menu-fundo{transition-duration:.15s}
