@@ -7,7 +7,9 @@ const brl = v => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const reduz = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const linhaDe = cat => LINHAS.find(l => l.cats.includes(cat)) || LINHAS[1];
-const foto = p => p.img || `assets/cat/${p.cat}.svg`;
+/* foto pequena (cartões, ~6 KB) e grande (página do produto). Sem foto: desenho da categoria */
+const foto = p => p.img ? p.img.replace(/\.webp$/, "-p.webp") : `assets/cat/${p.cat}.svg`;
+const fotoG = p => p.img || `assets/cat/${p.cat}.svg`;
 /* ordem da vitrine: destaques, depois quem tem estoque, depois os mais caros (máquinas e kits na frente de parafuso) */
 const peso = p => (p.destaque ? 1e6 : 0) + (p.est > 0 ? 1e5 : 0) + Math.min(p.p, 9e4);
 const seloDe = p => p.selo || (p.est <= 0 ? "consultar" : "");
@@ -40,7 +42,7 @@ const SELOS = { "mais-vendido": ["Mais vendido", "vendido", "Top vendas"], ultim
 const etiqueta = p => desc(p) ? `<span class="etiqueta">-${desc(p)}%</span>` : p.novo ? `<span class="etiqueta novo">Novo</span>` : "";
 const selosDe = p => [desc(p) ? `<span class="selo-f desc">-${desc(p)}% de desconto</span>` : "", SELOS[seloDe(p)] ? `<span class="selo-f ${SELOS[seloDe(p)][1]}">${SELOS[seloDe(p)][0]}</span>` : "", p.novo ? `<span class="selo-f novo">Novo</span>` : ""].join("");
 const cartao = p => `<button class="cartao" type="button" data-prod="${p.id}">
-  <span class="foto"><img src="${foto(p)}" alt="" loading="lazy" decoding="async" width="560" height="560">${etiqueta(p)}<span class="mais" data-add="${p.id}" role="button" aria-label="Adicionar à lista">+</span></span>
+  <span class="foto"><img src="${foto(p)}" alt="" loading="lazy" decoding="async" fetchpriority="low" width="320" height="320">${etiqueta(p)}<span class="mais" data-add="${p.id}" role="button" aria-label="Adicionar à lista">+</span></span>
   <span class="info">${SELOS[seloDe(p)] ? `<span class="selo-c ${SELOS[seloDe(p)][1]}" title="${SELOS[seloDe(p)][0]}">${SELOS[seloDe(p)][2]}</span>` : `<span class="selo-c" aria-hidden="true"></span>`}<span class="nome">${esc(p.nome)}</span>
   <span class="de${p.de ? "" : " sem"}">${p.de ? brl(p.de) : ""}</span><span class="preco">${brl(p.p)}</span></span>
 </button>`;
@@ -284,6 +286,16 @@ function parecidos(p) {
   return { mesmos, outros: [...nota.keys()].sort((a, b) => nota.get(b) - nota.get(a)).slice(0, 12) };
 }
 
+/* lotes de 30 cartões: o próximo entra quando a pessoa chega perto do fim */
+const LOTE = 30; let fila = [];
+function maisLote() {
+  if (!fila.length) return;
+  const parte = fila.splice(0, LOTE);
+  $("#grade").insertAdjacentHTML("beforeend", parte.map(x => typeof x === "string" ? x : cartao(x)).join(""));
+}
+const sentinela = document.createElement("div"); sentinela.className = "sentinela"; $("#grade").after(sentinela);
+if ("IntersectionObserver" in window) new IntersectionObserver(es => { if (es[0].isIntersecting) maisLote(); }, { rootMargin: "900px 0px" }).observe(sentinela);
+else fila = [];  /* navegador muito antigo: mostra tudo de uma vez */
 function grade() {
   const bruto = $("#busca").value.trim(), q = norm(bruto), ordem = $("#ordem").value;
   const base = PRODUTOS.filter(p => !filtro || (filtro === "ofertas" ? desc(p) > 0 : linhaDe(p.cat).id === filtro));
@@ -297,9 +309,9 @@ function grade() {
     return q ? l : l.slice().sort((a, b) => peso(b) - peso(a));
   };
   itens = ordenar(itens);
-  let html = itens.map(cartao).join("");
-  if (rel.length) html += `<p class="sep">${itens.length ? "Relacionados" : `Não achamos “${esc(bruto)}”. Veja parecidos:`}</p>` + rel.map(cartao).join("");
-  $("#grade").innerHTML = html;
+  fila = itens.slice();
+  if (rel.length) fila.push(`<p class="sep">${itens.length ? "Relacionados" : `Não achamos “${esc(bruto)}”. Veja parecidos:`}</p>`, ...rel);
+  $("#grade").innerHTML = ""; maisLote();
   $("#vazio").hidden = itens.length > 0;
   $("#busca-limpa").hidden = !q;
   $("#conta").textContent = q ? `${itens.length} ${itens.length === 1 ? "resultado" : "resultados"}` : `${itens.length} ${itens.length === 1 ? "produto" : "produtos"}`;
@@ -324,7 +336,7 @@ function fecharLoja() {
   $("#loja").hidden = true; $("#app").hidden = false;
   scrollTo(0, rolagemCasa); medir(true);
 }
-$("#busca").addEventListener("input", () => { if ($("#busca").value.trim()) filtro = ""; grade(); });
+let tBusca; $("#busca").addEventListener("input", () => { clearTimeout(tBusca); tBusca = setTimeout(() => { if ($("#busca").value.trim()) filtro = ""; grade(); scrollTo(0, 0); }, 140); });
 $("#busca").addEventListener("keydown", e => { if (e.key === "Enter") e.target.blur(); });
 $("#busca-limpa").addEventListener("click", () => { $("#busca").value = ""; grade(); $("#busca").focus(); });
 $("#ordem").addEventListener("change", grade);
@@ -363,7 +375,7 @@ function fecharFolha() {
 function verProduto(id) {
   const p = porId(id); if (!p) return;
   let q = 1;
-  abrirFolha(`<div class="f-foto"><img src="${foto(p)}" alt="${esc(p.nome)}"></div>
+  abrirFolha(`<div class="f-foto"><img src="${fotoG(p)}" alt="${esc(p.nome)}" decoding="async"></div>
     <p class="f-cat">${esc((typeof CATEGORIAS !== "undefined" && CATEGORIAS[p.cat]) || linhaDe(p.cat).nome)}${p.cod ? ` · cód. ${esc(p.cod)}` : ""}</p>
     <h2 class="f-nome">${esc(p.nome)}</h2>
     ${selosDe(p) ? `<div class="f-selos">${selosDe(p)}</div>` : ""}
@@ -561,6 +573,8 @@ function carregamento() {
   const L = $("#ld"), B = $("#ldb"), T = $("#ldp"), W = $("#ldw");
   const fim = () => { document.body.classList.remove("ldg"); document.body.classList.add("pronto"); setTimeout(abrirLink, 400); };
   if (!L) return fim();
+  if (sessao.get("rommo_viu")) { L.remove(); return fim(); }
+  sessao.set("rommo_viu", 1);
   const DUR = reduz ? 600 : 4200, t0 = Date.now();
   let ok = false, saiu = false, fi = 0;
   const frases = ["Separando as ferramentas", "Ligando a irrigação", "Preparando o campo", "Conferindo as ofertas"];
@@ -576,7 +590,7 @@ function carregamento() {
 }
 
 /* ---------- Início ---------- */
-montar(); carrossel(); grade(); salvarLista(); relogio(); setInterval(relogio, 30000);
+montar(); carrossel(); salvarLista(); relogio(); setInterval(relogio, 30000);
 if (!reduz) { scrollTo(0, 0); medir(true); addEventListener("load", () => medir(true)); document.fonts?.ready.then(() => medir(true)); }
 carregamento();
 })();
