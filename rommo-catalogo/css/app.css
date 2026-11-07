@@ -421,3 +421,16 @@ main,#loja{background:radial-gradient(ellipse 120% 40% at 0 0,#e4f0c9 0,transpar
 .f-sub{margin:26px 0 10px;font-size:16px}
 .folha .grade{padding:0;margin-bottom:6px}
 .folha .trilho{--vis:2.6}
+
+/* mapa da loja */
+.mapa-card{margin:10px var(--g) 0;border-radius:var(--raio);overflow:hidden;background:#fff;border:1px solid var(--borda);box-shadow:var(--sombra)}
+.mapa{position:relative;display:block;height:170px;background:#e8ecef linear-gradient(90deg,#0000000a 1px,transparent 1px) 0 0/22px 22px,linear-gradient(#0000000a 1px,transparent 1px) 0 0/22px 22px}
+.mapa iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;filter:saturate(.9)}
+.mapa-selo{position:absolute;left:10px;bottom:10px;display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:99px;background:#fff;color:var(--texto);font:600 12.5px var(--txt);box-shadow:0 2px 8px #0002}
+.mapa-selo svg{width:15px;height:15px;color:#d93025}
+.mapa-info{display:flex;align-items:center;gap:12px;padding:12px 14px}
+.mapa-info>div{flex:1;min-width:0}
+.mapa-info b{display:block;font:600 15px var(--txt)}
+.mapa-info small{display:block;color:var(--fosco);font-size:12.5px;line-height:1.35}
+.mapa-ir{flex:none;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px;border-radius:11px;background:var(--texto);color:#fff;font:700 13px var(--txt)}
+.mapa-ir svg{width:16px;height:16px}

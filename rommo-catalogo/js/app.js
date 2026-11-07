@@ -58,7 +58,11 @@ function montar() {
   if (INSTAGRAM_POSTS.length) montarInsta();
   $("#c-insta").href = ig; $("#c-insta-txt").textContent = "@" + LOJA.instagram;
   $("#c-zap").textContent = LOJA.whatsappVisivel;
-  $("#c-mapa").href = LOJA.mapa; $("#c-cidade").textContent = LOJA.cidade; $("#c-ref").textContent = LOJA.referencia || "Ver no mapa";
+  const lugar = [LOJA.nomeNoMapa, LOJA.endereco].filter(Boolean).join(", ") || LOJA.cidade;
+  $("#c-mapa").href = LOJA.mapa || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lugar)}`;
+  $("#c-rota").href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(lugar)}`;
+  $("#mapa-frame").src = `https://maps.google.com/maps?q=${encodeURIComponent(lugar)}&z=16&hl=pt-BR&output=embed`;
+  $("#c-cidade").textContent = LOJA.cidade; $("#c-end").textContent = LOJA.endereco || ""; $("#c-ref").textContent = LOJA.referencia || "";
   $("#ano").textContent = new Date().getFullYear();
   $("#chips").innerHTML = `<button class="chip" type="button" role="tab" data-filtro="">Tudo</button><button class="chip oferta-chip" type="button" role="tab" data-filtro="ofertas"><i></i>Ofertas</button>` +
     LINHAS.map(l => `<button class="chip" type="button" role="tab" data-filtro="${l.id}" style="--c:${l.cor}"><i></i>${l.nome}</button>`).join("");

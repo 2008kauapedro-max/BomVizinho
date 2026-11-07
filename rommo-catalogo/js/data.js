@@ -9,6 +9,8 @@ const LOJA = {
   cidade: "Planaltina - GO",
   mapa: "https://maps.app.goo.gl/hakYCaeqJ4LPmRhp7",
   referencia: "Ao lado do Retalhão Elias",
+  endereco: "QA 12 MC, Lote 01 - Planaltina, GO, 73753-112",
+  nomeNoMapa: "Rommo Ferramentas, Irrigação e Agropecuária",  // como aparece no Google Maps
   slogan: "Qualidade, atendimento e agilidade.",
   horario: "",                         // ex.: "Seg a sex, 8h às 18h" — vazio não aparece
 };
