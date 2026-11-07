@@ -5,7 +5,7 @@ const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const brl = v => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const leve = document.documentElement.classList.contains("leve");
+const leve = document.documentElement.classList.contains("fraco") || matchMedia("(prefers-reduced-motion: reduce)").matches;
 const reduz = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const linhaDe = cat => LINHAS.find(l => l.cats.includes(cat)) || LINHAS[1];
 /* foto pequena (cartões, ~6 KB) e grande (página do produto). Sem foto: desenho da categoria */

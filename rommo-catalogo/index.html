@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="leve">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -12,9 +12,9 @@
 <link rel="icon" href="assets/rommo-icon-192.png">
 <link rel="apple-touch-icon" href="assets/rommo-icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
-<script>/* modo leve: aparelho simples ganha a versão sem enfeites */
-(function(){try{var n=navigator,c=n.connection||{},m=n.deviceMemory||8,k=n.hardwareConcurrency||8;
-if(m<=4||k<=4||c.saveData||/2g/.test(c.effectiveType||"")||matchMedia("(prefers-reduced-motion: reduce)").matches||/[?&]leve\b/.test(location.search))document.documentElement.classList.add("leve")}catch(e){}})()</script>
+<script>/* o site é leve pra todo mundo (classe "leve" fixa no html).
+   Só aparelho muito fraco perde também o efeito do carrossel. */
+(function(){try{var n=navigator,c=n.connection||{};if((n.deviceMemory||8)<=2||(n.hardwareConcurrency||8)<=2||c.saveData||/2g/.test(c.effectiveType||""))document.documentElement.classList.add("fraco")}catch(e){}})()</script>
 <link rel="preload" as="font" type="font/woff" href="fonts/ChakraPetch-Bold.woff" crossorigin>
 <link rel="preload" as="font" type="font/woff" href="fonts/Barlow-Regular.woff" crossorigin>
 <link rel="preload" as="image" href="assets/fotos/capa-celular.webp" fetchpriority="high">
@@ -202,6 +202,6 @@ if(m<=4||k<=4||c.saveData||/2g/.test(c.effectiveType||"")||matchMedia("(prefers-
 </svg>
 
 <script src="js/data.js?v=9"></script>
-<script src="js/app.js?v=19"></script>
+<script src="js/app.js?v=20"></script>
 </body>
 </html>
